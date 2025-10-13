@@ -4,7 +4,7 @@
  */
 
 import { Row, Col, Card, Typography, Avatar, Rate } from 'antd';
-import { UserOutlined, QuoteOutlined } from '@ant-design/icons';
+import { UserOutlined, MessageOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -112,7 +112,7 @@ const TestimonialsSection = () => {
                 e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.08)';
               }}
             >
-              <QuoteOutlined style={{
+              <MessageOutlined style={{
                 position: 'absolute',
                 top: '15px',
                 right: '15px',
