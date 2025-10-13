@@ -46,8 +46,8 @@ const TeamSection = () => {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: '20px' }}>
             <span style={{
               display: 'inline-block',
-              background: 'linear-gradient(135deg, #14b8a620 0%, #0891b220 100%)',
-              color: '#14b8a6',
+              background: 'linear-gradient(135deg, #48abe220 0%, #2196f320 100%)',
+              color: '#48abe2',
               padding: '8px 20px',
               borderRadius: '50px',
               fontSize: '0.9rem',
@@ -108,7 +108,7 @@ const TeamSection = () => {
               <Avatar
                 size={110}
                 style={{
-                  background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                  background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
                   fontSize: '3.5rem',
                   marginBottom: '20px',
                   boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
@@ -123,7 +123,7 @@ const TeamSection = () => {
 
               <Text style={{ 
                 display: 'block',
-                color: '#14b8a6',
+                color: '#48abe2',
                 fontSize: '0.95rem',
                 fontWeight: 600,
                 marginBottom: '15px',
@@ -146,7 +146,7 @@ const TeamSection = () => {
                     width: '40px',
                     height: '40px',
                     borderRadius: '50%',
-                    background: '#14b8a6',
+                    background: '#48abe2',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -154,7 +154,7 @@ const TeamSection = () => {
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#0d9488';
+                    e.currentTarget.style.background = '#2196f3';
                     e.currentTarget.style.transform = 'translateY(-3px)';
                   }}
                   onMouseLeave={(e) => {
@@ -169,7 +169,7 @@ const TeamSection = () => {
                     width: '40px',
                     height: '40px',
                     borderRadius: '50%',
-                    background: '#14b8a6',
+                    background: '#48abe2',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -177,7 +177,7 @@ const TeamSection = () => {
                     transition: 'all 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#0d9488';
+                    e.currentTarget.style.background = '#2196f3';
                     e.currentTarget.style.transform = 'translateY(-3px)';
                   }}
                   onMouseLeave={(e) => {

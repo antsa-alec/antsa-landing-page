@@ -23,7 +23,7 @@ const HeroSection = () => {
   return (
     <div style={{
       position: 'relative',
-      background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+      background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
       backgroundSize: '400% 400%',
       animation: 'gradient-shift 15s ease infinite',
       padding: '80px 20px 100px',
@@ -127,7 +127,7 @@ const HeroSection = () => {
                 padding: '0 40px',
                 fontSize: '1.1rem',
                 background: '#ffffff',
-                color: '#14b8a6',
+                color: '#48abe2',
                 border: 'none',
                 fontWeight: 700,
                 borderRadius: '12px',
@@ -226,7 +226,7 @@ const HeroSection = () => {
                 
                 {/* Chat Header */}
                 <div style={{
-                  background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                  background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
                   padding: '35px 15px 15px',
                   color: '#ffffff',
                 }}>
@@ -262,7 +262,7 @@ const HeroSection = () => {
                   {/* User message */}
                   <div style={{ marginBottom: '15px', textAlign: 'right' }}>
                     <div style={{
-                      background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                      background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
                       padding: '10px 12px',
                       borderRadius: '12px 12px 2px 12px',
                       fontSize: '0.75rem',
@@ -372,13 +372,13 @@ const HeroSection = () => {
                     color: '#4a5568',
                   }}>
                     <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#14b8a6' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
+                      <strong style={{ color: '#48abe2' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
                     </div>
                     <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#0891b2' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
+                      <strong style={{ color: '#2196f3' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
                     </div>
                     <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#14b8a6' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
+                      <strong style={{ color: '#48abe2' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
                     </div>
                     <div style={{
                       marginTop: '20px',
@@ -437,7 +437,7 @@ const HeroSection = () => {
                   <div style={{
                     flex: 1,
                     height: '60px',
-                    background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                    background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
                     borderRadius: '8px',
                     position: 'relative',
                     overflow: 'hidden',

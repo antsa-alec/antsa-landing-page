@@ -25,7 +25,7 @@ const AppFooter = () => {
             <Text style={{ 
               fontSize: '2rem',
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+              background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -51,7 +51,7 @@ const AppFooter = () => {
                   transition: 'all 0.3s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#14b8a6';
+                  e.currentTarget.style.background = '#48abe2';
                   e.currentTarget.style.transform = 'translateY(-5px)';
                 }}
                 onMouseLeave={(e) => {
@@ -97,7 +97,7 @@ const AppFooter = () => {
 
           {/* Copyright */}
           <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.95rem' }}>
-            © {currentYear} ANTSA. All rights reserved. • Made with <HeartFilled style={{ color: '#14b8a6', margin: '0 5px' }} /> in Australia
+            © {currentYear} ANTSA. All rights reserved. • Made with <HeartFilled style={{ color: '#48abe2', margin: '0 5px' }} /> in Australia
           </Text>
           <br />
           <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.9rem' }}>

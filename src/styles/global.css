@@ -4,19 +4,21 @@
    ============================================ */
 
 :root {
-  /* ANTSA Brand Colors - Teal/Turquoise Theme */
-  --primary-gradient: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
-  --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);
+  /* ANTSA Brand Colors - Blue Theme */
+  --primary-gradient: linear-gradient(135deg, #48abe2 0%, #2196f3 100%);
+  --secondary-gradient: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --dark-gradient: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+  --white-gradient: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
   
-  --color-primary: #14b8a6;
-  --color-primary-dark: #0d9488;
-  --color-secondary: #0891b2;
-  --color-accent: #06b6d4;
+  --color-primary: #48abe2;
+  --color-primary-dark: #2196f3;
+  --color-primary-light: #64b5f6;
+  --color-secondary: #ffffff;
+  --color-accent: #000000;
   --color-success: #10b981;
   --color-warning: #f59e0b;
-  --color-info: #06b6d4;
+  --color-info: #48abe2;
   
   --color-text-primary: #1a202c;
   --color-text-secondary: #4a5568;
