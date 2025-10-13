@@ -11,6 +11,8 @@ const { Title, Paragraph } = Typography;
 
 const HeroSection = () => {
   const [scrollY, setScrollY] = useState(0);
+  const [visibleMessages, setVisibleMessages] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +20,28 @@ const HeroSection = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Animate conversation
+  useEffect(() => {
+    const conversationTimeline = [
+      { delay: 500, action: 'message', index: 1 },      // jAImee first message
+      { delay: 2000, action: 'typing', index: 2 },      // User typing
+      { delay: 2800, action: 'message', index: 2 },     // User message
+      { delay: 3800, action: 'typing', index: 3 },      // jAImee typing
+      { delay: 4600, action: 'message', index: 3 },     // jAImee response
+    ];
+
+    conversationTimeline.forEach(({ delay, action, index }) => {
+      setTimeout(() => {
+        if (action === 'typing') {
+          setIsTyping(true);
+        } else if (action === 'message') {
+          setIsTyping(false);
+          setVisibleMessages(index);
+        }
+      }, delay);
+    });
   }, []);
 
   return (
@@ -193,7 +217,7 @@ const HeroSection = () => {
             <div style={{
               position: 'absolute',
               left: '0',
-              top: '20%',
+              top: '10%',
               width: '280px',
               height: '550px',
               background: '#1a202c',
@@ -202,7 +226,6 @@ const HeroSection = () => {
               boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)',
               transform: 'rotate(-5deg)',
               zIndex: 3,
-              animation: 'float 6s ease-in-out infinite',
             }}>
               <div style={{
                 background: '#ffffff',
@@ -241,57 +264,118 @@ const HeroSection = () => {
                   overflowY: 'auto',
                   background: '#f7fafc',
                 }}>
-                  {/* jAImee message */}
-                  <div style={{ marginBottom: '15px' }}>
-                    <div style={{
-                      background: '#ffffff',
-                      padding: '10px 12px',
-                      borderRadius: '12px 12px 12px 2px',
-                      fontSize: '0.75rem',
-                      maxWidth: '80%',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                      lineHeight: 1.4,
+                  {/* jAImee first message */}
+                  {visibleMessages >= 1 && (
+                    <div style={{ 
+                      marginBottom: '15px',
+                      animation: 'fadeInUp 0.4s ease-out',
                     }}>
-                      Hi! How are you feeling today? 😊
+                      <div style={{
+                        background: '#ffffff',
+                        padding: '10px 12px',
+                        borderRadius: '12px 12px 12px 2px',
+                        fontSize: '0.75rem',
+                        maxWidth: '80%',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        lineHeight: 1.4,
+                      }}>
+                        Hi! How are you feeling today? 😊
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                        jAImee • 2:34 PM
+                      </div>
                     </div>
-                    <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
-                      jAImee • 2:34 PM
-                    </div>
-                  </div>
+                  )}
 
                   {/* User message */}
-                  <div style={{ marginBottom: '15px', textAlign: 'right' }}>
-                    <div style={{
-                      background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
-                      padding: '10px 12px',
-                      borderRadius: '12px 12px 2px 12px',
-                      fontSize: '0.75rem',
-                      maxWidth: '80%',
-                      display: 'inline-block',
-                      color: '#ffffff',
-                      lineHeight: 1.4,
+                  {visibleMessages >= 2 && (
+                    <div style={{ 
+                      marginBottom: '15px', 
+                      textAlign: 'right',
+                      animation: 'fadeInUp 0.4s ease-out',
                     }}>
-                      I've been practicing the breathing exercises you taught me!
+                      <div style={{
+                        background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
+                        padding: '10px 12px',
+                        borderRadius: '12px 12px 2px 12px',
+                        fontSize: '0.75rem',
+                        maxWidth: '80%',
+                        display: 'inline-block',
+                        color: '#ffffff',
+                        lineHeight: 1.4,
+                      }}>
+                        I've been practicing the breathing exercises you taught me!
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                        You • 2:35 PM
+                      </div>
                     </div>
-                    <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
-                      You • 2:35 PM
+                  )}
+
+                  {/* Typing indicator */}
+                  {isTyping && visibleMessages < 3 && (
+                    <div style={{ 
+                      marginBottom: '10px',
+                      animation: 'fadeIn 0.3s ease-out',
+                    }}>
+                      <div style={{
+                        background: '#ffffff',
+                        padding: '10px 12px',
+                        borderRadius: '12px 12px 12px 2px',
+                        fontSize: '0.75rem',
+                        maxWidth: '60px',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        display: 'inline-flex',
+                        gap: '4px',
+                        alignItems: 'center',
+                      }}>
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: '#48abe2',
+                          animation: 'pulse 1.4s ease-in-out infinite',
+                        }} />
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: '#48abe2',
+                          animation: 'pulse 1.4s ease-in-out 0.2s infinite',
+                        }} />
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: '#48abe2',
+                          animation: 'pulse 1.4s ease-in-out 0.4s infinite',
+                        }} />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* jAImee response */}
-                  <div style={{ marginBottom: '10px' }}>
-                    <div style={{
-                      background: '#ffffff',
-                      padding: '10px 12px',
-                      borderRadius: '12px 12px 12px 2px',
-                      fontSize: '0.75rem',
-                      maxWidth: '80%',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                      lineHeight: 1.4,
+                  {visibleMessages >= 3 && (
+                    <div style={{ 
+                      marginBottom: '10px',
+                      animation: 'fadeInUp 0.4s ease-out',
                     }}>
-                      That's wonderful! Building healthy habits takes time. How have they been helping you?
+                      <div style={{
+                        background: '#ffffff',
+                        padding: '10px 12px',
+                        borderRadius: '12px 12px 12px 2px',
+                        fontSize: '0.75rem',
+                        maxWidth: '80%',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                        lineHeight: 1.4,
+                      }}>
+                        That's wonderful! Building healthy habits takes time. How have they been helping you? 💪
+                      </div>
+                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                        jAImee • 2:35 PM
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Chat Input */}
@@ -320,11 +404,9 @@ const HeroSection = () => {
             {/* Laptop Mockup - AI Scribe Transcription */}
             <div style={{
               position: 'relative',
-              marginLeft: 'auto',
+              marginLeft: '320px',
               width: '550px',
               maxWidth: '100%',
-              animation: 'float 8s ease-in-out infinite',
-              animationDelay: '1s',
             }}>
               {/* Screen */}
               <div style={{
@@ -420,15 +502,14 @@ const HeroSection = () => {
               {/* Video Call Badge - Floating */}
               <div style={{
                 position: 'absolute',
-                bottom: '30px',
-                right: '-50px',
+                bottom: '20px',
+                right: '-40px',
                 width: '200px',
                 background: '#ffffff',
                 borderRadius: '16px',
                 padding: '15px',
                 boxShadow: '0 15px 40px rgba(0, 0, 0, 0.2)',
-                animation: 'float 5s ease-in-out infinite',
-                animationDelay: '2s',
+                zIndex: 4,
               }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a202c', marginBottom: '10px' }}>
                   🎥 Video Session
