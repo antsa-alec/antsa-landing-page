@@ -15,13 +15,17 @@ const { Content } = Layout;
  * ENHANCED ANTSA THEME
  * Next-level professional color palette with refined token system
  */
+/**
+ * ANTSA BRAND COLORS - Real color scheme
+ * Teal/Turquoise theme for mental health & wellness
+ */
 const theme = {
   token: {
-    colorPrimary: '#667eea',
+    colorPrimary: '#14b8a6', // Teal
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#3b82f6',
+    colorInfo: '#06b6d4',
     colorTextBase: '#1a202c',
     colorBgBase: '#ffffff',
     borderRadius: 12,

@@ -57,8 +57,8 @@ const pricingPlans = [
       'No minimum term',
     ],
     highlighted: true,
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: '#667eea',
+    gradient: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+    color: '#14b8a6',
     badge: 'MOST POPULAR',
   },
   {
@@ -360,8 +360,8 @@ const PricingSection = () => {
           >
             <span style={{
               display: 'inline-block',
-              background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
-              color: '#667eea',
+              background: 'linear-gradient(135deg, #14b8a620 0%, #0891b220 100%)',
+              color: '#14b8a6',
               padding: '8px 20px',
               borderRadius: '50px',
               fontSize: '0.9rem',

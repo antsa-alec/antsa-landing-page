@@ -51,8 +51,8 @@ const TestimonialsSection = () => {
           <div className="reveal" style={{ textAlign: 'center', marginBottom: '20px' }}>
             <span style={{
               display: 'inline-block',
-              background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
-              color: '#667eea',
+              background: 'linear-gradient(135deg, #14b8a620 0%, #0891b220 100%)',
+              color: '#14b8a6',
               padding: '8px 20px',
               borderRadius: '50px',
               fontSize: '0.9rem',
@@ -117,7 +117,7 @@ const TestimonialsSection = () => {
                 top: '15px',
                 right: '15px',
                 fontSize: '2.5rem',
-                color: '#667eea',
+                color: '#14b8a6',
                 opacity: 0.1,
               }} />
               
@@ -126,7 +126,7 @@ const TestimonialsSection = () => {
                   size={70}
                   icon={<UserOutlined />}
                   style={{ 
-                    backgroundColor: '#667eea',
+                    backgroundColor: '#14b8a6',
                     fontSize: '2rem',
                     marginBottom: '15px',
                   }}

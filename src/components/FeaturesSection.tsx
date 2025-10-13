@@ -21,8 +21,8 @@ const features = [
     icon: <RobotOutlined />,
     title: 'jAImee',
     description: "The world's first clinician-overseen therapy chatbot. Available 24/7 to support clients between sessions with evidence-based therapeutic conversations.",
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: '#667eea',
+    gradient: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+    color: '#14b8a6',
   },
   {
     icon: <FileTextOutlined />,
@@ -200,8 +200,8 @@ const FeaturesSection = () => {
           >
             <span style={{
               display: 'inline-block',
-              background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
-              color: '#667eea',
+              background: 'linear-gradient(135deg, #14b8a620 0%, #0891b220 100%)',
+              color: '#14b8a6',
               padding: '8px 20px',
               borderRadius: '50px',
               fontSize: '0.9rem',
@@ -263,7 +263,7 @@ const FeaturesSection = () => {
           <div 
             className="reveal"
             style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
               borderRadius: '24px',
               padding: '50px 40px',
               textAlign: 'center',
@@ -308,7 +308,7 @@ const FeaturesSection = () => {
             <button
               style={{
                 background: '#ffffff',
-                color: '#667eea',
+                color: '#14b8a6',
                 border: 'none',
                 padding: '16px 40px',
                 fontSize: '1.1rem',

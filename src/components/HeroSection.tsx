@@ -1,6 +1,6 @@
 /**
- * HERO SECTION - NEXT-LEVEL DESIGN
- * Features: Animated gradient background, parallax effect, glassmorphism, floating elements
+ * HERO SECTION - WITH DEVICE MOCKUPS
+ * Features: Phone with jAImee chat, Laptop with transcription, Video call screen
  */
 
 import { Row, Col, Button, Typography, Space } from 'antd';
@@ -12,7 +12,6 @@ const { Title, Paragraph } = Typography;
 const HeroSection = () => {
   const [scrollY, setScrollY] = useState(0);
 
-  // Parallax effect on scroll
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
@@ -24,19 +23,17 @@ const HeroSection = () => {
   return (
     <div style={{
       position: 'relative',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
       backgroundSize: '400% 400%',
       animation: 'gradient-shift 15s ease infinite',
-      padding: '120px 20px 140px',
-      textAlign: 'center',
+      padding: '80px 20px 100px',
       color: '#ffffff',
       overflow: 'hidden',
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center',
     }}>
-      {/* Floating Decorative Shapes */}
+      {/* Floating Shapes */}
       <div style={{
         position: 'absolute',
         top: '10%',
@@ -60,28 +57,10 @@ const HeroSection = () => {
         animation: 'float 10s ease-in-out infinite',
         animationDelay: '2s',
       }} />
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        right: '10%',
-        width: '200px',
-        height: '200px',
-        background: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: '50%',
-        filter: 'blur(60px)',
-        animation: 'float 6s ease-in-out infinite',
-        animationDelay: '4s',
-      }} />
 
-      {/* Main Content with Parallax */}
-      <Row justify="center" style={{
-        position: 'relative',
-        zIndex: 1,
-        transform: `translateY(${scrollY * 0.5}px)`,
-        transition: 'transform 0.1s ease-out',
-      }}>
-        <Col xs={22} sm={20} md={18} lg={16} xl={14}>
-          {/* Badge */}
+      <Row gutter={[48, 48]} align="middle" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        {/* Left Side - Content */}
+        <Col xs={24} lg={11} style={{ order: 1 }}>
           <div className="reveal" style={{
             display: 'inline-block',
             background: 'rgba(255, 255, 255, 0.2)',
@@ -89,82 +68,54 @@ const HeroSection = () => {
             border: '1px solid rgba(255, 255, 255, 0.3)',
             borderRadius: '50px',
             padding: '8px 20px',
-            marginBottom: '30px',
+            marginBottom: '25px',
             fontSize: '0.9rem',
             fontWeight: 600,
-            letterSpacing: '0.5px',
             animation: 'fadeInUp 0.8s ease-out',
           }}>
             <HeartOutlined style={{ marginRight: '8px' }} />
-            Welcome to the Future of Mental Health Care
+            AI-Powered Mental Health Platform
           </div>
 
-          {/* Main Heading */}
           <Title 
             level={1} 
             className="reveal"
             style={{ 
               color: '#ffffff', 
-              fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
+              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
               fontWeight: 800,
-              marginBottom: '30px',
+              marginBottom: '25px',
               lineHeight: 1.2,
-              letterSpacing: '-0.02em',
               animation: 'fadeInUp 0.8s ease-out 0.2s backwards',
-              textShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
             }}
           >
             Transform Mental Healthcare
             <br />
-            <span style={{ 
-              background: 'linear-gradient(to right, #ffffff, #f0f0f0)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>
-              With AI-Powered Intelligence
+            <span style={{ opacity: 0.9 }}>
+              With ANTSA
             </span>
           </Title>
 
-          {/* Subheading */}
           <Paragraph 
             className="reveal"
             style={{
-              fontSize: 'clamp(1.1rem, 2vw, 1.4rem)',
+              fontSize: 'clamp(1.1rem, 2vw, 1.3rem)',
               color: 'rgba(255, 255, 255, 0.95)',
-              marginBottom: '20px',
+              marginBottom: '30px',
               lineHeight: 1.8,
-              maxWidth: '800px',
-              margin: '0 auto 20px',
               animation: 'fadeInUp 0.8s ease-out 0.4s backwards',
-              textShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
             }}
           >
-            Reduce administrative burden by 80% while strengthening therapeutic outcomes. 
-            Our AI-powered platform bridges the gap between sessions.
+            24/7 AI therapy support, automated transcription, and seamless video sessions. 
+            Reduce admin time by 80% while enhancing client care.
           </Paragraph>
 
-          {/* Secondary Text */}
-          <Paragraph 
-            className="reveal"
-            style={{
-              fontSize: '1.1rem',
-              color: 'rgba(255, 255, 255, 0.85)',
-              marginBottom: '50px',
-              fontWeight: 500,
-              animation: 'fadeInUp 0.8s ease-out 0.6s backwards',
-            }}
-          >
-            Trusted by 500+ clinicians • 10,000+ active clients • Australian hosted
-          </Paragraph>
-
-          {/* CTA Buttons */}
           <Space 
             className="reveal"
             size="large" 
             wrap
             style={{
-              animation: 'fadeInUp 0.8s ease-out 0.8s backwards',
+              animation: 'fadeInUp 0.8s ease-out 0.6s backwards',
             }}
           >
             <Button
@@ -176,20 +127,11 @@ const HeroSection = () => {
                 padding: '0 40px',
                 fontSize: '1.1rem',
                 background: '#ffffff',
-                color: '#667eea',
+                color: '#14b8a6',
                 border: 'none',
                 fontWeight: 700,
                 borderRadius: '12px',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1)';
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
               }}
             >
               Start Free Trial <ArrowRightOutlined />
@@ -208,94 +150,348 @@ const HeroSection = () => {
                 border: '2px solid rgba(255, 255, 255, 0.3)',
                 fontWeight: 600,
                 borderRadius: '12px',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.25)';
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
               }}
             >
               Watch Demo
             </Button>
           </Space>
 
-          {/* Trust Indicators */}
           <div 
             className="reveal"
             style={{
-              marginTop: '60px',
+              marginTop: '40px',
               display: 'flex',
-              justifyContent: 'center',
-              gap: '40px',
+              gap: '30px',
               flexWrap: 'wrap',
-              animation: 'fadeInUp 0.8s ease-out 1s backwards',
+              animation: 'fadeInUp 0.8s ease-out 0.8s backwards',
             }}
           >
             {[
               { value: '500+', label: 'Clinicians' },
               { value: '10K+', label: 'Clients' },
               { value: '80%', label: 'Time Saved' },
-              { value: '4.9/5', label: 'Rating' },
             ].map((stat, index) => (
-              <div key={index} style={{ textAlign: 'center' }}>
-                <div style={{ 
-                  fontSize: '2rem', 
-                  fontWeight: 800, 
-                  color: '#ffffff',
-                  marginBottom: '5px',
-                }}>
+              <div key={index}>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff' }}>
                   {stat.value}
                 </div>
-                <div style={{ 
-                  fontSize: '0.9rem', 
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontWeight: 500,
-                }}>
+                <div style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
                   {stat.label}
                 </div>
               </div>
             ))}
           </div>
         </Col>
-      </Row>
 
-      {/* Scroll Indicator */}
-      <div style={{
-        position: 'absolute',
-        bottom: '30px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        animation: 'float 2s ease-in-out infinite',
-      }}>
-        <div style={{
-          width: '30px',
-          height: '50px',
-          border: '2px solid rgba(255, 255, 255, 0.5)',
-          borderRadius: '20px',
-          position: 'relative',
-        }}>
-          <div style={{
-            width: '6px',
-            height: '10px',
-            background: 'rgba(255, 255, 255, 0.8)',
-            borderRadius: '3px',
-            position: 'absolute',
-            top: '8px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            animation: 'float 1.5s ease-in-out infinite',
-          }} />
-        </div>
-      </div>
+        {/* Right Side - Device Mockups */}
+        <Col xs={24} lg={13} style={{ order: 2 }}>
+          <div className="reveal-right" style={{
+            position: 'relative',
+            animation: 'fadeInUp 0.8s ease-out 0.4s backwards',
+          }}>
+            {/* Phone Mockup - jAImee Chat */}
+            <div style={{
+              position: 'absolute',
+              left: '0',
+              top: '20%',
+              width: '280px',
+              height: '550px',
+              background: '#1a202c',
+              borderRadius: '35px',
+              padding: '12px',
+              boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)',
+              transform: 'rotate(-5deg)',
+              zIndex: 3,
+              animation: 'float 6s ease-in-out infinite',
+            }}>
+              <div style={{
+                background: '#ffffff',
+                borderRadius: '25px',
+                height: '100%',
+                overflow: 'hidden',
+                position: 'relative',
+              }}>
+                {/* Phone Notch */}
+                <div style={{
+                  position: 'absolute',
+                  top: '0',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '120px',
+                  height: '25px',
+                  background: '#1a202c',
+                  borderRadius: '0 0 20px 20px',
+                  zIndex: 10,
+                }} />
+                
+                {/* Chat Header */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                  padding: '35px 15px 15px',
+                  color: '#ffffff',
+                }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>jAImee</div>
+                  <div style={{ fontSize: '0.7rem', opacity: 0.9 }}>Your AI Therapist • Online</div>
+                </div>
+
+                {/* Chat Messages */}
+                <div style={{
+                  padding: '15px',
+                  height: 'calc(100% - 140px)',
+                  overflowY: 'auto',
+                  background: '#f7fafc',
+                }}>
+                  {/* jAImee message */}
+                  <div style={{ marginBottom: '15px' }}>
+                    <div style={{
+                      background: '#ffffff',
+                      padding: '10px 12px',
+                      borderRadius: '12px 12px 12px 2px',
+                      fontSize: '0.75rem',
+                      maxWidth: '80%',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      lineHeight: 1.4,
+                    }}>
+                      Hi! How are you feeling today? 😊
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                      jAImee • 2:34 PM
+                    </div>
+                  </div>
+
+                  {/* User message */}
+                  <div style={{ marginBottom: '15px', textAlign: 'right' }}>
+                    <div style={{
+                      background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                      padding: '10px 12px',
+                      borderRadius: '12px 12px 2px 12px',
+                      fontSize: '0.75rem',
+                      maxWidth: '80%',
+                      display: 'inline-block',
+                      color: '#ffffff',
+                      lineHeight: 1.4,
+                    }}>
+                      I've been practicing the breathing exercises you taught me!
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                      You • 2:35 PM
+                    </div>
+                  </div>
+
+                  {/* jAImee response */}
+                  <div style={{ marginBottom: '10px' }}>
+                    <div style={{
+                      background: '#ffffff',
+                      padding: '10px 12px',
+                      borderRadius: '12px 12px 12px 2px',
+                      fontSize: '0.75rem',
+                      maxWidth: '80%',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      lineHeight: 1.4,
+                    }}>
+                      That's wonderful! Building healthy habits takes time. How have they been helping you?
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chat Input */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0',
+                  right: '0',
+                  padding: '10px',
+                  background: '#ffffff',
+                  borderTop: '1px solid #e2e8f0',
+                }}>
+                  <div style={{
+                    background: '#f7fafc',
+                    borderRadius: '20px',
+                    padding: '8px 15px',
+                    fontSize: '0.75rem',
+                    color: '#718096',
+                  }}>
+                    Type a message...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Laptop Mockup - AI Scribe Transcription */}
+            <div style={{
+              position: 'relative',
+              marginLeft: 'auto',
+              width: '550px',
+              maxWidth: '100%',
+              animation: 'float 8s ease-in-out infinite',
+              animationDelay: '1s',
+            }}>
+              {/* Screen */}
+              <div style={{
+                background: '#1a202c',
+                borderRadius: '12px 12px 0 0',
+                padding: '10px',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+              }}>
+                <div style={{
+                  background: '#ffffff',
+                  borderRadius: '8px',
+                  height: '350px',
+                  overflow: 'hidden',
+                  position: 'relative',
+                }}>
+                  {/* Transcription Header */}
+                  <div style={{
+                    background: '#f7fafc',
+                    padding: '12px 20px',
+                    borderBottom: '1px solid #e2e8f0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1a202c' }}>
+                      AI Scribe • Session Transcript
+                    </div>
+                    <div style={{
+                      background: '#10b981',
+                      color: '#ffffff',
+                      padding: '3px 10px',
+                      borderRadius: '12px',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                    }}>
+                      ● Recording
+                    </div>
+                  </div>
+
+                  {/* Transcription Content */}
+                  <div style={{
+                    padding: '20px',
+                    fontSize: '0.8rem',
+                    lineHeight: 1.8,
+                    color: '#4a5568',
+                  }}>
+                    <div style={{ marginBottom: '15px' }}>
+                      <strong style={{ color: '#14b8a6' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
+                    </div>
+                    <div style={{ marginBottom: '15px' }}>
+                      <strong style={{ color: '#0891b2' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
+                    </div>
+                    <div style={{ marginBottom: '15px' }}>
+                      <strong style={{ color: '#14b8a6' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
+                    </div>
+                    <div style={{
+                      marginTop: '20px',
+                      padding: '12px',
+                      background: '#f0fdf4',
+                      borderRadius: '8px',
+                      border: '1px solid #86efac',
+                    }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#10b981', marginBottom: '5px' }}>
+                        📝 AI Summary
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#4a5568' }}>
+                        Session focused on work-related stress and sleep disturbances. Client showing positive response to previously assigned homework...
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Laptop Base */}
+              <div style={{
+                height: '15px',
+                background: 'linear-gradient(to bottom, #2d3748, #1a202c)',
+                borderRadius: '0 0 12px 12px / 0 0 4px 4px',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  bottom: '-5px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '80px',
+                  height: '5px',
+                  background: '#1a202c',
+                  borderRadius: '0 0 8px 8px',
+                }} />
+              </div>
+
+              {/* Video Call Badge - Floating */}
+              <div style={{
+                position: 'absolute',
+                bottom: '30px',
+                right: '-50px',
+                width: '200px',
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '15px',
+                boxShadow: '0 15px 40px rgba(0, 0, 0, 0.2)',
+                animation: 'float 5s ease-in-out infinite',
+                animationDelay: '2s',
+              }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a202c', marginBottom: '10px' }}>
+                  🎥 Video Session
+                </div>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                  <div style={{
+                    flex: 1,
+                    height: '60px',
+                    background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)',
+                    borderRadius: '8px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '5px',
+                      left: '5px',
+                      fontSize: '0.6rem',
+                      color: '#ffffff',
+                      fontWeight: 600,
+                      background: 'rgba(0,0,0,0.3)',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                    }}>
+                      You
+                    </div>
+                  </div>
+                  <div style={{
+                    width: '50px',
+                    height: '60px',
+                    background: '#e2e8f0',
+                    borderRadius: '8px',
+                    position: 'relative',
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '5px',
+                      left: '5px',
+                      fontSize: '0.5rem',
+                      color: '#4a5568',
+                      fontWeight: 600,
+                      background: 'rgba(255,255,255,0.9)',
+                      padding: '2px 4px',
+                      borderRadius: '4px',
+                    }}>
+                      Client
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '0.65rem',
+                  color: '#10b981',
+                  fontWeight: 600,
+                }}>
+                  ● 24:15 elapsed
+                </div>
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
     </div>
   );
 };
 
 export default HeroSection;
-
