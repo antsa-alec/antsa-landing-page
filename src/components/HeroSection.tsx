@@ -22,26 +22,28 @@ const HeroSection = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animate conversation
+  // Animate conversation - continuous loop
   useEffect(() => {
-    const conversationTimeline = [
-      { delay: 500, action: 'message', index: 1 },      // jAImee first message
-      { delay: 2000, action: 'typing', index: 2 },      // User typing
-      { delay: 2800, action: 'message', index: 2 },     // User message
-      { delay: 3800, action: 'typing', index: 3 },      // jAImee typing
-      { delay: 4600, action: 'message', index: 3 },     // jAImee response
-    ];
+    const animateConversation = () => {
+      // Reset
+      setVisibleMessages(0);
+      setIsTyping(false);
 
-    conversationTimeline.forEach(({ delay, action, index }) => {
-      setTimeout(() => {
-        if (action === 'typing') {
-          setIsTyping(true);
-        } else if (action === 'message') {
-          setIsTyping(false);
-          setVisibleMessages(index);
-        }
-      }, delay);
-    });
+      const timeline = [
+        { delay: 800, action: () => setVisibleMessages(1) },           // jAImee appears
+        { delay: 2500, action: () => setIsTyping(true) },              // User typing
+        { delay: 3800, action: () => { setIsTyping(false); setVisibleMessages(2); } }, // User message
+        { delay: 4800, action: () => setIsTyping(true) },              // jAImee typing
+        { delay: 6200, action: () => { setIsTyping(false); setVisibleMessages(3); } }, // jAImee response
+        { delay: 10000, action: animateConversation },                 // Loop after pause
+      ];
+
+      timeline.forEach(({ delay, action }) => {
+        setTimeout(action, delay);
+      });
+    };
+
+    animateConversation();
   }, []);
 
   return (
@@ -217,7 +219,7 @@ const HeroSection = () => {
             <div style={{
               position: 'absolute',
               left: '0',
-              top: '10%',
+              top: '20%',
               width: '280px',
               height: '550px',
               background: '#1a202c',
@@ -226,6 +228,7 @@ const HeroSection = () => {
               boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)',
               transform: 'rotate(-5deg)',
               zIndex: 3,
+              animation: 'float 6s ease-in-out infinite',
             }}>
               <div style={{
                 background: '#ffffff',
@@ -268,7 +271,7 @@ const HeroSection = () => {
                   {visibleMessages >= 1 && (
                     <div style={{ 
                       marginBottom: '15px',
-                      animation: 'fadeInUp 0.4s ease-out',
+                      animation: 'fadeInUp 0.5s ease-out',
                     }}>
                       <div style={{
                         background: '#ffffff',
@@ -292,7 +295,7 @@ const HeroSection = () => {
                     <div style={{ 
                       marginBottom: '15px', 
                       textAlign: 'right',
-                      animation: 'fadeInUp 0.4s ease-out',
+                      animation: 'fadeInUp 0.5s ease-out',
                     }}>
                       <div style={{
                         background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
@@ -313,21 +316,23 @@ const HeroSection = () => {
                   )}
 
                   {/* Typing indicator */}
-                  {isTyping && visibleMessages < 3 && (
+                  {isTyping && (
                     <div style={{ 
-                      marginBottom: '10px',
+                      marginBottom: '15px',
                       animation: 'fadeIn 0.3s ease-out',
+                      textAlign: visibleMessages === 1 ? 'right' : 'left',
                     }}>
                       <div style={{
-                        background: '#ffffff',
+                        background: visibleMessages === 1 ? 'rgba(72, 171, 226, 0.1)' : '#ffffff',
                         padding: '10px 12px',
-                        borderRadius: '12px 12px 12px 2px',
+                        borderRadius: '12px',
                         fontSize: '0.75rem',
-                        maxWidth: '60px',
+                        width: '60px',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                         display: 'inline-flex',
                         gap: '4px',
                         alignItems: 'center',
+                        justifyContent: 'center',
                       }}>
                         <span style={{
                           width: '6px',
@@ -358,7 +363,7 @@ const HeroSection = () => {
                   {visibleMessages >= 3 && (
                     <div style={{ 
                       marginBottom: '10px',
-                      animation: 'fadeInUp 0.4s ease-out',
+                      animation: 'fadeInUp 0.5s ease-out',
                     }}>
                       <div style={{
                         background: '#ffffff',
@@ -404,9 +409,11 @@ const HeroSection = () => {
             {/* Laptop Mockup - AI Scribe Transcription */}
             <div style={{
               position: 'relative',
-              marginLeft: '320px',
+              marginLeft: 'auto',
               width: '550px',
               maxWidth: '100%',
+              animation: 'float 8s ease-in-out infinite',
+              animationDelay: '1s',
             }}>
               {/* Screen */}
               <div style={{
@@ -502,14 +509,15 @@ const HeroSection = () => {
               {/* Video Call Badge - Floating */}
               <div style={{
                 position: 'absolute',
-                bottom: '20px',
-                right: '-40px',
+                bottom: '30px',
+                right: '-50px',
                 width: '200px',
                 background: '#ffffff',
                 borderRadius: '16px',
                 padding: '15px',
                 boxShadow: '0 15px 40px rgba(0, 0, 0, 0.2)',
-                zIndex: 4,
+                animation: 'float 5s ease-in-out infinite',
+                animationDelay: '2s',
               }}>
                 <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a202c', marginBottom: '10px' }}>
                   🎥 Video Session
