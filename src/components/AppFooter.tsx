@@ -1,5 +1,10 @@
+/**
+ * FOOTER - NEXT-LEVEL DESIGN
+ * Features: Modern dark theme, social media animations
+ */
+
 import { Layout, Row, Col, Typography, Space } from 'antd';
-import { GithubOutlined, LinkedinOutlined, TwitterOutlined } from '@ant-design/icons';
+import { GithubOutlined, LinkedinOutlined, TwitterOutlined, HeartFilled } from '@ant-design/icons';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -8,24 +13,95 @@ const AppFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <Footer style={{ background: '#001529', padding: '40px 20px', textAlign: 'center' }}>
+    <Footer style={{ 
+      background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
+      padding: '60px 20px 30px',
+      textAlign: 'center',
+    }}>
       <Row justify="center">
-        <Col xs={22} sm={20} md={16}>
-          <Space size="large" style={{ marginBottom: '20px' }}>
-            <GithubOutlined style={{ fontSize: '1.5rem', color: '#ffffff', cursor: 'pointer' }} />
-            <LinkedinOutlined style={{ fontSize: '1.5rem', color: '#ffffff', cursor: 'pointer' }} />
-            <TwitterOutlined style={{ fontSize: '1.5rem', color: '#ffffff', cursor: 'pointer' }} />
+        <Col xs={22} sm={20} md={16} lg={14}>
+          {/* Logo/Brand */}
+          <div style={{ marginBottom: '30px' }}>
+            <Text style={{ 
+              fontSize: '2rem',
+              fontWeight: 800,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}>
+              ANTSA
+            </Text>
+          </div>
+
+          {/* Social Media Icons */}
+          <Space size="large" style={{ marginBottom: '30px' }}>
+            {[GithubOutlined, LinkedinOutlined, TwitterOutlined].map((Icon, index) => (
+              <div
+                key={index}
+                style={{
+                  width: '45px',
+                  height: '45px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#667eea';
+                  e.currentTarget.style.transform = 'translateY(-5px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <Icon style={{ fontSize: '1.4rem', color: '#ffffff' }} />
+              </div>
+            ))}
           </Space>
-          <div style={{ marginBottom: '20px' }}>
-            <Space split="|" size="large">
-              <Link style={{ color: '#ffffff' }}>Privacy Policy</Link>
-              <Link style={{ color: '#ffffff' }}>Terms of Service</Link>
-              <Link style={{ color: '#ffffff' }}>Support</Link>
-              <Link style={{ color: '#ffffff' }}>About Us</Link>
+
+          {/* Links */}
+          <div style={{ marginBottom: '30px' }}>
+            <Space split={<span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>} size="large" wrap>
+              {['Privacy Policy', 'Terms of Service', 'Support', 'About Us', 'Careers'].map((item, index) => (
+                <Link 
+                  key={index}
+                  style={{ 
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontWeight: 500,
+                    transition: 'color 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
+                  }}
+                >
+                  {item}
+                </Link>
+              ))}
             </Space>
           </div>
-          <Text style={{ color: '#8c8c8c' }}>
-            © {currentYear} ANTSA. All rights reserved. | Data encrypted and hosted in Australia
+
+          {/* Divider */}
+          <div style={{
+            height: '1px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            margin: '30px 0',
+          }} />
+
+          {/* Copyright */}
+          <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.95rem' }}>
+            © {currentYear} ANTSA. All rights reserved. • Made with <HeartFilled style={{ color: '#667eea', margin: '0 5px' }} /> in Australia
+          </Text>
+          <br />
+          <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.9rem' }}>
+            Data encrypted and securely hosted on Australian servers
           </Text>
         </Col>
       </Row>
@@ -34,4 +110,3 @@ const AppFooter = () => {
 };
 
 export default AppFooter;
-

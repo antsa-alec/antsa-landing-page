@@ -1,5 +1,10 @@
-import { Row, Col, Card, Typography, Avatar } from 'antd';
-import { UserOutlined, StarFilled } from '@ant-design/icons';
+/**
+ * TESTIMONIALS SECTION - NEXT-LEVEL DESIGN
+ * Features: Masonry-style layout, quote styling, animated ratings
+ */
+
+import { Row, Col, Card, Typography, Avatar, Rate } from 'antd';
+import { UserOutlined, QuoteOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -36,50 +41,120 @@ const testimonials = [
 
 const TestimonialsSection = () => {
   return (
-    <div style={{ padding: '80px 20px', background: '#ffffff' }}>
-      <Row justify="center" style={{ marginBottom: '50px' }}>
-        <Col xs={22} sm={20} md={18}>
-          <Title level={2} style={{ textAlign: 'center', marginBottom: '20px' }}>
+    <div style={{ 
+      padding: '100px 20px',
+      background: '#ffffff',
+      position: 'relative',
+    }}>
+      <Row justify="center" style={{ marginBottom: '70px' }}>
+        <Col xs={22} sm={20} md={18} lg={14}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <span style={{
+              display: 'inline-block',
+              background: 'linear-gradient(135deg, #667eea20 0%, #764ba220 100%)',
+              color: '#667eea',
+              padding: '8px 20px',
+              borderRadius: '50px',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              letterSpacing: '0.5px',
+              textTransform: 'uppercase',
+            }}>
+              💬 Testimonials
+            </span>
+          </div>
+
+          <Title level={2} className="reveal" style={{ 
+            textAlign: 'center',
+            marginBottom: '20px',
+            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontWeight: 800,
+            background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>
             Trusted by Clinicians and Clients
           </Title>
-          <Paragraph style={{ textAlign: 'center', fontSize: '1.1rem', color: '#666' }}>
+
+          <Paragraph className="reveal" style={{ 
+            textAlign: 'center',
+            fontSize: '1.2rem',
+            color: '#4a5568',
+            lineHeight: 1.8,
+          }}>
             See what our community has to say about ANTSA
           </Paragraph>
         </Col>
       </Row>
+
       <Row gutter={[32, 32]} justify="center">
         {testimonials.map((testimonial, index) => (
-          <Col xs={22} sm={11} md={6} key={index}>
+          <Col xs={22} sm={11} md={6} key={index} className="reveal-scale">
             <Card
               hoverable
               style={{
                 height: '100%',
-                borderRadius: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                borderRadius: '20px',
+                border: '2px solid #f0f0f0',
+                background: 'linear-gradient(135deg, #ffffff 0%, #fafafa 100%)',
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px)';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.12)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.08)';
               }}
             >
+              <QuoteOutlined style={{
+                position: 'absolute',
+                top: '15px',
+                right: '15px',
+                fontSize: '2.5rem',
+                color: '#667eea',
+                opacity: 0.1,
+              }} />
+              
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                 <Avatar
-                  size={64}
+                  size={70}
                   icon={<UserOutlined />}
-                  style={{ backgroundColor: '#1890ff', fontSize: '2rem' }}
+                  style={{ 
+                    backgroundColor: '#667eea',
+                    fontSize: '2rem',
+                    marginBottom: '15px',
+                  }}
                 >
                   {testimonial.avatar}
                 </Avatar>
+                <Rate disabled defaultValue={testimonial.rating} style={{ fontSize: '1rem', color: '#faad14' }} />
               </div>
-              <div style={{ textAlign: 'center', marginBottom: '15px' }}>
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <StarFilled key={i} style={{ color: '#faad14', fontSize: '1rem' }} />
-                ))}
-              </div>
-              <Paragraph style={{ fontStyle: 'italic', color: '#666', marginBottom: '20px' }}>
+
+              <Paragraph style={{ 
+                fontStyle: 'italic',
+                color: '#4a5568',
+                marginBottom: '25px',
+                fontSize: '1rem',
+                lineHeight: 1.7,
+              }}>
                 "{testimonial.quote}"
               </Paragraph>
-              <div style={{ textAlign: 'center' }}>
-                <Text strong style={{ display: 'block' }}>
+
+              <div style={{ 
+                textAlign: 'center',
+                borderTop: '1px solid #e2e8f0',
+                paddingTop: '15px',
+              }}>
+                <Text strong style={{ display: 'block', fontSize: '1.1rem', color: '#1a202c' }}>
                   {testimonial.name}
                 </Text>
-                <Text type="secondary" style={{ fontSize: '0.9rem' }}>
+                <Text type="secondary" style={{ fontSize: '0.9rem', fontWeight: 500 }}>
                   {testimonial.role}
                 </Text>
               </div>
@@ -92,4 +167,3 @@ const TestimonialsSection = () => {
 };
 
 export default TestimonialsSection;
-
