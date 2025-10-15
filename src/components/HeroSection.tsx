@@ -11,8 +11,18 @@ const { Title, Paragraph } = Typography;
 
 const HeroSection = () => {
   const [scrollY, setScrollY] = useState(0);
+  
+  // Phone chat animation states
   const [visibleMessages, setVisibleMessages] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
+  
+  // Laptop transcription animation states
+  const [visibleTranscript, setVisibleTranscript] = useState(0);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  
+  // Video call animation states
+  const [videoCallActive, setVideoCallActive] = useState(false);
+  const [callTime, setCallTime] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,20 +32,46 @@ const HeroSection = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Animate conversation - continuous loop
+  // Master animation timeline - staggered so nothing overlaps
   useEffect(() => {
-    const animateConversation = () => {
-      // Reset
+    const animateAll = () => {
+      // Reset everything
       setVisibleMessages(0);
       setIsTyping(false);
+      setVisibleTranscript(0);
+      setIsTranscribing(false);
+      setVideoCallActive(false);
+      setCallTime(0);
 
       const timeline = [
-        { delay: 800, action: () => setVisibleMessages(1) },           // jAImee appears
+        // PHASE 1: Phone Chat (0-6s)
+        { delay: 800, action: () => setVisibleMessages(1) },           // jAImee greeting
         { delay: 2500, action: () => setIsTyping(true) },              // User typing
         { delay: 3800, action: () => { setIsTyping(false); setVisibleMessages(2); } }, // User message
         { delay: 4800, action: () => setIsTyping(true) },              // jAImee typing
         { delay: 6200, action: () => { setIsTyping(false); setVisibleMessages(3); } }, // jAImee response
-        { delay: 10000, action: animateConversation },                 // Loop after pause
+        
+        // PHASE 2: Laptop Transcription (7-12s)
+        { delay: 7500, action: () => setIsTranscribing(true) },        // Start transcribing
+        { delay: 8000, action: () => setVisibleTranscript(1) },        // First line appears
+        { delay: 9200, action: () => setVisibleTranscript(2) },        // Second line
+        { delay: 10500, action: () => setVisibleTranscript(3) },       // Third line
+        { delay: 11800, action: () => { setIsTranscribing(false); setVisibleTranscript(4); } }, // AI Summary
+        
+        // PHASE 3: Video Call (13-16s)
+        { delay: 13000, action: () => setVideoCallActive(true) },      // Call starts
+        { delay: 13000, action: () => {
+          // Animate call timer
+          let time = 0;
+          const interval = setInterval(() => {
+            time += 1;
+            setCallTime(time);
+            if (time >= 15) clearInterval(interval);
+          }, 200);
+        }},
+        
+        // Loop restart
+        { delay: 18000, action: animateAll },
       ];
 
       timeline.forEach(({ delay, action }) => {
@@ -43,7 +79,7 @@ const HeroSection = () => {
       });
     };
 
-    animateConversation();
+    animateAll();
   }, []);
 
   return (
@@ -228,7 +264,6 @@ const HeroSection = () => {
               boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)',
               transform: 'rotate(-5deg)',
               zIndex: 3,
-              animation: 'float 6s ease-in-out infinite',
             }}>
               <div style={{
                 background: '#ffffff',
@@ -412,8 +447,6 @@ const HeroSection = () => {
               marginLeft: 'auto',
               width: '550px',
               maxWidth: '100%',
-              animation: 'float 8s ease-in-out infinite',
-              animationDelay: '1s',
             }}>
               {/* Screen */}
               <div style={{
@@ -442,14 +475,15 @@ const HeroSection = () => {
                       AI Scribe • Session Transcript
                     </div>
                     <div style={{
-                      background: '#10b981',
+                      background: isTranscribing ? '#10b981' : '#94a3b8',
                       color: '#ffffff',
                       padding: '3px 10px',
                       borderRadius: '12px',
                       fontSize: '0.7rem',
                       fontWeight: 600,
+                      transition: 'all 0.3s ease',
                     }}>
-                      ● Recording
+                      ● {isTranscribing ? 'Recording' : 'Ready'}
                     </div>
                   </div>
 
@@ -460,29 +494,60 @@ const HeroSection = () => {
                     lineHeight: 1.8,
                     color: '#4a5568',
                   }}>
-                    <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#48abe2' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
-                    </div>
-                    <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#2196f3' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
-                    </div>
-                    <div style={{ marginBottom: '15px' }}>
-                      <strong style={{ color: '#48abe2' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
-                    </div>
-                    <div style={{
-                      marginTop: '20px',
-                      padding: '12px',
-                      background: '#f0fdf4',
-                      borderRadius: '8px',
-                      border: '1px solid #86efac',
-                    }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#10b981', marginBottom: '5px' }}>
-                        📝 AI Summary
+                    {visibleTranscript >= 1 && (
+                      <div style={{ 
+                        marginBottom: '15px',
+                        animation: 'fadeInUp 0.5s ease-out',
+                      }}>
+                        <strong style={{ color: '#48abe2' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#4a5568' }}>
-                        Session focused on work-related stress and sleep disturbances. Client showing positive response to previously assigned homework...
+                    )}
+                    {visibleTranscript >= 2 && (
+                      <div style={{ 
+                        marginBottom: '15px',
+                        animation: 'fadeInUp 0.5s ease-out',
+                      }}>
+                        <strong style={{ color: '#2196f3' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
                       </div>
-                    </div>
+                    )}
+                    {visibleTranscript >= 3 && (
+                      <div style={{ 
+                        marginBottom: '15px',
+                        animation: 'fadeInUp 0.5s ease-out',
+                      }}>
+                        <strong style={{ color: '#48abe2' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
+                      </div>
+                    )}
+                    {isTranscribing && visibleTranscript < 3 && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: '#48abe2',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        animation: 'pulse 1.5s ease-in-out infinite',
+                      }}>
+                        <span>●</span> Transcribing...
+                      </div>
+                    )}
+                    {visibleTranscript >= 4 && (
+                      <div style={{
+                        marginTop: '20px',
+                        padding: '12px',
+                        background: '#f0fdf4',
+                        borderRadius: '8px',
+                        border: '1px solid #86efac',
+                        animation: 'scaleIn 0.5s ease-out',
+                      }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#10b981', marginBottom: '5px' }}>
+                          📝 AI Summary
+                        </div>
+                        <div style={{ fontSize: '0.75rem', color: '#4a5568' }}>
+                          Session focused on work-related stress and sleep disturbances. Client showing positive response to previously assigned homework...
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -506,7 +571,7 @@ const HeroSection = () => {
                 }} />
               </div>
 
-              {/* Video Call Badge - Floating */}
+              {/* Video Call Badge - Animated */}
               <div style={{
                 position: 'absolute',
                 bottom: '30px',
@@ -515,28 +580,61 @@ const HeroSection = () => {
                 background: '#ffffff',
                 borderRadius: '16px',
                 padding: '15px',
-                boxShadow: '0 15px 40px rgba(0, 0, 0, 0.2)',
-                animation: 'float 5s ease-in-out infinite',
-                animationDelay: '2s',
+                boxShadow: videoCallActive 
+                  ? '0 15px 40px rgba(72, 171, 226, 0.3), 0 0 0 3px rgba(72, 171, 226, 0.2)' 
+                  : '0 15px 40px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.5s ease',
+                opacity: videoCallActive ? 1 : 0.7,
               }}>
-                <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1a202c', marginBottom: '10px' }}>
+                <div style={{ 
+                  fontSize: '0.75rem', 
+                  fontWeight: 700, 
+                  color: '#1a202c', 
+                  marginBottom: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}>
                   🎥 Video Session
+                  {videoCallActive && (
+                    <span style={{
+                      fontSize: '0.6rem',
+                      background: '#10b981',
+                      color: '#ffffff',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      animation: 'pulse 2s ease-in-out infinite',
+                    }}>
+                      LIVE
+                    </span>
+                  )}
                 </div>
                 <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                   <div style={{
                     flex: 1,
                     height: '60px',
-                    background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
+                    background: videoCallActive 
+                      ? 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)'
+                      : '#e2e8f0',
                     borderRadius: '8px',
                     position: 'relative',
                     overflow: 'hidden',
+                    transition: 'all 0.5s ease',
                   }}>
+                    {videoCallActive && (
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
+                        animation: 'shimmer 2s infinite',
+                      }} />
+                    )}
                     <div style={{
                       position: 'absolute',
                       bottom: '5px',
                       left: '5px',
                       fontSize: '0.6rem',
-                      color: '#ffffff',
+                      color: videoCallActive ? '#ffffff' : '#4a5568',
                       fontWeight: 600,
                       background: 'rgba(0,0,0,0.3)',
                       padding: '2px 6px',
@@ -548,9 +646,10 @@ const HeroSection = () => {
                   <div style={{
                     width: '50px',
                     height: '60px',
-                    background: '#e2e8f0',
+                    background: videoCallActive ? '#94a3b8' : '#e2e8f0',
                     borderRadius: '8px',
                     position: 'relative',
+                    transition: 'all 0.5s ease',
                   }}>
                     <div style={{
                       position: 'absolute',
@@ -569,10 +668,11 @@ const HeroSection = () => {
                 </div>
                 <div style={{
                   fontSize: '0.65rem',
-                  color: '#10b981',
+                  color: videoCallActive ? '#10b981' : '#94a3b8',
                   fontWeight: 600,
+                  transition: 'color 0.5s ease',
                 }}>
-                  ● 24:15 elapsed
+                  ● {videoCallActive ? `${Math.floor(callTime / 60)}:${(callTime % 60).toString().padStart(2, '0')}` : '0:00'} elapsed
                 </div>
               </div>
             </div>
