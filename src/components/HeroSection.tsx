@@ -32,7 +32,7 @@ const HeroSection = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Master animation timeline - staggered so nothing overlaps
+  // Master animation timeline - slowed down for realistic conversation pacing
   useEffect(() => {
     const animateAll = () => {
       // Reset everything
@@ -44,34 +44,35 @@ const HeroSection = () => {
       setCallTime(0);
 
       const timeline = [
-        // PHASE 1: Phone Chat (0-6s)
-        { delay: 800, action: () => setVisibleMessages(1) },           // jAImee greeting
-        { delay: 2500, action: () => setIsTyping(true) },              // User typing
-        { delay: 3800, action: () => { setIsTyping(false); setVisibleMessages(2); } }, // User message
-        { delay: 4800, action: () => setIsTyping(true) },              // jAImee typing
-        { delay: 6200, action: () => { setIsTyping(false); setVisibleMessages(3); } }, // jAImee response
+        // PHASE 1: Phone Chat (0-10s) - Slower, more realistic
+        { delay: 1000, action: () => setVisibleMessages(1) },           // jAImee greeting
+        { delay: 3500, action: () => setIsTyping(true) },               // User starts typing (2.5s pause)
+        { delay: 6500, action: () => { setIsTyping(false); setVisibleMessages(2); } }, // User message (3s typing)
+        { delay: 8000, action: () => setIsTyping(true) },               // jAImee starts typing (1.5s pause)
+        { delay: 11000, action: () => { setIsTyping(false); setVisibleMessages(3); } }, // jAImee response (3s typing)
         
-        // PHASE 2: Laptop Transcription (7-12s)
-        { delay: 7500, action: () => setIsTranscribing(true) },        // Start transcribing
-        { delay: 8000, action: () => setVisibleTranscript(1) },        // First line appears
-        { delay: 9200, action: () => setVisibleTranscript(2) },        // Second line
-        { delay: 10500, action: () => setVisibleTranscript(3) },       // Third line
-        { delay: 11800, action: () => { setIsTranscribing(false); setVisibleTranscript(4); } }, // AI Summary
+        // PHASE 2: Laptop Transcription (12-22s) - Slower transcription
+        { delay: 13000, action: () => setIsTranscribing(true) },        // Start transcribing
+        { delay: 14000, action: () => setVisibleTranscript(1) },        // Speaker A appears
+        { delay: 17000, action: () => setVisibleTranscript(2) },        // Speaker B appears (3s pause)
+        { delay: 20000, action: () => setVisibleTranscript(3) },        // Speaker A continues (3s pause)
+        { delay: 23000, action: () => setVisibleTranscript(4) },        // Speaker B continues (3s pause)
+        { delay: 25000, action: () => { setIsTranscribing(false); setVisibleTranscript(5); } }, // AI Summary
         
-        // PHASE 3: Video Call (13-16s)
-        { delay: 13000, action: () => setVideoCallActive(true) },      // Call starts
-        { delay: 13000, action: () => {
-          // Animate call timer
+        // PHASE 3: Video Call (26-30s)
+        { delay: 26000, action: () => setVideoCallActive(true) },       // Call starts
+        { delay: 26000, action: () => {
+          // Animate call timer - 1 second increments
           let time = 0;
           const interval = setInterval(() => {
             time += 1;
             setCallTime(time);
-            if (time >= 15) clearInterval(interval);
-          }, 200);
+            if (time >= 6) clearInterval(interval);
+          }, 1000);
         }},
         
         // Loop restart
-        { delay: 18000, action: animateAll },
+        { delay: 32000, action: animateAll },
       ];
 
       timeline.forEach(({ delay, action }) => {
@@ -248,22 +249,22 @@ const HeroSection = () => {
         {/* Right Side - Device Mockups */}
         <Col xs={24} lg={13} style={{ order: 2 }}>
           <div className="reveal-right" style={{
-            position: 'relative',
+            display: 'flex',
+            gap: '30px',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
             animation: 'fadeInUp 0.8s ease-out 0.4s backwards',
+            position: 'relative',
           }}>
             {/* Phone Mockup - jAImee Chat */}
             <div style={{
-              position: 'absolute',
-              left: '0',
-              top: '20%',
               width: '280px',
               height: '550px',
               background: '#1a202c',
               borderRadius: '35px',
               padding: '12px',
               boxShadow: '0 30px 60px rgba(0, 0, 0, 0.4)',
-              transform: 'rotate(-5deg)',
-              zIndex: 3,
+              flexShrink: 0,
             }}>
               <div style={{
                 background: '#ffffff',
@@ -291,8 +292,8 @@ const HeroSection = () => {
                   padding: '35px 15px 15px',
                   color: '#ffffff',
                 }}>
-                  <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>jAImee</div>
-                  <div style={{ fontSize: '0.7rem', opacity: 0.9 }}>Your AI Therapist • Online</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 700 }}>jAImee</div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.95 }}>Your Mental Health Assistant • Online</div>
                 </div>
 
                 {/* Chat Messages */}
@@ -312,14 +313,15 @@ const HeroSection = () => {
                         background: '#ffffff',
                         padding: '10px 12px',
                         borderRadius: '12px 12px 12px 2px',
-                        fontSize: '0.75rem',
+                        fontSize: '0.85rem',
                         maxWidth: '80%',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                         lineHeight: 1.4,
+                        color: '#1a202c',
                       }}>
                         Hi! How are you feeling today? 😊
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>
                         jAImee • 2:34 PM
                       </div>
                     </div>
@@ -336,7 +338,7 @@ const HeroSection = () => {
                         background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
                         padding: '10px 12px',
                         borderRadius: '12px 12px 2px 12px',
-                        fontSize: '0.75rem',
+                        fontSize: '0.85rem',
                         maxWidth: '80%',
                         display: 'inline-block',
                         color: '#ffffff',
@@ -344,7 +346,7 @@ const HeroSection = () => {
                       }}>
                         I've been practicing the breathing exercises you taught me!
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>
                         You • 2:35 PM
                       </div>
                     </div>
@@ -404,14 +406,15 @@ const HeroSection = () => {
                         background: '#ffffff',
                         padding: '10px 12px',
                         borderRadius: '12px 12px 12px 2px',
-                        fontSize: '0.75rem',
+                        fontSize: '0.85rem',
                         maxWidth: '80%',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                         lineHeight: 1.4,
+                        color: '#1a202c',
                       }}>
                         That's wonderful! Building healthy habits takes time. How have they been helping you? 💪
                       </div>
-                      <div style={{ fontSize: '0.65rem', color: '#718096', marginTop: '4px' }}>
+                      <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>
                         jAImee • 2:35 PM
                       </div>
                     </div>
@@ -432,8 +435,8 @@ const HeroSection = () => {
                     background: '#f7fafc',
                     borderRadius: '20px',
                     padding: '8px 15px',
-                    fontSize: '0.75rem',
-                    color: '#718096',
+                    fontSize: '0.8rem',
+                    color: '#4a5568',
                   }}>
                     Type a message...
                   </div>
@@ -444,9 +447,9 @@ const HeroSection = () => {
             {/* Laptop Mockup - AI Scribe Transcription */}
             <div style={{
               position: 'relative',
-              marginLeft: 'auto',
               width: '550px',
               maxWidth: '100%',
+              flexShrink: 0,
             }}>
               {/* Screen */}
               <div style={{
@@ -499,7 +502,7 @@ const HeroSection = () => {
                         marginBottom: '15px',
                         animation: 'fadeInUp 0.5s ease-out',
                       }}>
-                        <strong style={{ color: '#48abe2' }}>[00:02:15]</strong> Client expresses feeling overwhelmed with work responsibilities. Reports difficulty sleeping for the past two weeks.
+                        <strong style={{ color: '#48abe2' }}>Speaker A:</strong> I've been feeling really overwhelmed with work lately. It's been affecting my sleep for the past couple of weeks.
                       </div>
                     )}
                     {visibleTranscript >= 2 && (
@@ -507,7 +510,7 @@ const HeroSection = () => {
                         marginBottom: '15px',
                         animation: 'fadeInUp 0.5s ease-out',
                       }}>
-                        <strong style={{ color: '#2196f3' }}>[00:04:32]</strong> Discussed coping strategies including time management techniques and establishing a bedtime routine.
+                        <strong style={{ color: '#2196f3' }}>Speaker B:</strong> I hear you. Let's explore some strategies together. Have you tried any time management techniques or establishing a bedtime routine?
                       </div>
                     )}
                     {visibleTranscript >= 3 && (
@@ -515,10 +518,18 @@ const HeroSection = () => {
                         marginBottom: '15px',
                         animation: 'fadeInUp 0.5s ease-out',
                       }}>
-                        <strong style={{ color: '#48abe2' }}>[00:07:18]</strong> Client reports improvement in anxiety levels since implementing breathing exercises from last session.
+                        <strong style={{ color: '#48abe2' }}>Speaker A:</strong> Not really, but I did try those breathing exercises you taught me last time. They've actually been helping with my anxiety.
                       </div>
                     )}
-                    {isTranscribing && visibleTranscript < 3 && (
+                    {visibleTranscript >= 4 && (
+                      <div style={{ 
+                        marginBottom: '15px',
+                        animation: 'fadeInUp 0.5s ease-out',
+                      }}>
+                        <strong style={{ color: '#2196f3' }}>Speaker B:</strong> That's wonderful progress! Building on that success, let's work on creating a consistent evening routine that incorporates those exercises.
+                      </div>
+                    )}
+                    {isTranscribing && visibleTranscript < 5 && (
                       <div style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -531,7 +542,7 @@ const HeroSection = () => {
                         <span>●</span> Transcribing...
                       </div>
                     )}
-                    {visibleTranscript >= 4 && (
+                    {visibleTranscript >= 5 && (
                       <div style={{
                         marginTop: '20px',
                         padding: '12px',
@@ -544,7 +555,7 @@ const HeroSection = () => {
                           📝 AI Summary
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#4a5568' }}>
-                          Session focused on work-related stress and sleep disturbances. Client showing positive response to previously assigned homework...
+                          Session focused on work-related stress and sleep disturbances. Client showing positive response to breathing exercises from previous session. Discussed implementing bedtime routine.
                         </div>
                       </div>
                     )}
@@ -573,10 +584,10 @@ const HeroSection = () => {
 
               {/* Video Call Badge - Animated */}
               <div style={{
-                position: 'absolute',
-                bottom: '30px',
-                right: '-50px',
-                width: '200px',
+                marginTop: '20px',
+                width: '220px',
+                marginLeft: 'auto',
+                marginRight: 'auto',
                 background: '#ffffff',
                 borderRadius: '16px',
                 padding: '15px',
