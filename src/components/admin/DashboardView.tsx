@@ -14,7 +14,7 @@ interface DashboardViewProps {
   auth: AuthContextType;
 }
 
-const DashboardView = ({ auth }: DashboardViewProps) => {
+const DashboardView = ({ auth: _auth }: DashboardViewProps) => {
   return (
     <div>
       <div style={{ marginBottom: 32 }}>

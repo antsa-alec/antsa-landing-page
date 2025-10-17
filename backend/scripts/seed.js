@@ -7,7 +7,8 @@ async function seed() {
   try {
     // Create default admin user
     const username = 'admin';
-    const password = 'admin123'; // CHANGE THIS IN PRODUCTION!
+    // Note: This seed script is for initial database setup only.
+    // Admin credentials are set via update-admin.js script with secure password.
 
     // Check if user already exists
     const existingUser = db.prepare('SELECT * FROM users WHERE username = ?').get(username);

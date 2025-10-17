@@ -105,23 +105,6 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
             </Button>
           </Form.Item>
         </Form>
-
-        <div style={{
-          marginTop: 24,
-          padding: 16,
-          background: '#f0f7ff',
-          borderRadius: 8,
-          border: '1px solid #d1e9ff',
-        }}>
-          <Paragraph style={{ margin: 0, fontSize: '0.85rem', color: '#1890ff' }}>
-            <strong>Default credentials:</strong><br />
-            Username: admin<br />
-            Password: admin123<br />
-            <span style={{ color: '#ff4d4f', fontWeight: 600 }}>
-              ⚠️ Change password after first login!
-            </span>
-          </Paragraph>
-        </div>
       </Card>
     </div>
   );

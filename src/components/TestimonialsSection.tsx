@@ -155,9 +155,7 @@ const TestimonialsSection = () => {
                     fontSize: '2rem',
                     marginBottom: '15px',
                   }}
-                >
-                  {testimonial.avatar}
-                </Avatar>
+                />
                 <Rate disabled defaultValue={testimonial.rating} style={{ fontSize: '1rem', color: '#faad14' }} />
               </div>
 

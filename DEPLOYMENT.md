@@ -1,127 +1,106 @@
 # Deployment Guide
 
-This document provides instructions for deploying the ANTSA Landing Page to Azure Static Web Apps.
-
 ## Prerequisites
 
-- Azure account with an active subscription
-- Azure CLI installed and authenticated (`az login`)
-- GitHub repository (already created)
+1. **DNS Configuration**: Add the required DNS records (see DNS_SETUP.md)
+2. **GitHub Secrets**: Add the Azure publish profile to GitHub
 
-## Deploy to Azure Static Web Apps
+## GitHub Secrets Setup
 
-### Option 1: Using Azure Portal
+### 1. Add AZURE_WEBAPP_PUBLISH_PROFILE
 
-1. Log in to [Azure Portal](https://portal.azure.com)
-2. Click "Create a resource" and search for "Static Web App"
-3. Fill in the required details:
-   - **Subscription**: Select your subscription
-   - **Resource Group**: Create new or use existing
-   - **Name**: `antsa-landing-page`
-   - **Region**: Choose closest to your users
-   - **Source**: GitHub
-   - **Organization**: Your GitHub username
-   - **Repository**: `antsa-landing-page`
-   - **Branch**: `main`
-   - **Build Details**:
-     - Build Presets: `Custom`
-     - App location: `/`
-     - Output location: `dist`
-4. Click "Review + Create" then "Create"
-5. Azure will create a GitHub Actions workflow automatically
+Go to your GitHub repository → Settings → Secrets and variables → Actions → New repository secret
 
-### Option 2: Using Azure CLI
+**Name:** `AZURE_WEBAPP_PUBLISH_PROFILE`
 
+**Value:** (Use the publish profile from Azure)
+
+To get the publish profile, run:
 ```bash
-# Create a resource group (if needed)
-az group create --name antsa-rg --location australiaeast
-
-# Create the static web app
-az staticwebapp create \
-  --name antsa-landing-page \
-  --resource-group antsa-rg \
-  --source https://github.com/YOUR_USERNAME/antsa-landing-page \
-  --location australiaeast \
-  --branch main \
-  --app-location "/" \
-  --output-location "dist" \
-  --login-with-github
+az webapp deployment list-publishing-profiles --name antsa-landing-au-production --resource-group production --xml
 ```
 
-### Option 3: GitHub Actions (Automated)
+Copy the entire XML output and paste it as the secret value.
 
-The repository already includes a GitHub Actions workflow (`.github/workflows/azure-static-web-apps.yml`).
+## Automatic Deployment
 
-To enable it:
+The application automatically deploys when you push to the `master` branch:
 
-1. Create an Azure Static Web App in the Azure Portal
-2. Copy the deployment token from the Static Web App
-3. Add it as a GitHub secret:
-   - Go to your repository on GitHub
-   - Settings → Secrets and variables → Actions
-   - New repository secret
-   - Name: `AZURE_STATIC_WEB_APPS_API_TOKEN`
-   - Value: Paste the deployment token
-4. Push to main branch - the workflow will automatically deploy
+```bash
+git add .
+git commit -m "Your commit message"
+git push origin master
+```
 
-## Custom Domain (Optional)
+The GitHub Actions workflow will:
+1. ✅ Install dependencies
+2. ✅ Build the frontend (Vite + React)
+3. ✅ Install backend dependencies
+4. ✅ Create deployment package
+5. ✅ Deploy to Azure App Service
 
-After deployment, you can configure a custom domain:
+## Environment Variables (Already Configured in Azure)
 
-1. Go to your Static Web App in Azure Portal
-2. Select "Custom domains" from the left menu
-3. Click "Add" and follow the instructions
-4. Update your DNS records as specified
+The following environment variables are set in Azure App Service:
+- `NODE_ENV=production`
+- `PORT=8080`
+- `JWT_SECRET=[auto-generated secure random string]`
+- `ALLOWED_ORIGINS=https://antsa.ai,https://www.antsa.ai,https://antsa-landing-au-production.azurewebsites.net`
 
-## Environment Variables (If Needed)
+## Manual Deployment (Not Recommended)
 
-If you need to add environment variables:
+If you need to deploy manually:
+```bash
+npm run build
+az webapp deploy --name antsa-landing-au-production --resource-group production --src-path ./deploy.zip
+```
 
-1. Go to your Static Web App in Azure Portal
-2. Select "Configuration" from the left menu
-3. Add your environment variables
-4. Restart the app
+## Post-Deployment Steps
+
+1. **Verify DNS propagation**:
+   ```bash
+   nslookup antsa.ai
+   ```
+
+2. **Add custom domain** (after DNS is propagated):
+   ```bash
+   az webapp config hostname add --webapp-name antsa-landing-au-production --resource-group production --hostname antsa.ai
+   ```
+
+3. **Enable HTTPS** (free managed certificate):
+   ```bash
+   az webapp config ssl bind --name antsa-landing-au-production --resource-group production --certificate-thumbprint auto --ssl-type SNI
+   ```
+
+4. **Initialize database** (first time only):
+   SSH into the Azure app or run initialization script to:
+   - Run `backend/scripts/seed.js` to create initial database
+   - Run `backend/scripts/update-admin.js` to set admin credentials
 
 ## Monitoring
 
-To monitor your application:
-
-1. Go to your Static Web App in Azure Portal
-2. Select "Application Insights" from the left menu
-3. Enable Application Insights for monitoring and analytics
-
-## Cost
-
-Azure Static Web Apps has a free tier that includes:
-- 100 GB bandwidth per month
-- Custom domains
-- Free SSL certificates
-- GitHub integration
-
-For production use, consider the Standard tier for additional features.
+- **Azure Portal**: https://portal.azure.com → App Services → antsa-landing-au-production
+- **Logs**: View in Azure Portal → Log stream
+- **GitHub Actions**: Check workflow runs in your repo's Actions tab
 
 ## Troubleshooting
 
-### Build Fails
+### Build fails in GitHub Actions
+- Check the Actions tab for detailed error logs
+- Ensure all dependencies are in package.json
 
-- Check the GitHub Actions logs for errors
-- Ensure `npm run build` works locally
-- Verify the output directory is `dist`
+### App doesn't start after deployment
+- Check Azure Log Stream for errors
+- Verify startup.sh is executable
+- Check environment variables are set
 
-### 404 Errors
+### Database not persisting
+- SQLite database is stored in `/home/site/wwwroot/backend/`
+- Consider using Azure Database for PostgreSQL for production
 
-- The `staticwebapp.config.json` should handle routing
-- Ensure the configuration file is in the repository root
+## Rollback
 
-### Slow Load Times
-
-- Consider implementing code splitting
-- Optimize images and assets
-- Enable CDN (included with Azure Static Web Apps)
-
-## Support
-
-For issues specific to Azure deployment, refer to:
-- [Azure Static Web Apps Documentation](https://docs.microsoft.com/azure/static-web-apps/)
-- [Azure Support](https://azure.microsoft.com/support/)
-
+To rollback to a previous deployment:
+1. Go to Azure Portal → App Services → antsa-landing-au-production → Deployment Center
+2. Select a previous deployment from the history
+3. Click "Redeploy"

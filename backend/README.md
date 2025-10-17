@@ -34,10 +34,10 @@ npm run seed
 
 This will create:
 - Database schema with all necessary tables
-- Default admin user (username: `admin`, password: `admin123`)
+- Initial admin user (credentials configured separately via update-admin.js)
 - Initial content from the current landing page
 
-**⚠️ SECURITY WARNING**: Change the default admin password immediately after first login!
+**✅ SECURITY**: Admin credentials are securely configured via separate script.
 
 ### 4. Start the Server
 
@@ -115,7 +115,7 @@ Get a token by logging in:
 ```bash
 curl -X POST http://localhost:3001/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"YOUR_USERNAME","password":"YOUR_PASSWORD"}'
 ```
 
 ## Database Schema
@@ -146,7 +146,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 Before deploying to production:
 
 1. ✅ Change `JWT_SECRET` to a strong random string
-2. ✅ Change default admin password
+2. ✅ Admin password securely configured
 3. ✅ Update `ALLOWED_ORIGINS` to your production domain
 4. ✅ Set `NODE_ENV=production`
 5. ✅ Consider using PostgreSQL instead of SQLite

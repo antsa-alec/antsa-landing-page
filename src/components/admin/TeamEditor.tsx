@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Avatar, Upload } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, UploadOutlined } from '@ant-design/icons';
-import type { UploadFile } from 'antd/es/upload/interface';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { TextArea } = Input;

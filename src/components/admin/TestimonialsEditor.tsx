@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Rate } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, StarOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { TextArea } = Input;

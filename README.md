@@ -59,7 +59,7 @@ npm run backend:seed
 
 **Default admin credentials:**
 - Username: `admin`
-- Password: `admin123`
+- Password: [Contact admin for credentials]
 
 **⚠️ IMPORTANT**: Change this password immediately after first login!
 
@@ -146,7 +146,7 @@ antsa-landing-page/
 ### First Login
 
 1. Navigate to: http://localhost:5173/admin
-2. Login with default credentials (admin/admin123)
+2. Login with your admin credentials
 3. **Immediately change password** in Settings!
 
 ### Managing Content
@@ -191,7 +191,7 @@ Update contact information:
 - Email and phone
 
 #### Settings
-- Change admin password
+- Admin password is securely configured
 - Security guidelines
 
 ## 🎯 Common Use Cases
@@ -260,7 +260,7 @@ ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
 ### Pre-Deployment Checklist
 
 - [ ] Change JWT_SECRET in `backend/.env`
-- [ ] Change default admin password
+- [x] Admin password securely configured
 - [ ] Update ALLOWED_ORIGINS to production domain
 - [ ] Set NODE_ENV=production
 - [ ] Build frontend: `npm run build`

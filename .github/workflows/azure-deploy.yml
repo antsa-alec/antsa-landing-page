@@ -1,0 +1,58 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20.x'
+  APP_NAME: 'antsa-landing-au-production'
+  RESOURCE_GROUP: 'production'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install root dependencies
+      run: npm ci
+
+    - name: Build frontend
+      run: npm run build
+      env:
+        NODE_ENV: production
+
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        npm ci --production
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        cp -r dist deploy/
+        cp -r backend deploy/
+        cp package.json deploy/
+        cp startup.sh deploy/
+        cp web.config deploy/
+        cp .deployment deploy/
+        chmod +x deploy/startup.sh
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.APP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./deploy
+

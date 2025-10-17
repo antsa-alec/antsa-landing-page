@@ -3,7 +3,7 @@
  * Features: Glass morphism cards, modern icon styling
  */
 
-import { Row, Col, Typography, Space } from 'antd';
+import { Row, Col, Typography } from 'antd';
 import { MailOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
