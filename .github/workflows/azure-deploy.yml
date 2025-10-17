@@ -43,11 +43,24 @@ jobs:
         mkdir -p deploy
         cp -r dist deploy/
         cp -r backend deploy/
-        cp package.json deploy/
         cp startup.sh deploy/
-        cp web.config deploy/
-        cp .deployment deploy/
         chmod +x deploy/startup.sh
+        
+        # Create .deployment file to prevent Azure from running build
+        echo "[config]" > deploy/.deployment
+        echo "SCM_DO_BUILD_DURING_DEPLOYMENT=false" >> deploy/.deployment
+        
+        # Create package.json for Azure (minimal, no build scripts)
+        cat > deploy/package.json << 'EOF'
+        {
+          "name": "antsa-landing-page",
+          "version": "1.0.0",
+          "scripts": {
+            "start": "node backend/server.js"
+          },
+          "dependencies": {}
+        }
+        EOF
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
