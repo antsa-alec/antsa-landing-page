@@ -72,16 +72,33 @@ function App() {
       }
     );
 
-    // Observe all elements with reveal classes
-    const revealElements = document.querySelectorAll(
-      '.reveal, .reveal-left, .reveal-right, .reveal-scale'
-    );
-    
-    revealElements.forEach((el) => observer.observe(el));
+    // Function to observe all reveal elements (including dynamically loaded ones)
+    const observeElements = () => {
+      const revealElements = document.querySelectorAll(
+        '.reveal, .reveal-left, .reveal-right, .reveal-scale'
+      );
+      revealElements.forEach((el) => {
+        if (!el.classList.contains('observed')) {
+          el.classList.add('observed');
+          observer.observe(el);
+        }
+      });
+    };
+
+    // Initial observation
+    observeElements();
+
+    // Re-observe when new content loads (for dynamically loaded sections)
+    const intervalId = setInterval(observeElements, 500);
 
     // Cleanup
     return () => {
+      clearInterval(intervalId);
+      const revealElements = document.querySelectorAll(
+        '.reveal, .reveal-left, .reveal-right, .reveal-scale'
+      );
       revealElements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
     };
   }, []);
 

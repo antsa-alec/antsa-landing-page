@@ -3,14 +3,35 @@
  * Features: Phone with jAImee chat, Laptop with transcription, Video call screen
  */
 
-import { Row, Col, Button, Typography, Space } from 'antd';
+import { Row, Col, Button, Typography, Space, Spin } from 'antd';
 import { RocketOutlined, HeartOutlined, PlayCircleOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
 
 const { Title, Paragraph } = Typography;
 
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
+
+interface HeroContent {
+  badge?: string;
+  title?: string;
+  subtitle?: string;
+  description?: string;
+  cta_primary?: string;
+  cta_primary_url?: string;
+  cta_secondary?: string;
+  cta_secondary_url?: string;
+  stat1_value?: string;
+  stat1_label?: string;
+  stat2_value?: string;
+  stat2_label?: string;
+  stat3_value?: string;
+  stat3_label?: string;
+}
+
 const HeroSection = () => {
-  const [scrollY, setScrollY] = useState(0);
+  const [content, setContent] = useState<HeroContent>({});
+  const [loading, setLoading] = useState(true);
   
   // Phone chat animation states
   const [visibleMessages, setVisibleMessages] = useState(0);
@@ -24,12 +45,34 @@ const HeroSection = () => {
   const [videoCallActive, setVideoCallActive] = useState(false);
   const [callTime, setCallTime] = useState(0);
 
+  // Fetch hero content from API
   useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
+    let ignore = false;
+
+    const fetchContent = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/hero`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok) {
+          setContent(data.content || {});
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching hero content:', error);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    fetchContent();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   // Master animation timeline - slowed down for realistic conversation pacing
@@ -83,6 +126,48 @@ const HeroSection = () => {
     animateAll();
   }, []);
 
+  // Default values for content
+  const badge = content.badge || 'AI-Powered Mental Health Platform';
+  const title = content.title || 'Transform Mental Healthcare';
+  const subtitle = content.subtitle || 'With ANTSA';
+  const description = content.description || '24/7 AI mental health assistant support, automated transcription, and seamless video sessions. Reduce admin time by 80% while enhancing client care.';
+  const ctaPrimary = content.cta_primary || 'Start Free Trial';
+  const ctaPrimaryUrl = content.cta_primary_url || '#';
+  const ctaSecondary = content.cta_secondary || 'Watch Demo';
+  const ctaSecondaryUrl = content.cta_secondary_url || '#';
+  
+  const stats = [
+    { value: content.stat1_value || '500+', label: content.stat1_label || 'Clinicians' },
+    { value: content.stat2_value || '10K+', label: content.stat2_label || 'Clients' },
+    { value: content.stat3_value || '80%', label: content.stat3_label || 'Time Saved' },
+  ].filter(stat => stat.value && stat.label);
+
+  const handlePrimaryCTA = () => {
+    if (ctaPrimaryUrl && ctaPrimaryUrl !== '#') {
+      window.open(ctaPrimaryUrl, '_blank');
+    }
+  };
+
+  const handleSecondaryCTA = () => {
+    if (ctaSecondaryUrl && ctaSecondaryUrl !== '#') {
+      window.open(ctaSecondaryUrl, '_blank');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
+      }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <div style={{
       position: 'relative',
@@ -123,8 +208,8 @@ const HeroSection = () => {
 
       <Row gutter={[48, 48]} align="middle" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Left Side - Content */}
-        <Col xs={24} lg={11} style={{ order: 1 }}>
-          <div className="reveal" style={{
+        <Col xs={24} lg={11} style={{ order: 1, position: 'relative', zIndex: 100, paddingRight: '60px', marginLeft: '-20px' }}>
+          <div style={{
             display: 'inline-block',
             background: 'rgba(255, 255, 255, 0.2)',
             backdropFilter: 'blur(10px)',
@@ -137,12 +222,11 @@ const HeroSection = () => {
             animation: 'fadeInUp 0.8s ease-out',
           }}>
             <HeartOutlined style={{ marginRight: '8px' }} />
-            AI-Powered Mental Health Platform
+            {badge}
           </div>
 
           <Title 
             level={1} 
-            className="reveal"
             style={{ 
               color: '#ffffff', 
               fontSize: 'clamp(2.5rem, 5vw, 4rem)',
@@ -152,15 +236,14 @@ const HeroSection = () => {
               animation: 'fadeInUp 0.8s ease-out 0.2s backwards',
             }}
           >
-            Transform Mental Healthcare
+            {title}
             <br />
             <span style={{ opacity: 0.9 }}>
-              With ANTSA
+              {subtitle}
             </span>
           </Title>
 
           <Paragraph 
-            className="reveal"
             style={{
               fontSize: 'clamp(1.1rem, 2vw, 1.3rem)',
               color: 'rgba(255, 255, 255, 0.95)',
@@ -169,12 +252,10 @@ const HeroSection = () => {
               animation: 'fadeInUp 0.8s ease-out 0.4s backwards',
             }}
           >
-            24/7 AI therapy support, automated transcription, and seamless video sessions. 
-            Reduce admin time by 80% while enhancing client care.
+            {description}
           </Paragraph>
 
           <Space 
-            className="reveal"
             size="large" 
             wrap
             style={{
@@ -185,6 +266,7 @@ const HeroSection = () => {
               type="primary"
               size="large"
               icon={<RocketOutlined />}
+              onClick={handlePrimaryCTA}
               style={{
                 height: '60px',
                 padding: '0 40px',
@@ -195,14 +277,16 @@ const HeroSection = () => {
                 fontWeight: 700,
                 borderRadius: '12px',
                 boxShadow: '0 8px 30px rgba(0, 0, 0, 0.15)',
+                cursor: ctaPrimaryUrl && ctaPrimaryUrl !== '#' ? 'pointer' : 'default',
               }}
             >
-              Start Free Trial <ArrowRightOutlined />
+              {ctaPrimary} <ArrowRightOutlined />
             </Button>
             
             <Button
               size="large"
               icon={<PlayCircleOutlined />}
+              onClick={handleSecondaryCTA}
               style={{
                 height: '60px',
                 padding: '0 40px',
@@ -213,42 +297,40 @@ const HeroSection = () => {
                 border: '2px solid rgba(255, 255, 255, 0.3)',
                 fontWeight: 600,
                 borderRadius: '12px',
+                cursor: ctaSecondaryUrl && ctaSecondaryUrl !== '#' ? 'pointer' : 'default',
               }}
             >
-              Watch Demo
+              {ctaSecondary}
             </Button>
           </Space>
 
-          <div 
-            className="reveal"
-            style={{
-              marginTop: '40px',
-              display: 'flex',
-              gap: '30px',
-              flexWrap: 'wrap',
-              animation: 'fadeInUp 0.8s ease-out 0.8s backwards',
-            }}
-          >
-            {[
-              { value: '500+', label: 'Clinicians' },
-              { value: '10K+', label: 'Clients' },
-              { value: '80%', label: 'Time Saved' },
-            ].map((stat, index) => (
-              <div key={index}>
-                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff' }}>
-                  {stat.value}
+          {stats.length > 0 && (
+            <div 
+              style={{
+                marginTop: '40px',
+                display: 'flex',
+                gap: '30px',
+                flexWrap: 'wrap',
+                animation: 'fadeInUp 0.8s ease-out 0.8s backwards',
+              }}
+            >
+              {stats.map((stat, index) => (
+                <div key={index}>
+                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#ffffff' }}>
+                    {stat.value}
+                  </div>
+                  <div style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
+                    {stat.label}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.8)' }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Col>
 
         {/* Right Side - Device Mockups */}
-        <Col xs={24} lg={13} style={{ order: 2 }}>
-          <div className="reveal-right" style={{
+        <Col xs={24} lg={13} style={{ order: 2, position: 'relative', zIndex: 1 }}>
+          <div style={{
             display: 'flex',
             gap: '30px',
             alignItems: 'flex-start',

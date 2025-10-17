@@ -3,7 +3,8 @@
  * Features: Glassmorphism, 3D effects, animated borders, premium visual hierarchy
  */
 
-import { Row, Col, Card, Button, Typography, Space } from 'antd';
+import { useState, useEffect } from 'react';
+import { Row, Col, Card, Button, Typography, Space, Spin } from 'antd';
 import { 
   CheckCircleOutlined, 
   CrownOutlined, 
@@ -12,9 +13,27 @@ import {
   StarFilled,
   ArrowRightOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
 
 const { Title, Paragraph, Text } = Typography;
+
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
+
+interface PricingPlan {
+  id: number;
+  name: string;
+  price: string;
+  period: string;
+  featured: number;
+  features: string[];
+  // Optional properties for hardcoded plans
+  icon?: React.ReactElement;
+  description?: string;
+  highlighted?: boolean;
+  gradient?: string;
+  color?: string;
+  badge?: string;
+}
 
 const pricingPlans = [
   {
@@ -86,7 +105,19 @@ const pricingPlans = [
   },
 ];
 
-const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: number }) => {
+const PricingCard = ({ 
+  plan, 
+  index, 
+  freeCtaText, 
+  paidCtaText, 
+  signupUrl 
+}: { 
+  plan: any; // Combined type of PricingPlan and hardcoded plan
+  index: number;
+  freeCtaText: string;
+  paidCtaText: string;
+  signupUrl: string;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -231,6 +262,7 @@ const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: num
           size="large"
           block
           icon={<ArrowRightOutlined />}
+          onClick={() => signupUrl && signupUrl !== '#' && window.open(signupUrl, '_blank')}
           style={{
             height: '56px',
             fontSize: '1.05rem',
@@ -241,6 +273,7 @@ const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: num
             color: plan.highlighted ? '#ffffff' : plan.color,
             border: plan.highlighted ? 'none' : `2px solid ${plan.color}`,
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            cursor: signupUrl && signupUrl !== '#' ? 'pointer' : 'default',
           }}
           onMouseEnter={(e) => {
             if (plan.highlighted) {
@@ -261,7 +294,7 @@ const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: num
             }
           }}
         >
-          {plan.price === '$0' ? 'Start Free Trial' : 'Get Started'}
+          {plan.price === '$0' ? freeCtaText : paidCtaText}
         </Button>
 
         {/* Features List */}
@@ -281,7 +314,7 @@ const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: num
             What's Included:
           </Text>
           <Space direction="vertical" size={12} style={{ width: '100%' }}>
-            {plan.features.map((feature, idx) => (
+            {plan.features.map((feature: string, idx: number) => (
               <div 
                 key={idx}
                 style={{
@@ -317,6 +350,76 @@ const PricingCard = ({ plan, index }: { plan: typeof pricingPlans[0]; index: num
 };
 
 const PricingSection = () => {
+  const [pricingData, setPricingData] = useState<PricingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [freeCtaText, setFreeCtaText] = useState('Start Free Trial');
+  const [paidCtaText, setPaidCtaText] = useState('Get Started');
+  const [signupUrl, setSignupUrl] = useState('#');
+
+  useEffect(() => {
+    const fetchPricing = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/pricing`);
+        const data = await response.json();
+        if (response.ok && data.content.plans && data.content.plans.length > 0) {
+          setPricingData(data.content.plans);
+        } else {
+          // Fallback to hardcoded plans if no API data
+          setPricingData(pricingPlans.map((plan, idx) => ({
+            id: idx,
+            name: plan.name,
+            price: plan.price,
+            period: plan.period || '',
+            featured: plan.highlighted ? 1 : 0,
+            features: plan.features
+          })));
+        }
+      } catch (error) {
+        console.error('Error fetching pricing:', error);
+        // Fallback to hardcoded plans
+        setPricingData(pricingPlans.map((plan, idx) => ({
+          id: idx,
+          name: plan.name,
+          price: plan.price,
+          period: plan.period || '',
+          featured: plan.highlighted ? 1 : 0,
+          features: plan.features
+        })));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPricing();
+  }, []);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/settings`);
+        const data = await response.json();
+        
+        if (response.ok && data.content) {
+          setFreeCtaText(data.content.pricing_free_cta_text || 'Start Free Trial');
+          setPaidCtaText(data.content.pricing_paid_cta_text || 'Get Started');
+          setSignupUrl(data.content.signup_url || '#');
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '100px 20px', textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   return (
     <div style={{ 
       padding: '100px 20px',
@@ -411,32 +514,16 @@ const PricingSection = () => {
 
       {/* Pricing Cards */}
       <Row gutter={[32, 40]} justify="center" style={{ position: 'relative', zIndex: 1 }}>
-        {pricingPlans.map((plan, index) => (
-          <PricingCard key={index} plan={plan} index={index} />
+        {(pricingData.length > 0 ? pricingData : pricingPlans).map((plan, index) => (
+          <PricingCard 
+            key={index} 
+            plan={plan} 
+            index={index}
+            freeCtaText={freeCtaText}
+            paidCtaText={paidCtaText}
+            signupUrl={signupUrl}
+          />
         ))}
-      </Row>
-
-      {/* Money-Back Guarantee Banner */}
-      <Row justify="center" style={{ marginTop: '80px' }}>
-        <Col xs={22} sm={20} md={16}>
-          <div 
-            className="reveal"
-            style={{
-              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%)',
-              border: '2px dashed #10b981',
-              borderRadius: '16px',
-              padding: '30px',
-              textAlign: 'center',
-            }}
-          >
-            <Title level={4} style={{ color: '#10b981', marginBottom: '10px', fontWeight: 800 }}>
-              🛡️ 30-Day Money-Back Guarantee
-            </Title>
-            <Text style={{ color: '#1a202c', fontSize: '1rem' }}>
-              Not satisfied? Get a full refund within 30 days. No questions asked.
-            </Text>
-          </div>
-        </Col>
       </Row>
     </div>
   );

@@ -5,12 +5,62 @@
 
 import { Layout, Row, Col, Typography, Space } from 'antd';
 import { GithubOutlined, LinkedinOutlined, TwitterOutlined, HeartFilled } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
 
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
+
+interface FooterSettings {
+  footer_privacy_url?: string;
+  footer_terms_url?: string;
+  footer_support_url?: string;
+  footer_about_url?: string;
+  footer_careers_url?: string;
+  footer_copyright?: string;
+  footer_tagline?: string;
+  footer_subtitle?: string;
+}
+
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
+  const [settings, setSettings] = useState<FooterSettings>({});
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/settings`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok && data.content) {
+          setSettings(data.content);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching footer settings:', error);
+        }
+      }
+    };
+
+    fetchSettings();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  // Footer links with default values
+  const footerLinks = [
+    { label: 'Privacy Policy', url: settings.footer_privacy_url || '#' },
+    { label: 'Terms of Service', url: settings.footer_terms_url || '#' },
+    { label: 'Support', url: settings.footer_support_url || '#' },
+    { label: 'About Us', url: settings.footer_about_url || '#' },
+    { label: 'Careers', url: settings.footer_careers_url || '#' },
+  ];
 
   return (
     <Footer style={{ 
@@ -67,13 +117,17 @@ const AppFooter = () => {
           {/* Links */}
           <div style={{ marginBottom: '30px' }}>
             <Space split={<span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>} size="large" wrap>
-              {['Privacy Policy', 'Terms of Service', 'Support', 'About Us', 'Careers'].map((item, index) => (
+              {footerLinks.map((link, index) => (
                 <Link 
                   key={index}
+                  href={link.url}
+                  target={link.url && link.url !== '#' ? '_blank' : undefined}
+                  rel={link.url && link.url !== '#' ? 'noopener noreferrer' : undefined}
                   style={{ 
                     color: 'rgba(255, 255, 255, 0.7)',
                     fontWeight: 500,
                     transition: 'color 0.3s ease',
+                    cursor: link.url && link.url !== '#' ? 'pointer' : 'default',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = '#ffffff';
@@ -82,7 +136,7 @@ const AppFooter = () => {
                     e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
                   }}
                 >
-                  {item}
+                  {link.label}
                 </Link>
               ))}
             </Space>
@@ -97,11 +151,17 @@ const AppFooter = () => {
 
           {/* Copyright */}
           <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.95rem' }}>
-            © {currentYear} ANTSA. All rights reserved. • Made with <HeartFilled style={{ color: '#48abe2', margin: '0 5px' }} /> in Australia
+            {settings.footer_copyright || `© ${currentYear} ANTSA. All rights reserved.`}
+            {' • '}
+            {settings.footer_tagline ? (
+              <span dangerouslySetInnerHTML={{ __html: settings.footer_tagline }} />
+            ) : (
+              <>Made with <HeartFilled style={{ color: '#48abe2', margin: '0 5px' }} /> in Australia</>
+            )}
           </Text>
           <br />
           <Text style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.9rem' }}>
-            Data encrypted and securely hosted on Australian servers
+            {settings.footer_subtitle || 'Data encrypted and securely hosted on Australian servers'}
           </Text>
         </Col>
       </Row>

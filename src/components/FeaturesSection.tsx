@@ -12,15 +12,18 @@ import {
   SmileOutlined,
   BookOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const { Title, Paragraph } = Typography;
+
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
 
 const features = [
   {
     icon: <RobotOutlined />,
     title: 'jAImee',
-    description: "The world's first clinician-overseen therapy chatbot. Available 24/7 to support clients between sessions with evidence-based therapeutic conversations.",
+    description: "The world's first clinician-overseen mental health assistant chatbot. Available 24/7 to support clients between sessions with evidence-based conversations.",
     gradient: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
     color: '#48abe2',
   },
@@ -157,6 +160,35 @@ const FeatureCard = ({ feature, index }: { feature: typeof features[0]; index: n
 };
 
 const FeaturesSection = () => {
+  const [ctaText, setCtaText] = useState('Get Started Free');
+  const [ctaUrl, setCtaUrl] = useState('#');
+
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/settings`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok && data.content) {
+          setCtaText(data.content.features_cta_text || 'Get Started Free');
+          setCtaUrl(data.content.features_cta_url || '#');
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching settings:', error);
+        }
+      }
+    };
+
+    fetchSettings();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
   return (
     <div style={{ 
       padding: '100px 20px',
@@ -306,6 +338,7 @@ const FeaturesSection = () => {
               Join 500+ clinicians who have already reduced their admin time by 80%
             </Paragraph>
             <button
+              onClick={() => ctaUrl && ctaUrl !== '#' && window.open(ctaUrl, '_blank')}
               style={{
                 background: '#ffffff',
                 color: '#48abe2',
@@ -314,7 +347,7 @@ const FeaturesSection = () => {
                 fontSize: '1.1rem',
                 fontWeight: 700,
                 borderRadius: '12px',
-                cursor: 'pointer',
+                cursor: ctaUrl && ctaUrl !== '#' ? 'pointer' : 'default',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
@@ -329,7 +362,7 @@ const FeaturesSection = () => {
                 e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
               }}
             >
-              Get Started Free →
+              {ctaText} →
             </button>
           </div>
         </Col>

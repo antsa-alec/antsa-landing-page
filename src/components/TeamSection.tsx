@@ -3,39 +3,70 @@
  * Features: Modern card design, social media hover effects
  */
 
-import { Row, Col, Card, Typography, Avatar, Space } from 'antd';
-import { LinkedinOutlined, MailOutlined } from '@ant-design/icons';
+import { useState, useEffect } from 'react';
+import { Row, Col, Card, Typography, Avatar, Space, Spin } from 'antd';
+import { LinkedinOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
-const teamMembers = [
-  {
-    name: 'Dr. Alex Rodriguez',
-    role: 'Founder & CEO',
-    avatar: '👨‍⚕️',
-    bio: 'Clinical psychologist with 15+ years experience. Passionate about leveraging technology to improve mental health outcomes.',
-  },
-  {
-    name: 'Sophie Mitchell',
-    role: 'CTO',
-    avatar: '👩‍💻',
-    bio: 'Former AI researcher at leading tech companies. Expert in machine learning and natural language processing.',
-  },
-  {
-    name: 'Dr. Priya Patel',
-    role: 'Chief Clinical Officer',
-    avatar: '👩‍⚕️',
-    bio: 'Psychiatrist specializing in digital mental health. Ensures all AI tools meet clinical standards and ethical guidelines.',
-  },
-  {
-    name: 'Marcus Thompson',
-    role: 'Head of Product',
-    avatar: '👨‍💼',
-    bio: 'Product leader with experience building healthcare SaaS platforms. Focused on creating intuitive user experiences.',
-  },
-];
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
+
+interface TeamMember {
+  id: number;
+  name: string;
+  role: string;
+  bio: string;
+  image_url?: string;
+}
 
 const TeamSection = () => {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ignore = false; // Race condition protection (React best practice)
+
+    const fetchTeamMembers = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/team`);
+        const data = await response.json();
+        
+        // Only update state if this effect hasn't been cleaned up
+        if (!ignore && response.ok && data.content && data.content.members) {
+          setTeamMembers(data.content.members);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching team members:', error);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchTeamMembers();
+
+    // Cleanup function to prevent race conditions
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div style={{ padding: '100px 20px', textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (teamMembers.length === 0) {
+    return null; // Hide section if no team members
+  }
+
   return (
     <div style={{ 
       padding: '100px 20px',
@@ -85,7 +116,7 @@ const TeamSection = () => {
 
       <Row gutter={[32, 32]} justify="center">
         {teamMembers.map((member, index) => (
-          <Col xs={22} sm={11} md={6} key={index} className="reveal-scale">
+          <Col xs={22} sm={11} md={6} key={member.id || index} className="reveal-scale">
             <Card
               hoverable
               style={{
@@ -105,17 +136,27 @@ const TeamSection = () => {
                 e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.08)';
               }}
             >
-              <Avatar
-                size={110}
-                style={{
-                  background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
-                  fontSize: '3.5rem',
-                  marginBottom: '20px',
-                  boxShadow: '0 8px 20px rgba(102, 126, 234, 0.3)',
-                }}
-              >
-                {member.avatar}
-              </Avatar>
+              {member.image_url ? (
+                <Avatar
+                  size={110}
+                  src={member.image_url}
+                  style={{
+                    marginBottom: '20px',
+                    boxShadow: '0 8px 20px rgba(72, 171, 226, 0.3)',
+                  }}
+                />
+              ) : (
+                <Avatar
+                  size={110}
+                  icon={<UserOutlined />}
+                  style={{
+                    background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
+                    fontSize: '3.5rem',
+                    marginBottom: '20px',
+                    boxShadow: '0 8px 20px rgba(72, 171, 226, 0.3)',
+                  }}
+                />
+              )}
 
               <Title level={4} style={{ marginBottom: '5px', fontSize: '1.3rem', fontWeight: 700 }}>
                 {member.name}
@@ -131,14 +172,16 @@ const TeamSection = () => {
                 {member.role}
               </Text>
 
-              <Paragraph style={{ 
-                color: '#4a5568',
-                marginBottom: '25px',
-                fontSize: '0.95rem',
-                lineHeight: 1.7,
-              }}>
-                {member.bio}
-              </Paragraph>
+              {member.bio && (
+                <Paragraph style={{ 
+                  color: '#4a5568',
+                  marginBottom: '25px',
+                  fontSize: '0.95rem',
+                  lineHeight: 1.7,
+                }}>
+                  {member.bio}
+                </Paragraph>
+              )}
 
               <Space size="middle">
                 <div
