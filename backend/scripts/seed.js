@@ -9,6 +9,7 @@ async function seed() {
     const username = 'admin';
     // Note: This seed script is for initial database setup only.
     // Admin credentials are set via update-admin.js script with secure password.
+    const tempPassword = 'TEMP_' + Date.now(); // Temporary password
 
     // Check if user already exists
     const existingUser = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
@@ -17,13 +18,12 @@ async function seed() {
       console.log('⚠️  Admin user already exists. Skipping user creation.');
     } else {
       const salt = await bcrypt.genSalt(10);
-      const passwordHash = await bcrypt.hash(password, salt);
+      const passwordHash = await bcrypt.hash(tempPassword, salt);
 
       db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)').run(username, passwordHash);
       console.log('✅ Created admin user');
       console.log(`   Username: ${username}`);
-      console.log(`   Password: ${password}`);
-      console.log('   ⚠️  IMPORTANT: Change the password after first login!');
+      console.log('   ⚠️  IMPORTANT: Run update-admin.js to set your password!');
     }
 
     // Create sections
