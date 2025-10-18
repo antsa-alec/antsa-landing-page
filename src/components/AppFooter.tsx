@@ -14,19 +14,22 @@ const { Text, Link } = Typography;
 const API_BASE_URL = '/api';
 
 interface FooterSettings {
-  footer_privacy_url?: string;
-  footer_terms_url?: string;
-  footer_support_url?: string;
-  footer_about_url?: string;
-  footer_careers_url?: string;
   footer_copyright?: string;
   footer_tagline?: string;
   footer_subtitle?: string;
 }
 
+interface FooterLink {
+  id: number;
+  label: string;
+  url: string;
+  order_index: number;
+}
+
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState<FooterSettings>({});
+  const [footerLinks, setFooterLinks] = useState<FooterLink[]>([]);
 
   useEffect(() => {
     let ignore = false;
@@ -46,21 +49,28 @@ const AppFooter = () => {
       }
     };
 
+    const fetchFooterLinks = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/footer-links`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok && data.links) {
+          setFooterLinks(data.links);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching footer links:', error);
+        }
+      }
+    };
+
     fetchSettings();
+    fetchFooterLinks();
 
     return () => {
       ignore = true;
     };
   }, []);
-
-  // Footer links with default values
-  const footerLinks = [
-    { label: 'Privacy Policy', url: settings.footer_privacy_url || '#' },
-    { label: 'Terms of Service', url: settings.footer_terms_url || '#' },
-    { label: 'Support', url: settings.footer_support_url || '#' },
-    { label: 'About Us', url: settings.footer_about_url || '#' },
-    { label: 'Careers', url: settings.footer_careers_url || '#' },
-  ];
 
   return (
     <Footer style={{ 

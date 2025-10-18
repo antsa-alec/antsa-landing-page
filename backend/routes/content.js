@@ -414,5 +414,91 @@ router.delete('/team/:id', authenticateToken, (req, res) => {
   }
 });
 
+// ===== FOOTER LINKS ROUTES =====
+
+// Get all footer links (public)
+router.get('/footer-links', (req, res) => {
+  try {
+    const stmt = db.prepare('SELECT * FROM footer_links ORDER BY order_index');
+    const links = stmt.all();
+    res.json({ links });
+  } catch (error) {
+    console.error('Get footer links error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Create footer link (protected)
+router.post('/footer-links', [
+  authenticateToken,
+  body('label').notEmpty().withMessage('Label is required'),
+  body('url').notEmpty().withMessage('URL is required'),
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { label, url, order_index = 0 } = req.body;
+
+    const stmt = db.prepare(`
+      INSERT INTO footer_links (label, url, order_index)
+      VALUES (?, ?, ?)
+    `);
+
+    const result = stmt.run(label, url, order_index);
+    
+    res.json({
+      message: 'Footer link created successfully',
+      link: {
+        id: result.lastInsertRowid,
+        label,
+        url,
+        order_index,
+      }
+    });
+  } catch (error) {
+    console.error('Create footer link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update footer link (protected)
+router.put('/footer-links/:id', authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { label, url, order_index = 0 } = req.body;
+
+    const stmt = db.prepare(`
+      UPDATE footer_links
+      SET label = ?, url = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `);
+
+    stmt.run(label, url, order_index, id);
+    
+    res.json({ message: 'Footer link updated successfully' });
+  } catch (error) {
+    console.error('Update footer link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete footer link (protected)
+router.delete('/footer-links/:id', authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const stmt = db.prepare('DELETE FROM footer_links WHERE id = ?');
+    stmt.run(id);
+
+    res.json({ message: 'Footer link deleted successfully' });
+  } catch (error) {
+    console.error('Delete footer link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 

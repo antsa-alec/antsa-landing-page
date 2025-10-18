@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, message, Typography, Spin, Divider } from 'antd';
-import { LockOutlined, SaveOutlined, LinkOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, message, Typography, Spin, Divider, List, Modal, Space, Popconfirm } from 'antd';
+import { LockOutlined, SaveOutlined, LinkOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { Title, Paragraph } = Typography;
@@ -9,15 +9,28 @@ interface SettingsViewProps {
   auth: AuthContextType;
 }
 
+interface FooterLink {
+  id: number;
+  label: string;
+  url: string;
+  order_index: number;
+}
+
 const SettingsView = ({ auth }: SettingsViewProps) => {
   const [form] = Form.useForm();
   const [globalSettingsForm] = Form.useForm();
+  const [footerLinkForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
+  const [footerLinks, setFooterLinks] = useState<FooterLink[]>([]);
+  const [footerLinksLoading, setFooterLinksLoading] = useState(true);
+  const [linkModalVisible, setLinkModalVisible] = useState(false);
+  const [editingLink, setEditingLink] = useState<FooterLink | null>(null);
 
   useEffect(() => {
     fetchGlobalSettings();
+    fetchFooterLinks();
   }, []);
 
   const fetchGlobalSettings = async () => {
@@ -34,12 +47,6 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
           features_cta_url: data.content.features_cta_url || '',
           pricing_free_cta_text: data.content.pricing_free_cta_text || '',
           pricing_paid_cta_text: data.content.pricing_paid_cta_text || '',
-          // Footer settings
-          footer_privacy_url: data.content.footer_privacy_url || '',
-          footer_terms_url: data.content.footer_terms_url || '',
-          footer_support_url: data.content.footer_support_url || '',
-          footer_about_url: data.content.footer_about_url || '',
-          footer_careers_url: data.content.footer_careers_url || '',
           footer_copyright: data.content.footer_copyright || '',
           footer_tagline: data.content.footer_tagline || '',
           footer_subtitle: data.content.footer_subtitle || '',
@@ -50,6 +57,22 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
       message.error('Failed to load settings');
     } finally {
       setSettingsLoading(false);
+    }
+  };
+
+  const fetchFooterLinks = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/footer-links`);
+      const data = await response.json();
+
+      if (response.ok && data.links) {
+        setFooterLinks(data.links);
+      }
+    } catch (error) {
+      console.error('Fetch footer links error:', error);
+      message.error('Failed to load footer links');
+    } finally {
+      setFooterLinksLoading(false);
     }
   };
 
@@ -104,6 +127,70 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
       message.error('Connection error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddLink = () => {
+    setEditingLink(null);
+    footerLinkForm.resetFields();
+    setLinkModalVisible(true);
+  };
+
+  const handleEditLink = (link: FooterLink) => {
+    setEditingLink(link);
+    footerLinkForm.setFieldsValue(link);
+    setLinkModalVisible(true);
+  };
+
+  const handleDeleteLink = async (id: number) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/footer-links/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`,
+        },
+      });
+
+      if (response.ok) {
+        message.success('Footer link deleted successfully!');
+        fetchFooterLinks();
+      } else {
+        message.error('Failed to delete footer link');
+      }
+    } catch (error) {
+      console.error('Delete link error:', error);
+      message.error('Connection error');
+    }
+  };
+
+  const handleSubmitLink = async (values: any) => {
+    try {
+      const url = editingLink
+        ? `${API_BASE_URL}/content/footer-links/${editingLink.id}`
+        : `${API_BASE_URL}/content/footer-links`;
+      
+      const method = editingLink ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        message.success(`Footer link ${editingLink ? 'updated' : 'created'} successfully!`);
+        setLinkModalVisible(false);
+        fetchFooterLinks();
+      } else {
+        const data = await response.json();
+        message.error(data.error || `Failed to ${editingLink ? 'update' : 'create'} footer link`);
+      }
+    } catch (error) {
+      console.error('Submit link error:', error);
+      message.error('Connection error');
     }
   };
 
@@ -205,62 +292,7 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
               <Input placeholder="Get Started" size="large" />
             </Form.Item>
 
-            <Divider orientation="left">Footer Settings</Divider>
-
-            <Form.Item
-              label="Privacy Policy URL"
-              name="footer_privacy_url"
-            >
-              <Input 
-                prefix={<LinkOutlined />}
-                placeholder="https://antsa.ai/privacy" 
-                size="large" 
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Terms of Service URL"
-              name="footer_terms_url"
-            >
-              <Input 
-                prefix={<LinkOutlined />}
-                placeholder="https://antsa.ai/terms" 
-                size="large" 
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Support URL"
-              name="footer_support_url"
-            >
-              <Input 
-                prefix={<LinkOutlined />}
-                placeholder="https://antsa.ai/support" 
-                size="large" 
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="About Us URL"
-              name="footer_about_url"
-            >
-              <Input 
-                prefix={<LinkOutlined />}
-                placeholder="https://antsa.ai/about" 
-                size="large" 
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Careers URL"
-              name="footer_careers_url"
-            >
-              <Input 
-                prefix={<LinkOutlined />}
-                placeholder="https://antsa.ai/careers" 
-                size="large" 
-              />
-            </Form.Item>
+            <Divider orientation="left">Footer Text</Divider>
 
             <Form.Item
               label="Copyright Text"
@@ -300,6 +332,128 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
           </Form>
         )}
       </Card>
+
+      {/* Footer Links Manager */}
+      <Card style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <Title level={3} style={{ marginBottom: 8 }}>
+              <LinkOutlined style={{ marginRight: 8 }} />
+              Footer Links
+            </Title>
+            <Paragraph style={{ color: '#666', marginBottom: 0 }}>
+              Add custom links that will appear in the footer. Common examples: Privacy Policy, Terms of Service, Support, etc.
+            </Paragraph>
+          </div>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddLink}>
+            Add Link
+          </Button>
+        </div>
+
+        {footerLinksLoading ? (
+          <div style={{ textAlign: 'center', padding: 48 }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <List
+            dataSource={footerLinks}
+            locale={{ emptyText: 'No footer links yet. Click "Add Link" to create one.' }}
+            renderItem={(link) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEditLink(link)}
+                  >
+                    Edit
+                  </Button>,
+                  <Popconfirm
+                    title="Delete this link?"
+                    onConfirm={() => handleDeleteLink(link.id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button type="text" danger icon={<DeleteOutlined />}>
+                      Delete
+                    </Button>
+                  </Popconfirm>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={link.label}
+                  description={
+                    <Space direction="vertical" size={0}>
+                      <Text style={{ color: '#666', fontSize: '0.9rem' }}>
+                        <LinkOutlined style={{ marginRight: 4 }} />
+                        {link.url}
+                      </Text>
+                      <Text style={{ color: '#999', fontSize: '0.85rem' }}>
+                        Order: {link.order_index}
+                      </Text>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
+
+      {/* Footer Link Modal */}
+      <Modal
+        title={editingLink ? 'Edit Footer Link' : 'Add Footer Link'}
+        open={linkModalVisible}
+        onCancel={() => setLinkModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <Form
+          form={footerLinkForm}
+          layout="vertical"
+          onFinish={handleSubmitLink}
+          initialValues={{ order_index: 0 }}
+        >
+          <Form.Item
+            label="Label"
+            name="label"
+            rules={[{ required: true, message: 'Please enter a label' }]}
+          >
+            <Input placeholder="Privacy Policy" size="large" />
+          </Form.Item>
+
+          <Form.Item
+            label="URL"
+            name="url"
+            rules={[{ required: true, message: 'Please enter a URL' }]}
+          >
+            <Input
+              prefix={<LinkOutlined />}
+              placeholder="https://antsa.ai/privacy"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Order"
+            name="order_index"
+            tooltip="Links will be sorted by this number (lowest first)"
+          >
+            <Input type="number" size="large" />
+          </Form.Item>
+
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                {editingLink ? 'Update' : 'Create'}
+              </Button>
+              <Button onClick={() => setLinkModalVisible(false)}>
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Card style={{ marginBottom: 24 }}>
         <Title level={4}>Change Password</Title>
@@ -385,5 +539,7 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
   );
 };
 
-export default SettingsView;
+// Missing import that was referenced
+const { Text } = Typography;
 
+export default SettingsView;
