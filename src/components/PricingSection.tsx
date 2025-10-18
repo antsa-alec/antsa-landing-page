@@ -216,10 +216,7 @@ const PricingCard = ({
           <Title 
             level={2} 
             style={{ 
-              background: plan.gradient,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              color: plan.color,
               margin: 0,
               fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
               fontWeight: 900,
@@ -235,7 +232,7 @@ const PricingCard = ({
             display: 'block',
             textAlign: 'center',
             fontSize: '1rem',
-            color: '#718096',
+            color: '#4a5568',
             fontWeight: 600,
             marginBottom: '15px',
           }}
