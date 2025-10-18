@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, message, Typography, Spin, Divider, List, Modal, Space, Popconfirm } from 'antd';
+import { Form, Input, Button, Card, message, Typography, Spin, Divider, List, Modal, Space, Popconfirm, Select, Tag } from 'antd';
 import { LockOutlined, SaveOutlined, LinkOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 interface SettingsViewProps {
   auth: AuthContextType;
@@ -16,10 +17,32 @@ interface FooterLink {
   order_index: number;
 }
 
+interface SocialLink {
+  id: number;
+  platform: string;
+  url: string;
+  order_index: number;
+}
+
+// Available social platforms
+const SOCIAL_PLATFORMS = [
+  { value: 'github', label: 'GitHub', color: '#333' },
+  { value: 'linkedin', label: 'LinkedIn', color: '#0077b5' },
+  { value: 'twitter', label: 'Twitter', color: '#1da1f2' },
+  { value: 'x', label: 'X (Twitter)', color: '#000' },
+  { value: 'facebook', label: 'Facebook', color: '#1877f2' },
+  { value: 'instagram', label: 'Instagram', color: '#e4405f' },
+  { value: 'youtube', label: 'YouTube', color: '#ff0000' },
+  { value: 'tiktok', label: 'TikTok', color: '#000' },
+  { value: 'website', label: 'Website', color: '#48abe2' },
+  { value: 'other', label: 'Other', color: '#666' },
+];
+
 const SettingsView = ({ auth }: SettingsViewProps) => {
   const [form] = Form.useForm();
   const [globalSettingsForm] = Form.useForm();
   const [footerLinkForm] = Form.useForm();
+  const [socialLinkForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [settingsLoading, setSettingsLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
@@ -27,10 +50,15 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
   const [footerLinksLoading, setFooterLinksLoading] = useState(true);
   const [linkModalVisible, setLinkModalVisible] = useState(false);
   const [editingLink, setEditingLink] = useState<FooterLink | null>(null);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [socialLinksLoading, setSocialLinksLoading] = useState(true);
+  const [socialModalVisible, setSocialModalVisible] = useState(false);
+  const [editingSocial, setEditingSocial] = useState<SocialLink | null>(null);
 
   useEffect(() => {
     fetchGlobalSettings();
     fetchFooterLinks();
+    fetchSocialLinks();
   }, []);
 
   const fetchGlobalSettings = async () => {
@@ -73,6 +101,22 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
       message.error('Failed to load footer links');
     } finally {
       setFooterLinksLoading(false);
+    }
+  };
+
+  const fetchSocialLinks = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/social-links`);
+      const data = await response.json();
+
+      if (response.ok && data.links) {
+        setSocialLinks(data.links);
+      }
+    } catch (error) {
+      console.error('Fetch social links error:', error);
+      message.error('Failed to load social links');
+    } finally {
+      setSocialLinksLoading(false);
     }
   };
 
@@ -192,6 +236,81 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
       console.error('Submit link error:', error);
       message.error('Connection error');
     }
+  };
+
+  // Social Links handlers
+  const handleAddSocial = () => {
+    setEditingSocial(null);
+    socialLinkForm.resetFields();
+    setSocialModalVisible(true);
+  };
+
+  const handleEditSocial = (link: SocialLink) => {
+    setEditingSocial(link);
+    socialLinkForm.setFieldsValue(link);
+    setSocialModalVisible(true);
+  };
+
+  const handleDeleteSocial = async (id: number) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/social-links/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`,
+        },
+      });
+
+      if (response.ok) {
+        message.success('Social link deleted successfully!');
+        fetchSocialLinks();
+      } else {
+        message.error('Failed to delete social link');
+      }
+    } catch (error) {
+      console.error('Delete social link error:', error);
+      message.error('Connection error');
+    }
+  };
+
+  const handleSubmitSocial = async (values: any) => {
+    try {
+      const url = editingSocial
+        ? `${API_BASE_URL}/content/social-links/${editingSocial.id}`
+        : `${API_BASE_URL}/content/social-links`;
+      
+      const method = editingSocial ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        message.success(`Social link ${editingSocial ? 'updated' : 'created'} successfully!`);
+        setSocialModalVisible(false);
+        fetchSocialLinks();
+      } else {
+        const data = await response.json();
+        message.error(data.error || `Failed to ${editingSocial ? 'update' : 'create'} social link`);
+      }
+    } catch (error) {
+      console.error('Submit social link error:', error);
+      message.error('Connection error');
+    }
+  };
+
+  const getPlatformLabel = (platform: string) => {
+    const found = SOCIAL_PLATFORMS.find(p => p.value === platform);
+    return found ? found.label : platform;
+  };
+
+  const getPlatformColor = (platform: string) => {
+    const found = SOCIAL_PLATFORMS.find(p => p.value === platform);
+    return found ? found.color : '#666';
   };
 
   return (
@@ -448,6 +567,141 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
                 {editingLink ? 'Update' : 'Create'}
               </Button>
               <Button onClick={() => setLinkModalVisible(false)}>
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Social Links Manager */}
+      <Card style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <Title level={3} style={{ marginBottom: 8 }}>
+              <LinkOutlined style={{ marginRight: 8 }} />
+              Social Media Links
+            </Title>
+            <Paragraph style={{ color: '#666', marginBottom: 0 }}>
+              Add your social media profiles. Only one link per platform is allowed.
+            </Paragraph>
+          </div>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddSocial}>
+            Add Link
+          </Button>
+        </div>
+
+        {socialLinksLoading ? (
+          <div style={{ textAlign: 'center', padding: 48 }}>
+            <Spin size="large" />
+          </div>
+        ) : (
+          <List
+            dataSource={socialLinks}
+            locale={{ emptyText: 'No social links yet. Click "Add Link" to create one.' }}
+            renderItem={(link) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEditSocial(link)}
+                  >
+                    Edit
+                  </Button>,
+                  <Popconfirm
+                    title="Delete this social link?"
+                    onConfirm={() => handleDeleteSocial(link.id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button type="text" danger icon={<DeleteOutlined />}>
+                      Delete
+                    </Button>
+                  </Popconfirm>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Tag color={getPlatformColor(link.platform)}>
+                        {getPlatformLabel(link.platform)}
+                      </Tag>
+                    </Space>
+                  }
+                  description={
+                    <Space direction="vertical" size={0}>
+                      <Text style={{ color: '#666', fontSize: '0.9rem' }}>
+                        <LinkOutlined style={{ marginRight: 4 }} />
+                        {link.url}
+                      </Text>
+                      <Text style={{ color: '#999', fontSize: '0.85rem' }}>
+                        Order: {link.order_index}
+                      </Text>
+                    </Space>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
+
+      {/* Social Link Modal */}
+      <Modal
+        title={editingSocial ? 'Edit Social Link' : 'Add Social Link'}
+        open={socialModalVisible}
+        onCancel={() => setSocialModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <Form
+          form={socialLinkForm}
+          layout="vertical"
+          onFinish={handleSubmitSocial}
+          initialValues={{ order_index: 0 }}
+        >
+          <Form.Item
+            label="Platform"
+            name="platform"
+            rules={[{ required: true, message: 'Please select a platform' }]}
+            tooltip="Only one link per platform is allowed"
+          >
+            <Select placeholder="Select a social platform" size="large">
+              {SOCIAL_PLATFORMS.map(platform => (
+                <Option key={platform.value} value={platform.value}>
+                  <Tag color={platform.color}>{platform.label}</Tag>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="URL"
+            name="url"
+            rules={[{ required: true, message: 'Please enter a URL' }]}
+          >
+            <Input
+              prefix={<LinkOutlined />}
+              placeholder="https://twitter.com/yourcompany"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Order"
+            name="order_index"
+            tooltip="Links will be sorted by this number (lowest first)"
+          >
+            <Input type="number" size="large" />
+          </Form.Item>
+
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                {editingSocial ? 'Update' : 'Create'}
+              </Button>
+              <Button onClick={() => setSocialModalVisible(false)}>
                 Cancel
               </Button>
             </Space>

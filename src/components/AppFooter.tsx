@@ -4,7 +4,16 @@
  */
 
 import { Layout, Row, Col, Typography, Space } from 'antd';
-import { GithubOutlined, LinkedinOutlined, TwitterOutlined, HeartFilled } from '@ant-design/icons';
+import { 
+  GithubOutlined, 
+  LinkedinOutlined, 
+  TwitterOutlined, 
+  HeartFilled,
+  FacebookOutlined,
+  InstagramOutlined,
+  YoutubeOutlined,
+  GlobalOutlined,
+} from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 
 const { Footer } = Layout;
@@ -26,10 +35,32 @@ interface FooterLink {
   order_index: number;
 }
 
+interface SocialLink {
+  id: number;
+  platform: string;
+  url: string;
+  order_index: number;
+}
+
+// Map platform names to Ant Design icons
+const socialIconMap: Record<string, any> = {
+  github: GithubOutlined,
+  linkedin: LinkedinOutlined,
+  twitter: TwitterOutlined,
+  x: TwitterOutlined, // X (formerly Twitter)
+  facebook: FacebookOutlined,
+  instagram: InstagramOutlined,
+  youtube: YoutubeOutlined,
+  tiktok: GlobalOutlined, // TikTok doesn't have a dedicated icon, use global
+  website: GlobalOutlined,
+  other: GlobalOutlined,
+};
+
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState<FooterSettings>({});
   const [footerLinks, setFooterLinks] = useState<FooterLink[]>([]);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
   useEffect(() => {
     let ignore = false;
@@ -64,13 +95,35 @@ const AppFooter = () => {
       }
     };
 
+    const fetchSocialLinks = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/social-links`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok && data.links) {
+          setSocialLinks(data.links);
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching social links:', error);
+        }
+      }
+    };
+
     fetchSettings();
     fetchFooterLinks();
+    fetchSocialLinks();
 
     return () => {
       ignore = true;
     };
   }, []);
+
+  // Get icon component for platform
+  const getIconForPlatform = (platform: string) => {
+    const normalizedPlatform = platform.toLowerCase();
+    return socialIconMap[normalizedPlatform] || GlobalOutlined;
+  };
 
   return (
     <Footer style={{ 
@@ -96,32 +149,42 @@ const AppFooter = () => {
 
           {/* Social Media Icons */}
           <Space size="large" style={{ marginBottom: '30px' }}>
-            {[GithubOutlined, LinkedinOutlined, TwitterOutlined].map((Icon, index) => (
-              <div
-                key={index}
-                style={{
-                  width: '45px',
-                  height: '45px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#48abe2';
-                  e.currentTarget.style.transform = 'translateY(-5px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <Icon style={{ fontSize: '1.4rem', color: '#ffffff' }} />
-              </div>
-            ))}
+            {socialLinks.map((socialLink) => {
+              const IconComponent = getIconForPlatform(socialLink.platform);
+              return (
+                <a
+                  key={socialLink.id}
+                  href={socialLink.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none' }}
+                >
+                  <div
+                    style={{
+                      width: '45px',
+                      height: '45px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#48abe2';
+                      e.currentTarget.style.transform = 'translateY(-5px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <IconComponent style={{ fontSize: '1.4rem', color: '#ffffff' }} />
+                  </div>
+                </a>
+              );
+            })}
           </Space>
 
           {/* Links */}

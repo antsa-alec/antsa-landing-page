@@ -500,5 +500,107 @@ router.delete('/footer-links/:id', authenticateToken, (req, res) => {
   }
 });
 
+// ===== SOCIAL LINKS ROUTES =====
+
+// Get all social links (public)
+router.get('/social-links', (req, res) => {
+  try {
+    const stmt = db.prepare('SELECT * FROM social_links ORDER BY order_index');
+    const links = stmt.all();
+    res.json({ links });
+  } catch (error) {
+    console.error('Get social links error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Create social link (protected)
+router.post('/social-links', [
+  authenticateToken,
+  body('platform').notEmpty().withMessage('Platform is required'),
+  body('url').notEmpty().withMessage('URL is required'),
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { platform, url, order_index = 0 } = req.body;
+
+    // Check if platform already exists (only one per platform)
+    const existingStmt = db.prepare('SELECT * FROM social_links WHERE platform = ?');
+    const existing = existingStmt.get(platform);
+
+    if (existing) {
+      return res.status(400).json({ error: 'A link for this platform already exists. Please edit or delete the existing one.' });
+    }
+
+    const stmt = db.prepare(`
+      INSERT INTO social_links (platform, url, order_index)
+      VALUES (?, ?, ?)
+    `);
+
+    const result = stmt.run(platform, url, order_index);
+    
+    res.json({
+      message: 'Social link created successfully',
+      link: {
+        id: result.lastInsertRowid,
+        platform,
+        url,
+        order_index,
+      }
+    });
+  } catch (error) {
+    console.error('Create social link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update social link (protected)
+router.put('/social-links/:id', authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+    const { platform, url, order_index = 0 } = req.body;
+
+    // Check if platform already exists for a different link
+    const existingStmt = db.prepare('SELECT * FROM social_links WHERE platform = ? AND id != ?');
+    const existing = existingStmt.get(platform, id);
+
+    if (existing) {
+      return res.status(400).json({ error: 'A link for this platform already exists.' });
+    }
+
+    const stmt = db.prepare(`
+      UPDATE social_links
+      SET platform = ?, url = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `);
+
+    stmt.run(platform, url, order_index, id);
+    
+    res.json({ message: 'Social link updated successfully' });
+  } catch (error) {
+    console.error('Update social link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete social link (protected)
+router.delete('/social-links/:id', authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const stmt = db.prepare('DELETE FROM social_links WHERE id = ?');
+    stmt.run(id);
+
+    res.json({ message: 'Social link deleted successfully' });
+  } catch (error) {
+    console.error('Delete social link error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 
