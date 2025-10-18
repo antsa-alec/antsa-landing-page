@@ -602,5 +602,110 @@ router.delete('/social-links/:id', authenticateToken, (req, res) => {
   }
 });
 
+// ===== TEAM MEMBER SOCIALS ROUTES =====
+
+// Get social links for a team member (public)
+router.get('/team/:teamMemberId/socials', (req, res) => {
+  try {
+    const { teamMemberId } = req.params;
+    const stmt = db.prepare('SELECT * FROM team_member_socials WHERE team_member_id = ? ORDER BY order_index');
+    const socials = stmt.all(teamMemberId);
+    res.json({ socials });
+  } catch (error) {
+    console.error('Get team member socials error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add social link to team member (protected)
+router.post('/team/:teamMemberId/socials', [
+  authenticateToken,
+  body('platform').notEmpty().withMessage('Platform is required'),
+  body('url').notEmpty().withMessage('URL is required'),
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { teamMemberId } = req.params;
+    const { platform, url, order_index = 0 } = req.body;
+
+    // Check if platform already exists for this team member
+    const existingStmt = db.prepare('SELECT * FROM team_member_socials WHERE team_member_id = ? AND platform = ?');
+    const existing = existingStmt.get(teamMemberId, platform);
+
+    if (existing) {
+      return res.status(400).json({ error: 'A link for this platform already exists for this team member.' });
+    }
+
+    const stmt = db.prepare(`
+      INSERT INTO team_member_socials (team_member_id, platform, url, order_index)
+      VALUES (?, ?, ?, ?)
+    `);
+
+    const result = stmt.run(teamMemberId, platform, url, order_index);
+    
+    res.json({
+      message: 'Social link created successfully',
+      social: {
+        id: result.lastInsertRowid,
+        team_member_id: teamMemberId,
+        platform,
+        url,
+        order_index,
+      }
+    });
+  } catch (error) {
+    console.error('Create team member social error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update team member social link (protected)
+router.put('/team/:teamMemberId/socials/:id', authenticateToken, (req, res) => {
+  try {
+    const { teamMemberId, id } = req.params;
+    const { platform, url, order_index = 0 } = req.body;
+
+    // Check if platform already exists for a different social link of this team member
+    const existingStmt = db.prepare('SELECT * FROM team_member_socials WHERE team_member_id = ? AND platform = ? AND id != ?');
+    const existing = existingStmt.get(teamMemberId, platform, id);
+
+    if (existing) {
+      return res.status(400).json({ error: 'A link for this platform already exists for this team member.' });
+    }
+
+    const stmt = db.prepare(`
+      UPDATE team_member_socials
+      SET platform = ?, url = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND team_member_id = ?
+    `);
+
+    stmt.run(platform, url, order_index, id, teamMemberId);
+    
+    res.json({ message: 'Social link updated successfully' });
+  } catch (error) {
+    console.error('Update team member social error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete team member social link (protected)
+router.delete('/team/:teamMemberId/socials/:id', authenticateToken, (req, res) => {
+  try {
+    const { teamMemberId, id } = req.params;
+
+    const stmt = db.prepare('DELETE FROM team_member_socials WHERE id = ? AND team_member_id = ?');
+    stmt.run(id, teamMemberId);
+
+    res.json({ message: 'Social link deleted successfully' });
+  } catch (error) {
+    console.error('Delete team member social error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 

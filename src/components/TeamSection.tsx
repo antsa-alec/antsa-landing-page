@@ -5,7 +5,16 @@
 
 import { useState, useEffect } from 'react';
 import { Row, Col, Card, Typography, Avatar, Space, Spin } from 'antd';
-import { LinkedinOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
+import { 
+  LinkedinOutlined, 
+  MailOutlined, 
+  UserOutlined,
+  GithubOutlined,
+  TwitterOutlined,
+  FacebookOutlined,
+  InstagramOutlined,
+  GlobalOutlined,
+} from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -18,23 +27,66 @@ interface TeamMember {
   role: string;
   bio: string;
   image_url?: string;
+  socials?: TeamMemberSocial[];
 }
+
+interface TeamMemberSocial {
+  id: number;
+  platform: string;
+  url: string;
+  order_index: number;
+}
+
+// Map platform names to Ant Design icons
+const socialIconMap: Record<string, any> = {
+  linkedin: LinkedinOutlined,
+  twitter: TwitterOutlined,
+  x: TwitterOutlined,
+  github: GithubOutlined,
+  facebook: FacebookOutlined,
+  instagram: InstagramOutlined,
+  email: MailOutlined,
+  website: GlobalOutlined,
+  other: GlobalOutlined,
+};
 
 const TeamSection = () => {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let ignore = false; // Race condition protection (React best practice)
+    let ignore = false;
 
     const fetchTeamMembers = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/content/section/team`);
         const data = await response.json();
         
-        // Only update state if this effect hasn't been cleaned up
         if (!ignore && response.ok && data.content && data.content.members) {
-          setTeamMembers(data.content.members);
+          const members = data.content.members;
+          
+          // Fetch social links for each member
+          const membersWithSocials = await Promise.all(
+            members.map(async (member: TeamMember) => {
+              try {
+                const socialsResponse = await fetch(`${API_BASE_URL}/content/team/${member.id}/socials`);
+                const socialsData = await socialsResponse.json();
+                
+                return {
+                  ...member,
+                  socials: socialsData.socials || [],
+                };
+              } catch (error) {
+                console.error(`Error fetching socials for member ${member.id}:`, error);
+                return {
+                  ...member,
+                  socials: [],
+                };
+              }
+            })
+          );
+          
+          setTeamMembers(membersWithSocials);
         }
       } catch (error) {
         if (!ignore) {
@@ -49,11 +101,15 @@ const TeamSection = () => {
 
     fetchTeamMembers();
 
-    // Cleanup function to prevent race conditions
     return () => {
       ignore = true;
     };
   }, []);
+
+  const getIconForPlatform = (platform: string) => {
+    const normalizedPlatform = platform.toLowerCase();
+    return socialIconMap[normalizedPlatform] || GlobalOutlined;
+  };
 
   if (loading) {
     return (
@@ -183,54 +239,46 @@ const TeamSection = () => {
                 </Paragraph>
               )}
 
-              <Space size="middle">
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: '#48abe2',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#2196f3';
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#667eea';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <LinkedinOutlined style={{ fontSize: '1.3rem', color: '#ffffff' }} />
-                </div>
-                <div
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: '#48abe2',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#2196f3';
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#667eea';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <MailOutlined style={{ fontSize: '1.3rem', color: '#ffffff' }} />
-                </div>
-              </Space>
+              {member.socials && member.socials.length > 0 && (
+                <Space size="middle">
+                  {member.socials.map((social) => {
+                    const IconComponent = getIconForPlatform(social.platform);
+                    return (
+                      <a
+                        key={social.id}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                      >
+                        <div
+                          style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: '#48abe2',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = '#2196f3';
+                            e.currentTarget.style.transform = 'translateY(-3px)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = '#48abe2';
+                            e.currentTarget.style.transform = 'translateY(0)';
+                          }}
+                        >
+                          <IconComponent style={{ fontSize: '1.3rem', color: '#ffffff' }} />
+                        </div>
+                      </a>
+                    );
+                  })}
+                </Space>
+              )}
             </Card>
           </Col>
         ))}

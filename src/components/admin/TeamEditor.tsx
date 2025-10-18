@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Avatar, Upload } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, UploadOutlined } from '@ant-design/icons';
+import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Avatar, Upload, Select, Tag, Divider, Typography } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, UploadOutlined, LinkOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { TextArea } = Input;
+const { Option } = Select;
+const { Text } = Typography;
 
 interface TeamMember {
   id: number;
@@ -14,9 +16,30 @@ interface TeamMember {
   order_index: number;
 }
 
+interface TeamMemberSocial {
+  id: number;
+  team_member_id: number;
+  platform: string;
+  url: string;
+  order_index: number;
+}
+
 interface TeamEditorProps {
   auth: AuthContextType;
 }
+
+// Available social platforms
+const SOCIAL_PLATFORMS = [
+  { value: 'linkedin', label: 'LinkedIn', color: '#0077b5' },
+  { value: 'twitter', label: 'Twitter', color: '#1da1f2' },
+  { value: 'x', label: 'X (Twitter)', color: '#000' },
+  { value: 'github', label: 'GitHub', color: '#333' },
+  { value: 'facebook', label: 'Facebook', color: '#1877f2' },
+  { value: 'instagram', label: 'Instagram', color: '#e4405f' },
+  { value: 'website', label: 'Website', color: '#48abe2' },
+  { value: 'email', label: 'Email', color: '#666' },
+  { value: 'other', label: 'Other', color: '#666' },
+];
 
 const TeamEditor = ({ auth }: TeamEditorProps) => {
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -26,6 +49,15 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
   const [form] = Form.useForm();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  
+  // Social links state
+  const [socialsModalVisible, setSocialsModalVisible] = useState(false);
+  const [currentMemberId, setCurrentMemberId] = useState<number | null>(null);
+  const [socials, setSocials] = useState<TeamMemberSocial[]>([]);
+  const [socialsLoading, setSocialsLoading] = useState(false);
+  const [socialForm] = Form.useForm();
+  const [editingSocial, setEditingSocial] = useState<TeamMemberSocial | null>(null);
+  const [socialEditModalVisible, setSocialEditModalVisible] = useState(false);
 
   useEffect(() => {
     fetchMembers();
@@ -49,6 +81,25 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     }
   };
 
+  const fetchSocials = async (memberId: number) => {
+    setSocialsLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/team/${memberId}/socials`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setSocials(data.socials || []);
+      } else {
+        message.error('Failed to load social links');
+      }
+    } catch (error) {
+      console.error('Fetch socials error:', error);
+      message.error('Connection error');
+    } finally {
+      setSocialsLoading(false);
+    }
+  };
+
   const handleAdd = () => {
     setEditingMember(null);
     form.resetFields();
@@ -61,6 +112,80 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     form.setFieldsValue(member);
     setImageUrl(member.image_url || null);
     setModalVisible(true);
+  };
+
+  const handleManageSocials = (member: TeamMember) => {
+    setCurrentMemberId(member.id);
+    fetchSocials(member.id);
+    setSocialsModalVisible(true);
+  };
+
+  const handleAddSocial = () => {
+    setEditingSocial(null);
+    socialForm.resetFields();
+    setSocialEditModalVisible(true);
+  };
+
+  const handleEditSocial = (social: TeamMemberSocial) => {
+    setEditingSocial(social);
+    socialForm.setFieldsValue(social);
+    setSocialEditModalVisible(true);
+  };
+
+  const handleDeleteSocial = async (socialId: number) => {
+    if (!currentMemberId) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/team/${currentMemberId}/socials/${socialId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`,
+        },
+      });
+
+      if (response.ok) {
+        message.success('Social link deleted successfully!');
+        fetchSocials(currentMemberId);
+      } else {
+        message.error('Failed to delete social link');
+      }
+    } catch (error) {
+      console.error('Delete social error:', error);
+      message.error('Connection error');
+    }
+  };
+
+  const handleSubmitSocial = async (values: any) => {
+    if (!currentMemberId) return;
+
+    try {
+      const url = editingSocial
+        ? `${API_BASE_URL}/content/team/${currentMemberId}/socials/${editingSocial.id}`
+        : `${API_BASE_URL}/content/team/${currentMemberId}/socials`;
+      
+      const method = editingSocial ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (response.ok) {
+        message.success(`Social link ${editingSocial ? 'updated' : 'created'} successfully!`);
+        setSocialEditModalVisible(false);
+        fetchSocials(currentMemberId);
+      } else {
+        const data = await response.json();
+        message.error(data.error || `Failed to ${editingSocial ? 'update' : 'create'} social link`);
+      }
+    } catch (error) {
+      console.error('Submit social error:', error);
+      message.error('Connection error');
+    }
   };
 
   const handleImageUpload = async (file: File) => {
@@ -152,6 +277,16 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     }
   };
 
+  const getPlatformLabel = (platform: string) => {
+    const found = SOCIAL_PLATFORMS.find(p => p.value === platform);
+    return found ? found.label : platform;
+  };
+
+  const getPlatformColor = (platform: string) => {
+    const found = SOCIAL_PLATFORMS.find(p => p.value === platform);
+    return found ? found.color : '#666';
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
@@ -183,6 +318,14 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
                   onClick={() => handleEdit(member)}
                 >
                   Edit
+                </Button>,
+                <Button
+                  key="socials"
+                  type="text"
+                  icon={<LinkOutlined />}
+                  onClick={() => handleManageSocials(member)}
+                >
+                  Socials
                 </Button>,
                 <Popconfirm
                   key="delete"
@@ -218,6 +361,7 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
         )}
       />
 
+      {/* Team Member Edit Modal */}
       <Modal
         title={editingMember ? 'Edit Team Member' : 'Add Team Member'}
         open={modalVisible}
@@ -303,9 +447,135 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
           </Form.Item>
         </Form>
       </Modal>
+
+      {/* Social Links Management Modal */}
+      <Modal
+        title={`Manage Social Links${currentMemberId ? ` - ${members.find(m => m.id === currentMemberId)?.name}` : ''}`}
+        open={socialsModalVisible}
+        onCancel={() => setSocialsModalVisible(false)}
+        footer={null}
+        width={700}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleAddSocial}>
+            Add Social Link
+          </Button>
+        </div>
+
+        {socialsLoading ? (
+          <div style={{ textAlign: 'center', padding: 48 }}>
+            <Spin />
+          </div>
+        ) : (
+          <List
+            dataSource={socials}
+            locale={{ emptyText: 'No social links yet. Click "Add Social Link" to create one.' }}
+            renderItem={(social) => (
+              <List.Item
+                actions={[
+                  <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEditSocial(social)}
+                  >
+                    Edit
+                  </Button>,
+                  <Popconfirm
+                    title="Delete this social link?"
+                    onConfirm={() => handleDeleteSocial(social.id)}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <Button type="text" danger icon={<DeleteOutlined />}>
+                      Delete
+                    </Button>
+                  </Popconfirm>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      <Tag color={getPlatformColor(social.platform)}>
+                        {getPlatformLabel(social.platform)}
+                      </Tag>
+                    </Space>
+                  }
+                  description={
+                    <Text style={{ fontSize: '0.9rem' }}>
+                      <LinkOutlined style={{ marginRight: 4 }} />
+                      {social.url}
+                    </Text>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Modal>
+
+      {/* Social Link Edit Modal */}
+      <Modal
+        title={editingSocial ? 'Edit Social Link' : 'Add Social Link'}
+        open={socialEditModalVisible}
+        onCancel={() => setSocialEditModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <Form
+          form={socialForm}
+          layout="vertical"
+          onFinish={handleSubmitSocial}
+          initialValues={{ order_index: 0 }}
+        >
+          <Form.Item
+            label="Platform"
+            name="platform"
+            rules={[{ required: true, message: 'Please select a platform' }]}
+            tooltip="Only one link per platform per team member"
+          >
+            <Select placeholder="Select a social platform" size="large">
+              {SOCIAL_PLATFORMS.map(platform => (
+                <Option key={platform.value} value={platform.value}>
+                  <Tag color={platform.color}>{platform.label}</Tag>
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            label="URL"
+            name="url"
+            rules={[{ required: true, message: 'Please enter a URL' }]}
+          >
+            <Input
+              prefix={<LinkOutlined />}
+              placeholder="https://linkedin.com/in/yourprofile"
+              size="large"
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Order"
+            name="order_index"
+            tooltip="Links will be sorted by this number (lowest first)"
+          >
+            <Input type="number" size="large" />
+          </Form.Item>
+
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                {editingSocial ? 'Update' : 'Create'}
+              </Button>
+              <Button onClick={() => setSocialEditModalVisible(false)}>
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   );
 };
 
 export default TeamEditor;
-
