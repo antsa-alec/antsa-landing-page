@@ -46,6 +46,9 @@ jobs:
         cp startup.sh deploy/
         chmod +x deploy/startup.sh
         
+        # Remove .env file to use Azure environment variables
+        rm -f deploy/backend/.env
+        
         # Create .deployment file to prevent Azure from running build
         echo "[config]" > deploy/.deployment
         echo "SCM_DO_BUILD_DURING_DEPLOYMENT=false" >> deploy/.deployment
