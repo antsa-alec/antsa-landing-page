@@ -34,6 +34,7 @@ const SOCIAL_PLATFORMS = [
   { value: 'instagram', label: 'Instagram', color: '#e4405f' },
   { value: 'youtube', label: 'YouTube', color: '#ff0000' },
   { value: 'tiktok', label: 'TikTok', color: '#000' },
+  { value: 'email', label: 'Email', color: '#48abe2' },
   { value: 'website', label: 'Website', color: '#48abe2' },
   { value: 'other', label: 'Other', color: '#666' },
 ];
@@ -54,11 +55,14 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
   const [socialLinksLoading, setSocialLinksLoading] = useState(true);
   const [socialModalVisible, setSocialModalVisible] = useState(false);
   const [editingSocial, setEditingSocial] = useState<SocialLink | null>(null);
+  const [availableDocuments, setAvailableDocuments] = useState<{privacy: boolean, terms: boolean}>({ privacy: false, terms: false });
+  const [linkType, setLinkType] = useState<'url' | 'document'>('url');
 
   useEffect(() => {
     fetchGlobalSettings();
     fetchFooterLinks();
     fetchSocialLinks();
+    fetchAvailableDocuments();
   }, []);
 
   const fetchGlobalSettings = async () => {
@@ -120,6 +124,25 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
     }
   };
 
+  const fetchAvailableDocuments = async () => {
+    try {
+      const [privacyRes, termsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/documents/privacy/info`),
+        fetch(`${API_BASE_URL}/documents/terms/info`),
+      ]);
+
+      const privacyData = await privacyRes.json();
+      const termsData = await termsRes.json();
+
+      setAvailableDocuments({
+        privacy: privacyData.exists || false,
+        terms: termsData.exists || false,
+      });
+    } catch (error) {
+      console.error('Fetch available documents error:', error);
+    }
+  };
+
   const handleSaveGlobalSettings = async (values: any) => {
     setSavingSettings(true);
     try {
@@ -176,12 +199,19 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
 
   const handleAddLink = () => {
     setEditingLink(null);
+    setLinkType('url');
     footerLinkForm.resetFields();
     setLinkModalVisible(true);
   };
 
   const handleEditLink = (link: FooterLink) => {
     setEditingLink(link);
+    // Detect if this is a document link
+    if (link.url.includes('/api/documents/')) {
+      setLinkType('document');
+    } else {
+      setLinkType('url');
+    }
     footerLinkForm.setFieldsValue(link);
     setLinkModalVisible(true);
   };
@@ -525,7 +555,7 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
         open={linkModalVisible}
         onCancel={() => setLinkModalVisible(false)}
         footer={null}
-        width={500}
+        width={600}
       >
         <Form
           form={footerLinkForm}
@@ -541,17 +571,45 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
             <Input placeholder="Privacy Policy" size="large" />
           </Form.Item>
 
-          <Form.Item
-            label="URL"
-            name="url"
-            rules={[{ required: true, message: 'Please enter a URL' }]}
-          >
-            <Input
-              prefix={<LinkOutlined />}
-              placeholder="https://antsa.ai/privacy"
-              size="large"
-            />
+          <Form.Item label="Link Type" tooltip="Choose whether to link to a URL or an uploaded document">
+            <Select value={linkType} onChange={(value) => setLinkType(value)} size="large">
+              <Option value="url">Custom URL</Option>
+              <Option value="document">Uploaded Document</Option>
+            </Select>
           </Form.Item>
+
+          {linkType === 'url' ? (
+            <Form.Item
+              label="URL"
+              name="url"
+              rules={[{ required: true, message: 'Please enter a URL' }]}
+            >
+              <Input
+                prefix={<LinkOutlined />}
+                placeholder="https://antsa.ai/privacy or mailto:support@antsa.com.au"
+                size="large"
+              />
+            </Form.Item>
+          ) : (
+            <Form.Item
+              label="Select Document"
+              name="url"
+              rules={[{ required: true, message: 'Please select a document' }]}
+              tooltip="Documents are uploaded in the Documents section"
+            >
+              <Select placeholder="Select a document" size="large">
+                {availableDocuments.privacy && (
+                  <Option value="/api/documents/privacy">Privacy Policy</Option>
+                )}
+                {availableDocuments.terms && (
+                  <Option value="/api/documents/terms">Terms of Service</Option>
+                )}
+                {!availableDocuments.privacy && !availableDocuments.terms && (
+                  <Option value="" disabled>No documents uploaded yet - Go to Documents section first</Option>
+                )}
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             label="Order"
@@ -680,10 +738,11 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
             label="URL"
             name="url"
             rules={[{ required: true, message: 'Please enter a URL' }]}
+            tooltip={linkType === 'url' ? "For email, use: mailto:support@antsa.com.au" : undefined}
           >
             <Input
               prefix={<LinkOutlined />}
-              placeholder="https://twitter.com/yourcompany"
+              placeholder="https://twitter.com/yourcompany or mailto:support@antsa.com.au"
               size="large"
             />
           </Form.Item>
