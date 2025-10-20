@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import contentRoutes from './routes/content.js';
 import imageRoutes from './routes/images.js';
+import documentRoutes from './routes/documents.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -55,6 +56,7 @@ app.use(cors({
 app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/api/documents', documentRoutes);
 
 // Serve static files from the dist directory (production)
 if (process.env.NODE_ENV === 'production') {
@@ -81,6 +83,10 @@ app.use((err, req, res, next) => {
   }
   
   if (err.message === 'Only image files are allowed') {
+    return res.status(400).json({ error: err.message });
+  }
+
+  if (err.message === 'Only PDF, DOC, DOCX, and TXT files are allowed') {
     return res.status(400).json({ error: err.message });
   }
 

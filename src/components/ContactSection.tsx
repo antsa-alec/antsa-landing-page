@@ -10,12 +10,6 @@ const { Title, Paragraph, Text } = Typography;
 
 const contactInfo = [
   {
-    icon: <EnvironmentOutlined />,
-    title: 'Visit Us',
-    content: 'P.O. Box 2324, Blackburn South, 3130, Victoria, AUSTRALIA',
-    gradient: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
-  },
-  {
     icon: <PhoneOutlined />,
     title: 'Call Us',
     content: '+61 3 881 22 373',
@@ -26,6 +20,7 @@ const contactInfo = [
     title: 'Email Us',
     content: 'info@antsa.com.au',
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+    link: 'mailto:info@antsa.com.au',
   },
 ];
 
@@ -121,14 +116,33 @@ const ContactSection = () => {
                 {info.title}
               </Title>
 
-              <Text style={{ 
-                fontSize: '1.1rem',
-                color: '#4a5568',
-                lineHeight: 1.7,
-                display: 'block',
-              }}>
-                {info.content}
-              </Text>
+              {info.link ? (
+                <a href={info.link} style={{ 
+                  fontSize: '1.1rem',
+                  color: '#4a5568',
+                  lineHeight: 1.7,
+                  display: 'block',
+                  textDecoration: 'none',
+                  transition: 'color 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#48abe2';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#4a5568';
+                }}>
+                  {info.content}
+                </a>
+              ) : (
+                <Text style={{ 
+                  fontSize: '1.1rem',
+                  color: '#4a5568',
+                  lineHeight: 1.7,
+                  display: 'block',
+                }}>
+                  {info.content}
+                </Text>
+              )}
             </div>
           </Col>
         ))}

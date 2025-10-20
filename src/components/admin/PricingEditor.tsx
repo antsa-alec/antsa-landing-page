@@ -84,7 +84,7 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
 
   const handleSubmit = async (values: any) => {
     try {
-      const featuresArray = values.features.split('\n').filter((f: string) => f.trim());
+      const featuresArray = values.features ? values.features.split('\n').filter((f: string) => f.trim()) : [];
 
       const url = editingPlan
         ? `${API_BASE_URL}/content/pricing/${editingPlan.id}`

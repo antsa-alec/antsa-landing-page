@@ -13,8 +13,10 @@ import {
   InstagramOutlined,
   YoutubeOutlined,
   GlobalOutlined,
+  MailOutlined,
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
+import watermarkLogo from '../assets/watermark.png';
 
 const { Footer } = Layout;
 const { Text, Link } = Typography;
@@ -53,6 +55,7 @@ const socialIconMap: Record<string, any> = {
   youtube: YoutubeOutlined,
   tiktok: GlobalOutlined, // TikTok doesn't have a dedicated icon, use global
   website: GlobalOutlined,
+  email: MailOutlined,
   other: GlobalOutlined,
 };
 
@@ -135,28 +138,33 @@ const AppFooter = () => {
         <Col xs={22} sm={20} md={16} lg={14}>
           {/* Logo/Brand */}
           <div style={{ marginBottom: '30px' }}>
-            <Text style={{ 
-              fontSize: '2rem',
-              fontWeight: 800,
-              background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}>
-              ANTSA
-            </Text>
+            <img 
+              src={watermarkLogo} 
+              alt="ANTSA Logo" 
+              style={{ 
+                width: '120px',
+                height: '120px',
+                objectFit: 'contain',
+                objectPosition: 'center',
+              }} 
+            />
           </div>
 
           {/* Social Media Icons */}
           <Space size="large" style={{ marginBottom: '30px' }}>
             {socialLinks.map((socialLink) => {
               const IconComponent = getIconForPlatform(socialLink.platform);
+              const isEmail = socialLink.platform.toLowerCase() === 'email';
+              const linkUrl = isEmail && !socialLink.url.startsWith('mailto:') 
+                ? `mailto:${socialLink.url}` 
+                : socialLink.url;
+              
               return (
                 <a
                   key={socialLink.id}
-                  href={socialLink.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={linkUrl}
+                  target={isEmail ? undefined : "_blank"}
+                  rel={isEmail ? undefined : "noopener noreferrer"}
                   style={{ textDecoration: 'none' }}
                 >
                   <div

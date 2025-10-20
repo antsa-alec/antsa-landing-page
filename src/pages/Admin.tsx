@@ -10,6 +10,7 @@ import {
   TeamOutlined,
   PhoneOutlined,
   SettingOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -20,6 +21,7 @@ import TestimonialsEditor from '../components/admin/TestimonialsEditor';
 import TeamEditor from '../components/admin/TeamEditor';
 import ContactEditor from '../components/admin/ContactEditor';
 import SettingsView from '../components/admin/SettingsView';
+import DocumentsEditor from '../components/admin/DocumentsEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -123,6 +125,7 @@ const Admin = () => {
     { key: 'testimonials', icon: <CommentOutlined />, label: 'Testimonials' },
     { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'contact', icon: <PhoneOutlined />, label: 'Contact' },
+    { key: 'documents', icon: <FileTextOutlined />, label: 'Documents' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
@@ -142,6 +145,8 @@ const Admin = () => {
         return <TeamEditor auth={authContext} />;
       case 'contact':
         return <ContactEditor auth={authContext} />;
+      case 'documents':
+        return <DocumentsEditor auth={authContext} />;
       case 'settings':
         return <SettingsView auth={authContext} />;
       default:
