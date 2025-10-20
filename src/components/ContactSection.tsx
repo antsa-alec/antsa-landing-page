@@ -4,7 +4,7 @@
  */
 
 import { Row, Col, Typography } from 'antd';
-import { MailOutlined, PhoneOutlined, EnvironmentOutlined } from '@ant-design/icons';
+import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
 

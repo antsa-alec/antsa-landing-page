@@ -4,7 +4,7 @@ import { UploadOutlined, FilePdfOutlined, FileWordOutlined, FileTextOutlined, De
 import type { UploadProps } from 'antd';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 
 interface DocumentInfo {
   exists: boolean;
