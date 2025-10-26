@@ -43,28 +43,20 @@ jobs:
     - name: Create deployment package
       run: |
         mkdir -p deploy
-        cp -r dist deploy/
-        cp -r backend deploy/
-        cp startup.sh deploy/
-        chmod +x deploy/startup.sh
+        # Just serve the static React build - skip backend for now
+        cp -r dist/* deploy/
         
-        # Remove .env file to use Azure environment variables
-        rm -f deploy/backend/.env
-        
-        # Create .deployment file - allow Azure to rebuild native modules
-        echo "[config]" > deploy/.deployment
-        echo "SCM_DO_BUILD_DURING_DEPLOYMENT=true" >> deploy/.deployment
-        echo "POST_BUILD_COMMAND=cd backend && npm rebuild better-sqlite3" >> deploy/.deployment
-        
-        # Create package.json for Azure (minimal, no build scripts)
+        # Create a simple static server
         cat > deploy/package.json << 'EOF'
         {
           "name": "antsa-landing-page",
           "version": "1.0.0",
           "scripts": {
-            "start": "node backend/server.js"
+            "start": "npx serve -s . -l 8080"
           },
-          "dependencies": {}
+          "dependencies": {
+            "serve": "^14.2.0"
+          }
         }
         EOF
 
