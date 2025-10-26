@@ -1,11 +1,33 @@
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const db = new Database(join(__dirname, '..', 'content.db'));
+// Try to rebuild better-sqlite3 if it fails to load
+let db;
+try {
+  db = new Database(join(__dirname, '..', 'content.db'));
+} catch (error) {
+  if (error.code === 'ERR_DLOPEN_FAILED') {
+    console.log('⚠️  Database module needs rebuilding...');
+    try {
+      execSync('npm rebuild better-sqlite3', { 
+        cwd: join(__dirname, '..'),
+        stdio: 'inherit'
+      });
+      db = new Database(join(__dirname, '..', 'content.db'));
+      console.log('✅ Database module rebuilt successfully');
+    } catch (rebuildError) {
+      console.error('❌ Failed to rebuild database module:', rebuildError);
+      throw rebuildError;
+    }
+  } else {
+    throw error;
+  }
+}
 
 // Enable foreign keys
 db.pragma('foreign_keys = ON');
