@@ -8,7 +8,7 @@ To point your custom domain `antsa.ai` to the Azure App Service, add these DNS r
 ```
 Type: A
 Name: @
-Value: 20.211.64.7
+Value: 20.211.64.30
 TTL: 3600
 ```
 

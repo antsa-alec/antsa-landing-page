@@ -3,28 +3,91 @@
  * Features: Glass morphism cards, modern icon styling
  */
 
-import { Row, Col, Typography } from 'antd';
+import { Row, Col, Typography, Spin } from 'antd';
 import { MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { useEffect, useState } from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 
-const contactInfo = [
-  {
-    icon: <PhoneOutlined />,
-    title: 'Call Us',
-    content: '+61 3 881 22 373',
-    gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-  },
-  {
-    icon: <MailOutlined />,
-    title: 'Email Us',
-    content: 'info@antsa.com.au',
-    gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-    link: 'mailto:info@antsa.com.au',
-  },
-];
+// Using relative URL so Vite proxy can handle the request
+const API_BASE_URL = '/api';
+
+interface ContactContent {
+  title?: string;
+  subtitle?: string;
+  email?: string;
+  phone?: string;
+}
 
 const ContactSection = () => {
+  const [content, setContent] = useState<ContactContent>({});
+  const [loading, setLoading] = useState(true);
+
+  // Fetch contact content from API
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchContent = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/content/section/contact`);
+        const data = await response.json();
+        
+        if (!ignore && response.ok) {
+          setContent(data.content || {});
+        }
+      } catch (error) {
+        if (!ignore) {
+          console.error('Error fetching contact content:', error);
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchContent();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  // Default values
+  const sectionTitle = content.title || 'Get in Touch';
+  const sectionSubtitle = content.subtitle || "We'd love to hear from you. Send us a message and we'll respond as soon as possible.";
+  const email = content.email || 'info@antsa.com.au';
+  const phone = content.phone || '+61 XXX XXX XXX';
+
+  const contactInfo = [
+    {
+      icon: <PhoneOutlined />,
+      title: 'Call Us',
+      content: phone,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+    },
+    {
+      icon: <MailOutlined />,
+      title: 'Email Us',
+      content: email,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+      link: `mailto:${email}`,
+    },
+  ];
+
+  if (loading) {
+    return (
+      <div style={{ 
+        padding: '100px 20px',
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#ffffff',
+      }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <div style={{ 
       padding: '100px 20px',
@@ -45,7 +108,7 @@ const ContactSection = () => {
               letterSpacing: '0.5px',
               textTransform: 'uppercase',
             }}>
-              📞 Get in Touch
+              📞 {sectionTitle}
             </span>
           </div>
 
@@ -59,7 +122,7 @@ const ContactSection = () => {
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
           }}>
-            We're Here to Help
+            {sectionTitle}
           </Title>
 
           <Paragraph className="reveal" style={{ 
@@ -68,7 +131,7 @@ const ContactSection = () => {
             color: '#4a5568',
             lineHeight: 1.8,
           }}>
-            Have questions? Our team is ready to assist you
+            {sectionSubtitle}
           </Paragraph>
         </Col>
       </Row>
