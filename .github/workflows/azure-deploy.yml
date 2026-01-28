@@ -60,17 +60,20 @@ jobs:
         }
         EOF
 
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
+    - name: Login to Azure
+      uses: azure/login@v2
       with:
-        app-name: ${{ env.APP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ./deploy
-        clean: true
-        
-    - name: Restart App Service
-      run: |
-        curl -X POST "https://${{ env.APP_NAME }}.scm.azurewebsites.net/api/restart" \
-          -H "Authorization: Basic ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}" \
-          --fail-with-body || echo "Restart requested"
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+    - name: Deploy with clean flag
+      run: |
+        cd deploy
+        zip -r ../deploy.zip .
+        cd ..
+        az webapp deploy \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.APP_NAME }} \
+          --src-path deploy.zip \
+          --type zip \
+          --clean true \
+          --restart true
