@@ -11,6 +11,9 @@ import {
   PhoneOutlined,
   SettingOutlined,
   FileTextOutlined,
+  MenuOutlined,
+  TrophyOutlined,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -22,6 +25,9 @@ import TeamEditor from '../components/admin/TeamEditor';
 import ContactEditor from '../components/admin/ContactEditor';
 import SettingsView from '../components/admin/SettingsView';
 import DocumentsEditor from '../components/admin/DocumentsEditor';
+import NavigationEditor from '../components/admin/NavigationEditor';
+import SponsorsEditor from '../components/admin/SponsorsEditor';
+import FAQEditor from '../components/admin/FAQEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -119,9 +125,12 @@ const Admin = () => {
 
   const menuItems = [
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+    { key: 'navigation', icon: <MenuOutlined />, label: 'Navigation' },
     { key: 'hero', icon: <RocketOutlined />, label: 'Hero Section' },
+    { key: 'sponsors', icon: <TrophyOutlined />, label: 'Sponsors' },
     { key: 'features', icon: <AppstoreOutlined />, label: 'Features' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
+    { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
     { key: 'testimonials', icon: <CommentOutlined />, label: 'Testimonials' },
     { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'contact', icon: <PhoneOutlined />, label: 'Contact' },
@@ -133,12 +142,18 @@ const Admin = () => {
     switch (selectedMenu) {
       case 'dashboard':
         return <DashboardView auth={authContext} />;
+      case 'navigation':
+        return <NavigationEditor auth={authContext} />;
       case 'hero':
         return <HeroEditor auth={authContext} />;
+      case 'sponsors':
+        return <SponsorsEditor auth={authContext} />;
       case 'features':
         return <FeaturesEditor auth={authContext} />;
       case 'pricing':
         return <PricingEditor auth={authContext} />;
+      case 'faq':
+        return <FAQEditor auth={authContext} />;
       case 'testimonials':
         return <TestimonialsEditor auth={authContext} />;
       case 'team':

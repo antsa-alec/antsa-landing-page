@@ -368,3 +368,208 @@ button, a, input, textarea, select {
   transition: all var(--transition-base);
 }
 
+/* ============================================
+   HEADER STYLES
+   ============================================ */
+
+/* Adjust hero section to account for fixed header overlap */
+.hero-section-with-header {
+  margin-top: -70px;
+  padding-top: 70px;
+}
+
+/* Header scroll behavior */
+.header-scrolled {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Header menu transparent state */
+.ant-layout-header .ant-menu-horizontal {
+  background: transparent;
+  border-bottom: none;
+}
+
+/* Mobile menu button */
+@media (max-width: 992px) {
+  .ant-layout-header {
+    padding: 0 20px !important;
+  }
+}
+
+/* ============================================
+   SPONSORS SECTION STYLES
+   ============================================ */
+
+/* Sponsor logo scroll animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.sponsors-track {
+  display: flex;
+  gap: 60px;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+}
+
+.sponsors-track:hover {
+  animation-play-state: paused;
+}
+
+/* Sponsor logo hover effects */
+.sponsor-logo {
+  transition: transform 0.3s ease;
+}
+
+.sponsor-logo:hover {
+  transform: scale(1.05);
+}
+
+.sponsor-logo img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.sponsor-logo:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* ============================================
+   FAQ SECTION STYLES
+   ============================================ */
+
+/* FAQ Collapse customization */
+.faq-collapse .ant-collapse-item {
+  background: #ffffff;
+  border-radius: 12px !important;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0 !important;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faq-collapse .ant-collapse-item:hover {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 4px 15px rgba(72, 171, 226, 0.1);
+}
+
+.faq-collapse .ant-collapse-item-active {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 4px 20px rgba(72, 171, 226, 0.15);
+}
+
+.faq-collapse .ant-collapse-header {
+  padding: 20px 24px !important;
+  align-items: center !important;
+}
+
+.faq-collapse .ant-collapse-content {
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+.faq-collapse .ant-collapse-content-box {
+  padding: 20px 24px !important;
+  background: #fafafa;
+}
+
+/* ============================================
+   FOOTER MULTI-COLUMN LAYOUT
+   ============================================ */
+
+/* Footer link hover */
+.footer-link {
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+}
+
+/* Footer social icons */
+.footer-social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.footer-social-icon:hover {
+  background: var(--color-primary);
+  transform: translateY(-3px);
+}
+
+/* ============================================
+   SECTION SPACING WITH FIXED HEADER
+   ============================================ */
+
+/* Add scroll margin for anchor links */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* Ensure sections have proper anchor target offset */
+#features, #pricing, #faq, #testimonials, #team, #contact, #sponsors {
+  scroll-margin-top: 80px;
+}
+
+/* ============================================
+   ANT DESIGN MENU OVERRIDES FOR HEADER
+   ============================================ */
+
+/* Remove default menu item bottom border animation in header */
+.ant-layout-header .ant-menu-horizontal > .ant-menu-item::after,
+.ant-layout-header .ant-menu-horizontal > .ant-menu-submenu::after {
+  display: none;
+}
+
+/* Menu item styling */
+.ant-layout-header .ant-menu-item {
+  font-weight: 500;
+}
+
+.ant-layout-header .ant-menu-item:hover {
+  color: var(--color-primary) !important;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* Smaller header padding on mobile */
+  .ant-layout-header {
+    padding: 0 16px !important;
+  }
+  
+  /* Adjust section padding */
+  section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  
+  /* Footer columns stack on mobile */
+  .footer-columns {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  /* FAQ single column on mobile */
+  .faq-columns {
+    flex-direction: column;
+  }
+}
+

@@ -1,8 +1,11 @@
 import { ConfigProvider, Layout } from 'antd';
 import { useEffect } from 'react';
+import AppHeader from './components/AppHeader';
 import HeroSection from './components/HeroSection';
+import SponsorsSection from './components/SponsorsSection';
 import FeaturesSection from './components/FeaturesSection';
 import PricingSection from './components/PricingSection';
+import FAQSection from './components/FAQSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import TeamSection from './components/TeamSection';
 import ContactSection from './components/ContactSection';
@@ -105,10 +108,13 @@ function App() {
   return (
     <ConfigProvider theme={theme}>
       <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
+        <AppHeader />
         <Content>
           <HeroSection />
+          <SponsorsSection />
           <FeaturesSection />
           <PricingSection />
+          <FAQSection />
           <TestimonialsSection />
           <TeamSection />
           <ContactSection />
