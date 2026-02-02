@@ -5,6 +5,22 @@ import { authenticateToken, optionalAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
+// Get settings (public)
+router.get('/settings', (req, res) => {
+  try {
+    // For now, return some default settings
+    // You can extend this to read from a settings table
+    const settings = {
+      company_name: 'ANTSA',
+      copyright_text: 'Designed by ANTSA Team',
+    };
+    res.json({ settings });
+  } catch (error) {
+    console.error('Get settings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get all content (public)
 router.get('/', optionalAuth, (req, res) => {
   try {

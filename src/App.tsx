@@ -6,32 +6,23 @@ import SponsorsSection from './components/SponsorsSection';
 import FeaturesSection from './components/FeaturesSection';
 import PricingSection from './components/PricingSection';
 import FAQSection from './components/FAQSection';
-import TestimonialsSection from './components/TestimonialsSection';
-import TeamSection from './components/TeamSection';
-import ContactSection from './components/ContactSection';
+import CTASection from './components/CTASection';
 import AppFooter from './components/AppFooter';
 import './styles/global.css';
 
 const { Content } = Layout;
 
 /**
- * ENHANCED ANTSA THEME
- * Next-level professional color palette with refined token system
- */
-/**
- * ANTSA BRAND COLORS - Blue Theme
- * Primary: rgb(72, 171, 226) / #48abe2
- * Secondary: White
- * Alt: Black
+ * ANTSA THEME - Modern Purple/Pink Gradient
  */
 const theme = {
   token: {
-    colorPrimary: '#48abe2', // Sky Blue
+    colorPrimary: '#a855f7',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#48abe2',
-    colorTextBase: '#1a202c',
+    colorInfo: '#3b82f6',
+    colorTextBase: '#0f172a',
     colorBgBase: '#ffffff',
     borderRadius: 12,
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -41,7 +32,7 @@ const theme = {
   components: {
     Layout: {
       headerBg: '#ffffff',
-      bodyBg: '#f5f7fa',
+      bodyBg: '#ffffff',
     },
     Card: {
       borderRadiusLG: 16,
@@ -109,15 +100,13 @@ function App() {
     <ConfigProvider theme={theme}>
       <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
         <AppHeader />
-        <Content>
+        <Content style={{ marginTop: '70px' }}>
           <HeroSection />
           <SponsorsSection />
           <FeaturesSection />
           <PricingSection />
           <FAQSection />
-          <TestimonialsSection />
-          <TeamSection />
-          <ContactSection />
+          <CTASection />
         </Content>
         <AppFooter />
       </Layout>

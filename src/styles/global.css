@@ -1,33 +1,35 @@
 /* ============================================
    GLOBAL STYLES & CSS VARIABLES
-   Next-Level Professional Design System
+   Modern SaaS Design System
    ============================================ */
 
 :root {
-  /* ANTSA Brand Colors - Blue Theme */
-  --primary-gradient: linear-gradient(135deg, #48abe2 0%, #2196f3 100%);
-  --secondary-gradient: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  /* ANTSA Brand Colors - Dark Modern Theme */
+  --primary-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+  --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --dark-gradient: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
-  --white-gradient: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+  --dark-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  --light-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   
-  --color-primary: #48abe2;
-  --color-primary-dark: #2196f3;
-  --color-primary-light: #64b5f6;
-  --color-secondary: #ffffff;
-  --color-accent: #000000;
+  --color-primary: #a855f7;
+  --color-primary-dark: #9333ea;
+  --color-primary-light: #c084fc;
+  --color-secondary: #ec4899;
+  --color-accent: #3b82f6;
   --color-success: #10b981;
   --color-warning: #f59e0b;
-  --color-info: #48abe2;
+  --color-info: #3b82f6;
   
-  --color-text-primary: #1a202c;
-  --color-text-secondary: #4a5568;
-  --color-text-light: #718096;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-light: #64748b;
   --color-text-white: #ffffff;
   
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f7fafc;
-  --color-bg-tertiary: #edf2f7;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #e2e8f0;
+  --color-bg-dark: #0f172a;
+  --color-bg-dark-secondary: #1e293b;
   
   /* Spacing System */
   --spacing-xs: 0.5rem;

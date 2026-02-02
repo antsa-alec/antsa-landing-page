@@ -6,11 +6,7 @@ import {
   RocketOutlined,
   AppstoreOutlined,
   DollarOutlined,
-  CommentOutlined,
-  TeamOutlined,
-  PhoneOutlined,
   SettingOutlined,
-  FileTextOutlined,
   MenuOutlined,
   TrophyOutlined,
   QuestionCircleOutlined,
@@ -20,11 +16,7 @@ import DashboardView from '../components/admin/DashboardView';
 import HeroEditor from '../components/admin/HeroEditor';
 import FeaturesEditor from '../components/admin/FeaturesEditor';
 import PricingEditor from '../components/admin/PricingEditor';
-import TestimonialsEditor from '../components/admin/TestimonialsEditor';
-import TeamEditor from '../components/admin/TeamEditor';
-import ContactEditor from '../components/admin/ContactEditor';
 import SettingsView from '../components/admin/SettingsView';
-import DocumentsEditor from '../components/admin/DocumentsEditor';
 import NavigationEditor from '../components/admin/NavigationEditor';
 import SponsorsEditor from '../components/admin/SponsorsEditor';
 import FAQEditor from '../components/admin/FAQEditor';
@@ -131,10 +123,11 @@ const Admin = () => {
     { key: 'features', icon: <AppstoreOutlined />, label: 'Features' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
     { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
-    { key: 'testimonials', icon: <CommentOutlined />, label: 'Testimonials' },
-    { key: 'team', icon: <TeamOutlined />, label: 'Team' },
-    { key: 'contact', icon: <PhoneOutlined />, label: 'Contact' },
-    { key: 'documents', icon: <FileTextOutlined />, label: 'Documents' },
+    // REMOVED: Testimonials, Team, Contact - not in new design
+    // { key: 'testimonials', icon: <CommentOutlined />, label: 'Testimonials' },
+    // { key: 'team', icon: <TeamOutlined />, label: 'Team' },
+    // { key: 'contact', icon: <PhoneOutlined />, label: 'Contact' },
+    // { key: 'documents', icon: <FileTextOutlined />, label: 'Documents' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
@@ -154,16 +147,9 @@ const Admin = () => {
         return <PricingEditor auth={authContext} />;
       case 'faq':
         return <FAQEditor auth={authContext} />;
-      case 'testimonials':
-        return <TestimonialsEditor auth={authContext} />;
-      case 'team':
-        return <TeamEditor auth={authContext} />;
-      case 'contact':
-        return <ContactEditor auth={authContext} />;
-      case 'documents':
-        return <DocumentsEditor auth={authContext} />;
       case 'settings':
         return <SettingsView auth={authContext} />;
+      // Removed unused sections: testimonials, team, contact, documents
       default:
         return <DashboardView auth={authContext} />;
     }

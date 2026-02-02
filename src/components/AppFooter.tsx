@@ -1,362 +1,250 @@
-/**
- * FOOTER - MULTI-COLUMN LAYOUT
- * Features: Modern dark theme, categorized links, social media animations
- */
+import { useEffect, useState } from 'react';
+import { Typography, Row, Col, Space } from 'antd';
+import { TwitterOutlined, FacebookOutlined, LinkedinOutlined, GithubOutlined } from '@ant-design/icons';
 
-import { Layout, Row, Col, Typography, Space } from 'antd';
-import { 
-  GithubOutlined, 
-  LinkedinOutlined, 
-  TwitterOutlined, 
-  HeartFilled,
-  FacebookOutlined,
-  InstagramOutlined,
-  YoutubeOutlined,
-  GlobalOutlined,
-  MailOutlined,
-} from '@ant-design/icons';
-import { useState, useEffect } from 'react';
-import watermarkLogo from '../assets/watermark.png';
-
-const { Footer } = Layout;
-const { Text, Link, Title } = Typography;
-
-// Using relative URL so Vite proxy can handle the request
-const API_BASE_URL = '/api';
+const { Title, Paragraph, Link } = Typography;
 
 interface FooterSettings {
-  footer_copyright?: string;
-  footer_tagline?: string;
-  footer_subtitle?: string;
-  header_logo_text?: string;
-}
-
-interface FooterLink {
-  id: number;
-  label: string;
-  url: string;
-  order_index: number;
-  category_id?: number | null;
-}
-
-interface FooterCategory {
-  id: number;
-  title: string;
-  order_index: number;
-  links: FooterLink[];
+  company_name?: string;
+  copyright_text?: string;
+  social_twitter?: string;
+  social_facebook?: string;
+  social_linkedin?: string;
+  social_github?: string;
 }
 
 interface SocialLink {
-  id: number;
+  id: string;
   platform: string;
   url: string;
-  order_index: number;
 }
 
-// Map platform names to Ant Design icons
-const socialIconMap: Record<string, any> = {
-  github: GithubOutlined,
-  linkedin: LinkedinOutlined,
-  twitter: TwitterOutlined,
-  x: TwitterOutlined, // X (formerly Twitter)
-  facebook: FacebookOutlined,
-  instagram: InstagramOutlined,
-  youtube: YoutubeOutlined,
-  tiktok: GlobalOutlined, // TikTok doesn't have a dedicated icon, use global
-  website: GlobalOutlined,
-  email: MailOutlined,
-  other: GlobalOutlined,
-};
+interface FooterLink {
+  id: string;
+  label: string;
+  url: string;
+  category: string;
+  category_id?: number | null;
+}
 
+/**
+ * FOOTER - Dark theme with multiple columns
+ */
 const AppFooter = () => {
-  const currentYear = new Date().getFullYear();
   const [settings, setSettings] = useState<FooterSettings>({});
-  const [categories, setCategories] = useState<FooterCategory[]>([]);
-  const [uncategorizedLinks, setUncategorizedLinks] = useState<FooterLink[]>([]);
+  const [links, setLinks] = useState<FooterLink[]>([]);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let ignore = false;
-
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/content/section/settings`);
-        const data = await response.json();
-        
-        if (!ignore && response.ok && data.content) {
-          setSettings(data.content);
+    Promise.all([
+      fetch('/api/content/settings').then((res) => res.json()),
+      fetch('/api/content/footer-links').then((res) => res.json()),
+      fetch('/api/content/social-links').then((res) => res.json()),
+    ])
+      .then(([settingsData, linksData, socialLinksData]) => {
+        if (settingsData.settings) {
+          setSettings(settingsData.settings);
         }
-      } catch (error) {
-        if (!ignore) {
-          console.error('Error fetching footer settings:', error);
+        if (linksData.links) {
+          setLinks(linksData.links);
         }
-      }
-    };
-
-    const fetchFooterCategories = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/content/footer-categories`);
-        const data = await response.json();
-        
-        if (!ignore && response.ok) {
-          setCategories(data.categories || []);
-          setUncategorizedLinks(data.uncategorizedLinks || []);
+        if (socialLinksData.links) {
+          setSocialLinks(socialLinksData.links);
         }
-      } catch (error) {
-        if (!ignore) {
-          console.error('Error fetching footer categories:', error);
-        }
-      }
-    };
-
-    const fetchSocialLinks = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/content/social-links`);
-        const data = await response.json();
-        
-        if (!ignore && response.ok && data.links) {
-          setSocialLinks(data.links);
-        }
-      } catch (error) {
-        if (!ignore) {
-          console.error('Error fetching social links:', error);
-        }
-      }
-    };
-
-    fetchSettings();
-    fetchFooterCategories();
-    fetchSocialLinks();
-
-    return () => {
-      ignore = true;
-    };
+      })
+      .catch((err) => console.error('Failed to load footer data:', err))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Get icon component for platform
-  const getIconForPlatform = (platform: string) => {
-    const normalizedPlatform = platform.toLowerCase();
-    return socialIconMap[normalizedPlatform] || GlobalOutlined;
+  const companyName = settings.company_name || 'SaaS Template';
+  const copyrightText = settings.copyright_text || 'Designed by ANTSA Team';
+
+  // Default navigation links
+  const defaultLinks = {
+    product: [
+      { id: '1', label: 'Product', url: '#', category: 'product' },
+      { id: '2', label: 'Docs', url: '#', category: 'product' },
+      { id: '3', label: 'Blog', url: '#', category: 'product' },
+      { id: '4', label: 'Community', url: '#', category: 'product' },
+      { id: '5', label: 'Company', url: '#', category: 'product' },
+    ],
+    legal: [
+      { id: '6', label: 'Terms Of Service', url: '#', category: 'legal' },
+      { id: '7', label: 'Privacy Policy', url: '#', category: 'legal' },
+    ],
   };
 
-  const handleLinkClick = (url: string) => {
-    if (!url || url === '#') return;
-    
-    if (url.startsWith('#')) {
-      const element = document.querySelector(url);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-      }
-    } else if (url.startsWith('mailto:')) {
-      window.location.href = url;
-    } else {
-      window.open(url, '_blank');
-    }
-  };
+  // Use database links if available, otherwise defaults
+  const productLinks = links.length > 0 
+    ? links.filter((l) => l.category === 'product' || (l.category_id === 1)) 
+    : defaultLinks.product;
+  const legalLinks = links.length > 0
+    ? links.filter((l) => l.category === 'legal' || !l.category_id)
+    : defaultLinks.legal;
+
+  if (loading) {
+    return null;
+  }
 
   return (
-    <Footer style={{ 
-      background: 'linear-gradient(135deg, #1a202c 0%, #2d3748 100%)',
-      padding: '80px 20px 30px',
-    }}>
-      <Row justify="center">
-        <Col xs={22} sm={22} md={22} lg={20} xl={18}>
-          {/* Main Footer Content - Multi-Column Layout */}
-          <Row gutter={[48, 48]} style={{ marginBottom: '60px' }}>
-            {/* Brand Column */}
-            <Col xs={24} sm={24} md={8} lg={6}>
-              <div style={{ marginBottom: '24px' }}>
-                <div 
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '12px',
-                    marginBottom: '20px',
+    <footer
+      style={{
+        background: '#0f172a',
+        color: '#ffffff',
+        padding: '80px 20px 32px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}
+      >
+        {/* Main Footer Content */}
+        <Row gutter={[48, 48]} style={{ marginBottom: '64px' }}>
+          {/* Brand Column */}
+          <Col xs={24} md={8}>
+            <Title
+              level={3}
+              style={{
+                color: '#ffffff',
+                fontSize: '24px',
+                fontWeight: 700,
+                marginBottom: '16px',
+              }}
+            >
+              {companyName}
+            </Title>
+            <Paragraph
+              style={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: '15px',
+                lineHeight: 1.7,
+              }}
+            >
+              Transform mental healthcare with AI-powered solutions.
+            </Paragraph>
+          </Col>
+
+          {/* Navigation Links */}
+          <Col xs={12} md={8}>
+            <Space direction="vertical" size={12} style={{ width: '100%' }}>
+              {productLinks.map((link) => (
+                <Link
+                  key={link.id}
+                  href={link.url}
+                  style={{
+                    color: 'rgba(255, 255, 255, 0.7)',
+                    fontSize: '15px',
+                    display: 'block',
+                    transition: 'color 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
                   }}
                 >
-                  <img 
-                    src={watermarkLogo} 
-                    alt="ANTSA Logo" 
-                    style={{ 
-                      width: '48px',
-                      height: '48px',
-                      objectFit: 'contain',
-                    }} 
-                  />
-                  <span style={{ 
-                    fontSize: '1.5rem', 
-                    fontWeight: 800, 
-                    color: '#48abe2',
-                    letterSpacing: '-0.5px',
-                  }}>
-                    {settings.header_logo_text || 'ANTSA'}
-                  </span>
-                </div>
-                <Text style={{ 
-                  color: 'rgba(255, 255, 255, 0.7)',
-                  fontSize: '0.95rem',
-                  lineHeight: 1.7,
-                  display: 'block',
-                  marginBottom: '24px',
-                }}>
-                  {settings.footer_subtitle || 'AI-powered mental health platform connecting practitioners with clients for better care.'}
-                </Text>
+                  {link.label}
+                </Link>
+              ))}
+            </Space>
+          </Col>
 
-                {/* Social Media Icons */}
-                <Space size="middle">
-                  {socialLinks.map((socialLink) => {
-                    const IconComponent = getIconForPlatform(socialLink.platform);
-                    const isEmail = socialLink.platform.toLowerCase() === 'email';
-                    const linkUrl = isEmail && !socialLink.url.startsWith('mailto:') 
-                      ? `mailto:${socialLink.url}` 
-                      : socialLink.url;
-                    
-                    return (
-                      <a
-                        key={socialLink.id}
-                        href={linkUrl}
-                        target={isEmail ? undefined : "_blank"}
-                        rel={isEmail ? undefined : "noopener noreferrer"}
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <div
-                          style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            background: 'rgba(255, 255, 255, 0.1)',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#48abe2';
-                            e.currentTarget.style.transform = 'translateY(-3px)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                            e.currentTarget.style.transform = 'translateY(0)';
-                          }}
-                        >
-                          <IconComponent style={{ fontSize: '1.2rem', color: '#ffffff' }} />
-                        </div>
-                      </a>
-                    );
-                  })}
-                </Space>
-              </div>
-            </Col>
+          {/* Social Links */}
+          <Col xs={12} md={8}>
+            <Space size={16}>
+              {socialLinks.map((link) => {
+                let Icon = TwitterOutlined; // Default
+                if (link.platform === 'facebook') Icon = FacebookOutlined;
+                if (link.platform === 'linkedin') Icon = LinkedinOutlined;
+                if (link.platform === 'github') Icon = GithubOutlined;
+                
+                return (
+                  <a
+                    key={link.id}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#ffffff',
+                      fontSize: '18px',
+                      transition: 'all 0.3s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#a855f7';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <Icon />
+                  </a>
+                );
+              })}
+            </Space>
+          </Col>
+        </Row>
 
-            {/* Link Columns */}
-            {categories.map((category) => (
-              <Col xs={12} sm={8} md={5} lg={4} key={category.id}>
-                <Title 
-                  level={5} 
-                  style={{ 
-                    color: '#ffffff',
-                    marginBottom: '20px',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  {category.title}
-                </Title>
-                <Space direction="vertical" size={12}>
-                  {category.links.map((link) => (
-                    <Link 
-                      key={link.id}
-                      onClick={() => handleLinkClick(link.url)}
-                      style={{ 
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        fontSize: '0.95rem',
-                        transition: 'color 0.3s ease',
-                        cursor: 'pointer',
-                        display: 'block',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#ffffff';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </Space>
-              </Col>
+        {/* Bottom Bar */}
+        <div
+          style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            paddingTop: '32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '16px',
+          }}
+        >
+          {/* Copyright */}
+          <Paragraph
+            style={{
+              color: 'rgba(255, 255, 255, 0.6)',
+              fontSize: '14px',
+              margin: 0,
+            }}
+          >
+            © Copyright 2026 {companyName}. {copyrightText}.
+          </Paragraph>
+
+          {/* Legal Links */}
+          <Space size={24}>
+            {legalLinks.map((link) => (
+              <Link
+                key={link.id}
+                href={link.url}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '14px',
+                  transition: 'color 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)';
+                }}
+              >
+                {link.label}
+              </Link>
             ))}
-
-            {/* Uncategorized links column (if any) */}
-            {uncategorizedLinks.length > 0 && (
-              <Col xs={12} sm={8} md={5} lg={4}>
-                <Title 
-                  level={5} 
-                  style={{ 
-                    color: '#ffffff',
-                    marginBottom: '20px',
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  Links
-                </Title>
-                <Space direction="vertical" size={12}>
-                  {uncategorizedLinks.map((link) => (
-                    <Link 
-                      key={link.id}
-                      onClick={() => handleLinkClick(link.url)}
-                      style={{ 
-                        color: 'rgba(255, 255, 255, 0.7)',
-                        fontSize: '0.95rem',
-                        transition: 'color 0.3s ease',
-                        cursor: 'pointer',
-                        display: 'block',
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = '#ffffff';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)';
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  ))}
-                </Space>
-              </Col>
-            )}
-          </Row>
-
-          {/* Divider */}
-          <div style={{
-            height: '1px',
-            background: 'rgba(255, 255, 255, 0.1)',
-            marginBottom: '30px',
-          }} />
-
-          {/* Bottom Bar - Copyright */}
-          <Row justify="space-between" align="middle" gutter={[16, 16]}>
-            <Col xs={24} md={12}>
-              <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
-                {settings.footer_copyright || `© ${currentYear} ANTSA. All rights reserved.`}
-              </Text>
-            </Col>
-            <Col xs={24} md={12} style={{ textAlign: 'right' }}>
-              <Text style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.9rem' }}>
-                {settings.footer_tagline ? (
-                  <span dangerouslySetInnerHTML={{ __html: settings.footer_tagline }} />
-                ) : (
-                  <>Made with <HeartFilled style={{ color: '#48abe2', margin: '0 5px' }} /> in Australia</>
-                )}
-              </Text>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </Footer>
+          </Space>
+        </div>
+      </div>
+    </footer>
   );
 };
 
