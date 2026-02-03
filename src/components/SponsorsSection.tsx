@@ -38,11 +38,11 @@ const SponsorsSection = () => {
   }, []);
 
   // Default sponsors if none loaded
-  const defaultSponsors = [
-    { id: '1', name: 'Microsoft Azure', logo: '/logos/azure.svg' },
-    { id: '2', name: 'OpenAI', logo: '/logos/openai.svg' },
-    { id: '3', name: 'Stripe', logo: '/logos/stripe.svg' },
-    { id: '4', name: 'Firebase', logo: '/logos/firebase.svg' },
+  const defaultSponsors: Sponsor[] = [
+    { id: '1', name: 'Microsoft Azure', logo: '/logos/azure.svg', website: 'https://azure.microsoft.com' },
+    { id: '2', name: 'OpenAI', logo: '/logos/openai.svg', website: 'https://openai.com' },
+    { id: '3', name: 'Stripe', logo: '/logos/stripe.svg', website: 'https://stripe.com' },
+    { id: '4', name: 'Firebase', logo: '/logos/firebase.svg', website: 'https://firebase.google.com' },
   ];
 
   const displaySponsors = sponsors.length > 0 ? sponsors : defaultSponsors;
