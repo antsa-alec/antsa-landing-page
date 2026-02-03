@@ -32,8 +32,6 @@ const HeroSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const badge = content.badge || 'Live Demo of Mental Health Platform';
-  const title = content.title || 'The perfect mental health platform to build and scale your practice with ease.';
   const description = content.description || 'A comprehensive platform connecting practitioners with clients, built with React, TypeScript, AI-powered features, and modern tools.';
   const ctaPrimary = content.cta_primary || 'Get Started';
   const ctaSecondary = content.cta_secondary || 'Star on GitHub';
