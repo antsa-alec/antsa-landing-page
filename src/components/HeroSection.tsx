@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Typography, Button, Space } from 'antd';
-import { GithubOutlined } from '@ant-design/icons';
+import { PlayCircleOutlined } from '@ant-design/icons';
+import antsaLogo from '../assets/antsa-logo.png';
 
 const { Title, Paragraph } = Typography;
 
@@ -32,9 +33,9 @@ const HeroSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const description = content.description || 'A comprehensive platform connecting practitioners with clients, built with React, TypeScript, AI-powered features, and modern tools.';
-  const ctaPrimary = content.cta_primary || 'Get Started';
-  const ctaSecondary = content.cta_secondary || 'Star on GitHub';
+  const description = content.description || 'ANTSA is an Australian-built digital mental health system designed to support safe, supervised care between appointments. Brings AI within clinical governance, records, and duty-of-care frameworks, rather than leaving clients to use unregulated tools on their own.';
+  const ctaPrimary = content.cta_primary || 'Start Your Free Trial';
+  const ctaSecondary = content.cta_secondary || 'Watch Demo';
 
   if (loading) {
     return null;
@@ -63,31 +64,24 @@ const HeroSection = () => {
           zIndex: 1,
         }}
       >
-        {/* Social/Badge Button */}
+        {/* ANTSA Logo */}
         <div
           className="reveal"
           style={{
-            marginBottom: '32px',
+            marginBottom: '48px',
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          <Button
+          <img 
+            src={antsaLogo} 
+            alt="ANTSA for Professionals" 
             style={{
-              background: '#1e293b',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '30px',
-              padding: '10px 28px',
+              maxWidth: '500px',
+              width: '100%',
               height: 'auto',
-              fontSize: '14px',
-              fontWeight: 500,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 4px 12px rgba(30, 41, 59, 0.3)',
             }}
-          >
-            <span>🐦</span> Follow @ANTSA on Twitter
-          </Button>
+          />
         </div>
 
         {/* Main Title with Gradient Highlight */}
@@ -108,7 +102,7 @@ const HeroSection = () => {
           The perfect{' '}
           <span
             style={{
-              background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -132,6 +126,21 @@ const HeroSection = () => {
           }}
         >
           {description}
+        </Paragraph>
+
+        <Paragraph
+          className="reveal"
+          style={{
+            fontSize: 'clamp(16px, 2.5vw, 20px)',
+            fontWeight: 700,
+            color: '#0f172a',
+            marginBottom: '48px',
+            maxWidth: '800px',
+            margin: '0 auto 48px',
+            lineHeight: 1.7,
+          }}
+        >
+          Home of the world's first practitioner-overseen AI therapy support chatbot.
         </Paragraph>
 
         {/* CTA Buttons */}
@@ -160,7 +169,7 @@ const HeroSection = () => {
           </Button>
           <Button
             size="large"
-            icon={<GithubOutlined />}
+            icon={<PlayCircleOutlined />}
             style={{
               height: '64px',
               padding: '0 48px',

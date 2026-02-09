@@ -126,13 +126,13 @@ const PricingSection = () => {
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: '#a855f7',
+              color: '#3b82f6',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
             }}
           >
-            Features
+            PRICING
           </Title>
           <Title
             level={2}
@@ -145,16 +145,16 @@ const PricingSection = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            Unlock the Full Potential of the{' '}
+            Choose the plan that works best for{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              Mental Health Platform
+              your practice
             </span>
           </Title>
           <Paragraph
@@ -167,7 +167,7 @@ const PricingSection = () => {
               lineHeight: 1.7,
             }}
           >
-            Choose the plan that works best for your practice.
+            Flexible pricing for practitioners of all sizes, from solo practice to large clinics.
           </Paragraph>
         </div>
 
@@ -179,7 +179,7 @@ const PricingSection = () => {
                 className="reveal"
                 style={{
                   height: '100%',
-                  border: plan.featured ? '2px solid #a855f7' : '1px solid #e2e8f0',
+                  border: plan.featured ? '2px solid #3b82f6' : '1px solid #e2e8f0',
                   borderRadius: '16px',
                   background: '#ffffff',
                   padding: '32px 24px',
@@ -209,7 +209,7 @@ const PricingSection = () => {
                       top: '-12px',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
                       color: '#ffffff',
                       padding: '4px 16px',
                       borderRadius: '20px',
@@ -280,7 +280,7 @@ const PricingSection = () => {
                     fontWeight: 600,
                     borderRadius: '12px',
                     marginBottom: '32px',
-                    background: plan.featured ? '#0f172a' : '#ffffff',
+                    background: plan.featured ? 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)' : '#ffffff',
                     border: plan.featured ? 'none' : '2px solid #e2e8f0',
                     color: plan.featured ? '#ffffff' : '#0f172a',
                   }}

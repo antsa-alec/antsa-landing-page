@@ -2,8 +2,10 @@ import { ConfigProvider, Layout } from 'antd';
 import { useEffect } from 'react';
 import AppHeader from './components/AppHeader';
 import HeroSection from './components/HeroSection';
-import SponsorsSection from './components/SponsorsSection';
 import FeaturesSection from './components/FeaturesSection';
+import WhyAntsaSection from './components/WhyAntsaSection';
+import TrustStandardsSection from './components/TrustStandardsSection';
+import TeamSection from './components/TeamSection';
 import PricingSection from './components/PricingSection';
 import FAQSection from './components/FAQSection';
 import CTASection from './components/CTASection';
@@ -13,11 +15,11 @@ import './styles/global.css';
 const { Content } = Layout;
 
 /**
- * ANTSA THEME - Modern Purple/Pink Gradient
+ * ANTSA THEME - Modern Blue Gradient
  */
 const theme = {
   token: {
-    colorPrimary: '#a855f7',
+    colorPrimary: '#3b82f6',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
@@ -102,8 +104,10 @@ function App() {
         <AppHeader />
         <Content style={{ marginTop: '70px' }}>
           <HeroSection />
-          <SponsorsSection />
           <FeaturesSection />
+          <WhyAntsaSection />
+          <TrustStandardsSection />
+          <TeamSection />
           <PricingSection />
           <FAQSection />
           <CTASection />

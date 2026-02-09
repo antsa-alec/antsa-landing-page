@@ -35,39 +35,57 @@ const FeaturesSection = () => {
   const defaultFeatures = [
     {
       id: '1',
-      title: 'Node.js',
-      description: 'Powerful backend runtime built on Chrome\'s V8 JavaScript engine.',
-      icon: 'NodeIndexOutlined',
-    },
-    {
-      id: '2',
-      title: 'React',
-      description: 'A JavaScript library for building user interfaces with components.',
-      icon: 'ReactOutlined',
-    },
-    {
-      id: '3',
-      title: 'TypeScript',
-      description: 'Typed superset of JavaScript that compiles to plain JavaScript.',
-      icon: 'CodeOutlined',
-    },
-    {
-      id: '4',
-      title: 'AI Assistant',
-      description: '24/7 intelligent support powered by advanced language models.',
+      title: 'Clinician-Overseen AI Chatbot',
+      description: 'A practitioner-assigned AI chatbot that supports clients between sessions, with all interactions visible within the clinical record.',
       icon: 'RobotOutlined',
     },
     {
-      id: '5',
-      title: 'Video Sessions',
-      description: 'Secure video conferencing with built-in recording capabilities.',
+      id: '2',
+      title: 'AI Scribe & Templates',
+      description: 'AI-assisted session notes with structured clinical templates to reduce administrative burden.',
+      icon: 'FileTextOutlined',
+    },
+    {
+      id: '3',
+      title: 'Telehealth & Session Summaries',
+      description: 'Integrated video sessions with automatic session summaries to support accurate documentation.',
       icon: 'VideoCameraOutlined',
     },
     {
+      id: '4',
+      title: 'Psychometric Measures',
+      description: 'Assignable psychometric questionnaires completed and stored directly in the client file.',
+      icon: 'FormOutlined',
+    },
+    {
+      id: '5',
+      title: 'Automated Reminders',
+      description: 'Scheduled notifications for tasks, check-ins, and questionnaires without increasing practitioner workload.',
+      icon: 'BellOutlined',
+    },
+    {
       id: '6',
-      title: 'Analytics',
-      description: 'Comprehensive insights and reporting for practice management.',
-      icon: 'BarChartOutlined',
+      title: 'Homework Task Assignment',
+      description: 'Practitioner-assigned therapeutic tasks with automated delivery and completion tracking between sessions.',
+      icon: 'CheckSquareOutlined',
+    },
+    {
+      id: '7',
+      title: 'Psychoeducation Library',
+      description: 'Evidence-based educational resources assigned by practitioners to support client insight and engagement.',
+      icon: 'ReadOutlined',
+    },
+    {
+      id: '8',
+      title: 'Mood & Distress Tracking',
+      description: 'Ongoing mood monitoring to identify patterns and early warning signs between appointments.',
+      icon: 'LineChartOutlined',
+    },
+    {
+      id: '9',
+      title: 'Secure Messaging',
+      description: 'HIPAA-compliant messaging for practitioner-client communication and care coordination.',
+      icon: 'MessageOutlined',
     },
   ];
 
@@ -76,7 +94,7 @@ const FeaturesSection = () => {
   // Render icon dynamically
   const renderIcon = (iconName: string) => {
     const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
-    return <IconComponent style={{ fontSize: '32px', color: '#a855f7' }} />;
+    return <IconComponent style={{ fontSize: '32px', color: '#3b82f6' }} />;
   };
 
   if (loading) {
@@ -105,13 +123,13 @@ const FeaturesSection = () => {
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: '#a855f7',
+              color: '#3b82f6',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
             }}
           >
-            Features
+            FEATURES
           </Title>
           <Title
             level={2}
@@ -124,29 +142,41 @@ const FeaturesSection = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            Unlock the Full Potential of the{' '}
+            Supporting{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              Mental Health Platform
-            </span>
+              safe
+            </span>{' '}
+            and{' '}
+            <span
+              style={{
+                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              secure
+            </span>{' '}
+            care between sessions
           </Title>
           <Paragraph
             className="reveal"
             style={{
               fontSize: '18px',
               color: '#64748b',
-              maxWidth: '700px',
+              maxWidth: '800px',
               margin: '0 auto',
               lineHeight: 1.7,
             }}
           >
-            A comprehensive platform connecting practitioners with clients, built with modern technologies and AI-powered features.
+            A governed digital mental health system that brings together the core tools practitioners use to support and monitor clients between appointments.
           </Paragraph>
         </div>
 
@@ -170,7 +200,7 @@ const FeaturesSection = () => {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-8px)';
                   e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.borderColor = '#a855f7';
+                  e.currentTarget.style.borderColor = '#3b82f6';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import antsaIcon from '../assets/antsa-icon.png';
 
 const { Header } = Layout;
 
@@ -19,19 +20,19 @@ const AppHeader = () => {
     },
     {
       key: 'docs',
-      label: <a href="#pricing">Docs</a>,
+      label: <a href="#trust-standards">Trust & Standards</a>,
     },
     {
       key: 'blog',
-      label: <a href="#faq">Blog</a>,
+      label: <a href="#team">Our Team</a>,
     },
     {
       key: 'community',
-      label: <a href="#testimonials">Community</a>,
+      label: <a href="#pricing">Pricing</a>,
     },
     {
       key: 'company',
-      label: <a href="#contact">Company</a>,
+      label: <a href="#faq">FAQ</a>,
     },
   ];
 
@@ -63,31 +64,16 @@ const AppHeader = () => {
           }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
-          <div
+          <img 
+            src={antsaIcon} 
+            alt="ANTSA" 
             style={{
-              width: '32px',
-              height: '32px',
-              background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontSize: '20px',
-              fontWeight: 700,
+              height: '40px',
+              width: '40px',
+              borderRadius: '10px',
+              objectFit: 'contain',
             }}
-          >
-            📊
-          </div>
-          <span
-            style={{
-              fontSize: '20px',
-              fontWeight: 700,
-              color: '#0f172a',
-            }}
-          >
-            SaaS Template
-          </span>
+          />
         </div>
 
         {/* Desktop Navigation */}
@@ -131,7 +117,7 @@ const AppHeader = () => {
             <Button
               type="primary"
               style={{
-                background: '#0f172a',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
                 border: 'none',
                 fontSize: '15px',
                 fontWeight: 500,
@@ -161,23 +147,16 @@ const AppHeader = () => {
       <Drawer
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div
+            <img 
+              src={antsaIcon} 
+              alt="ANTSA" 
               style={{
-                width: '28px',
-                height: '28px',
-                background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)',
+                height: '32px',
+                width: '32px',
                 borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#ffffff',
-                fontSize: '16px',
-                fontWeight: 700,
+                objectFit: 'contain',
               }}
-            >
-              📊
-            </div>
-            <span style={{ fontSize: '18px', fontWeight: 700 }}>SaaS Template</span>
+            />
           </div>
         }
         placement="right"
@@ -210,7 +189,7 @@ const AppHeader = () => {
             type="primary"
             block
             style={{
-              background: '#0f172a',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
               border: 'none',
               fontSize: '16px',
               fontWeight: 500,
@@ -242,7 +221,7 @@ const AppHeader = () => {
 
         .ant-menu-horizontal .ant-menu-item:hover,
         .ant-menu-horizontal .ant-menu-item-selected {
-          color: #a855f7 !important;
+          color: #3b82f6 !important;
           border-bottom: none !important;
         }
 

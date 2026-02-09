@@ -1,289 +1,294 @@
-/**
- * TEAM SECTION - NEXT-LEVEL DESIGN  
- * Features: Modern card design, social media hover effects
- */
+import { useEffect, useState } from 'react';
+import { Typography, Row, Col, Card, Space } from 'antd';
+import { LinkedinOutlined, TwitterOutlined, GithubOutlined, GlobalOutlined } from '@ant-design/icons';
 
-import { useState, useEffect } from 'react';
-import { Row, Col, Card, Typography, Avatar, Space, Spin } from 'antd';
-import { 
-  LinkedinOutlined, 
-  MailOutlined, 
-  UserOutlined,
-  GithubOutlined,
-  TwitterOutlined,
-  FacebookOutlined,
-  InstagramOutlined,
-  GlobalOutlined,
-} from '@ant-design/icons';
-
-const { Title, Paragraph, Text } = Typography;
-
-// Using relative URL so Vite proxy can handle the request
-const API_BASE_URL = '/api';
+const { Title, Paragraph } = Typography;
 
 interface TeamMember {
-  id: number;
+  id: string;
   name: string;
   role: string;
   bio: string;
   image_url?: string;
-  socials?: TeamMemberSocial[];
+  socials?: {
+    platform: string;
+    url: string;
+  }[];
 }
 
-interface TeamMemberSocial {
-  id: number;
-  platform: string;
-  url: string;
-  order_index: number;
-}
-
-// Map platform names to Ant Design icons
-const socialIconMap: Record<string, any> = {
-  linkedin: LinkedinOutlined,
-  twitter: TwitterOutlined,
-  x: TwitterOutlined,
-  github: GithubOutlined,
-  facebook: FacebookOutlined,
-  instagram: InstagramOutlined,
-  email: MailOutlined,
-  website: GlobalOutlined,
-  other: GlobalOutlined,
-};
-
+/**
+ * TEAM SECTION - Our Team
+ * Displays team members with social links
+ */
 const TeamSection = () => {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let ignore = false;
-
-    const fetchTeamMembers = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/content/section/team`);
-        const data = await response.json();
-        
-        if (!ignore && response.ok && data.content && data.content.members) {
-          const members = data.content.members;
-          
-          // Fetch social links for each member
-          const membersWithSocials = await Promise.all(
-            members.map(async (member: TeamMember) => {
-              try {
-                const socialsResponse = await fetch(`${API_BASE_URL}/content/team/${member.id}/socials`);
-                const socialsData = await socialsResponse.json();
-                
-                return {
-                  ...member,
-                  socials: socialsData.socials || [],
-                };
-              } catch (error) {
-                console.error(`Error fetching socials for member ${member.id}:`, error);
-                return {
-                  ...member,
-                  socials: [],
-                };
-              }
-            })
-          );
-          
-          setTeamMembers(membersWithSocials);
+    fetch('/api/content/section/team')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.content && data.content.members) {
+          setMembers(data.content.members);
         }
-      } catch (error) {
-        if (!ignore) {
-          console.error('Error fetching team members:', error);
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchTeamMembers();
-
-    return () => {
-      ignore = true;
-    };
+      })
+      .catch((err) => console.error('Failed to load team:', err))
+      .finally(() => setLoading(false));
   }, []);
 
-  const getIconForPlatform = (platform: string) => {
-    const normalizedPlatform = platform.toLowerCase();
-    return socialIconMap[normalizedPlatform] || GlobalOutlined;
-  };
+  // Default team members if none loaded
+  const defaultMembers: TeamMember[] = [
+    {
+      id: '1',
+      name: 'Dr. Sarah Johnson',
+      role: 'Clinical Director',
+      bio: 'Clinical psychologist with 15+ years experience in digital mental health.',
+      image_url: '',
+    },
+    {
+      id: '2',
+      name: 'Michael Chen',
+      role: 'Chief Technology Officer',
+      bio: 'Experienced engineer passionate about building secure healthcare technology.',
+      image_url: '',
+    },
+    {
+      id: '3',
+      name: 'Dr. Emily Roberts',
+      role: 'Head of Clinical Innovation',
+      bio: 'Specialist in evidence-based therapy and AI-assisted clinical practice.',
+      image_url: '',
+    },
+  ];
+
+  const displayMembers = members.length > 0 ? members : defaultMembers;
 
   if (loading) {
-    return (
-      <div style={{ padding: '100px 20px', textAlign: 'center' }}>
-        <Spin size="large" />
-      </div>
-    );
+    return null;
   }
 
-  if (teamMembers.length === 0) {
-    return null; // Hide section if no team members
-  }
+  // Render social icon based on platform
+  const renderSocialIcon = (platform: string) => {
+    const iconStyle = { fontSize: '18px', color: '#64748b' };
+    switch (platform.toLowerCase()) {
+      case 'linkedin':
+        return <LinkedinOutlined style={iconStyle} />;
+      case 'twitter':
+        return <TwitterOutlined style={iconStyle} />;
+      case 'github':
+        return <GithubOutlined style={iconStyle} />;
+      default:
+        return <GlobalOutlined style={iconStyle} />;
+    }
+  };
 
   return (
-    <div style={{ 
-      padding: '100px 20px',
-      background: 'linear-gradient(180deg, #f7fafc 0%, #ffffff 100%)',
-    }}>
-      <Row justify="center" style={{ marginBottom: '70px' }}>
-        <Col xs={22} sm={20} md={18} lg={14}>
-          <div className="reveal" style={{ textAlign: 'center', marginBottom: '20px' }}>
-            <span style={{
-              display: 'inline-block',
-              background: 'linear-gradient(135deg, #48abe220 0%, #2196f320 100%)',
-              color: '#48abe2',
-              padding: '8px 20px',
-              borderRadius: '50px',
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              letterSpacing: '0.5px',
+    <section
+      id="team"
+      style={{
+        background: '#ffffff',
+        padding: '120px 20px',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+        }}
+      >
+        {/* Section Header */}
+        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <Title
+            level={5}
+            className="reveal"
+            style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#3b82f6',
+              marginBottom: '16px',
               textTransform: 'uppercase',
-            }}>
-              👥 Our Team
-            </span>
-          </div>
-
-          <Title level={2} className="reveal" style={{ 
-            textAlign: 'center',
-            marginBottom: '20px',
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
-            fontWeight: 800,
-            background: 'linear-gradient(135deg, #1a202c 0%, #4a5568 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>
-            Meet the Minds Behind ANTSA
+              letterSpacing: '0.1em',
+            }}
+          >
+            OUR TEAM
           </Title>
-
-          <Paragraph className="reveal" style={{ 
-            textAlign: 'center',
-            fontSize: '1.2rem',
-            color: '#4a5568',
-            lineHeight: 1.8,
-          }}>
-            A diverse team of clinicians, technologists, and healthcare innovators
-          </Paragraph>
-        </Col>
-      </Row>
-
-      <Row gutter={[32, 32]} justify="center">
-        {teamMembers.map((member, index) => (
-          <Col xs={22} sm={11} md={6} key={member.id || index} className="reveal-scale">
-            <Card
-              hoverable
+          <Title
+            level={2}
+            className="reveal"
+            style={{
+              fontSize: 'clamp(32px, 5vw, 48px)',
+              fontWeight: 800,
+              color: '#0f172a',
+              marginBottom: '24px',
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Meet the{' '}
+            <span
               style={{
-                height: '100%',
-                textAlign: 'center',
-                borderRadius: '20px',
-                border: '2px solid #f0f0f0',
-                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.08)',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-8px)';
-                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.12)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.08)';
+                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
               }}
             >
-              {member.image_url ? (
-                <Avatar
-                  size={110}
-                  src={member.image_url}
+              experts
+            </span>{' '}
+            behind ANTSA
+          </Title>
+          <Paragraph
+            className="reveal"
+            style={{
+              fontSize: '18px',
+              color: '#64748b',
+              maxWidth: '800px',
+              margin: '0 auto',
+              lineHeight: 1.7,
+            }}
+          >
+            Our team combines clinical expertise with cutting-edge technology to deliver safe, practitioner-controlled mental health solutions.
+          </Paragraph>
+        </div>
+
+        {/* Team Members Grid */}
+        <Row gutter={[32, 32]}>
+          {displayMembers.map((member, index) => (
+            <Col xs={24} sm={12} lg={8} key={member.id}>
+              <Card
+                className="reveal"
+                style={{
+                  height: '100%',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  background: '#ffffff',
+                  transition: 'all 0.3s ease',
+                  transitionDelay: `${index * 100}ms`,
+                  overflow: 'hidden',
+                }}
+                bodyStyle={{ padding: 0 }}
+                bordered={false}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-8px)';
+                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.borderColor = '#3b82f6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+              >
+                {/* Member Image */}
+                <div
                   style={{
-                    marginBottom: '20px',
-                    boxShadow: '0 8px 20px rgba(72, 171, 226, 0.3)',
+                    width: '100%',
+                    height: '280px',
+                    background: member.image_url
+                      ? `url(${member.image_url}) center/cover`
+                      : 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
-                />
-              ) : (
-                <Avatar
-                  size={110}
-                  icon={<UserOutlined />}
-                  style={{
-                    background: 'linear-gradient(135deg, #48abe2 0%, #2196f3 100%)',
-                    fontSize: '3.5rem',
-                    marginBottom: '20px',
-                    boxShadow: '0 8px 20px rgba(72, 171, 226, 0.3)',
-                  }}
-                />
-              )}
+                >
+                  {!member.image_url && (
+                    <div
+                      style={{
+                        width: '120px',
+                        height: '120px',
+                        borderRadius: '50%',
+                        background: 'rgba(255, 255, 255, 0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#ffffff',
+                        fontSize: '48px',
+                        fontWeight: 700,
+                      }}
+                    >
+                      {member.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
 
-              <Title level={4} style={{ marginBottom: '5px', fontSize: '1.3rem', fontWeight: 700 }}>
-                {member.name}
-              </Title>
+                {/* Member Info */}
+                <div style={{ padding: '24px' }}>
+                  <Title
+                    level={4}
+                    style={{
+                      fontSize: '22px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      marginBottom: '4px',
+                    }}
+                  >
+                    {member.name}
+                  </Title>
+                  <Paragraph
+                    style={{
+                      fontSize: '14px',
+                      color: '#3b82f6',
+                      fontWeight: 600,
+                      marginBottom: '16px',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    {member.role}
+                  </Paragraph>
+                  <Paragraph
+                    style={{
+                      fontSize: '15px',
+                      color: '#64748b',
+                      marginBottom: '20px',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {member.bio}
+                  </Paragraph>
 
-              <Text style={{ 
-                display: 'block',
-                color: '#48abe2',
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                marginBottom: '15px',
-              }}>
-                {member.role}
-              </Text>
-
-              {member.bio && (
-                <Paragraph style={{ 
-                  color: '#4a5568',
-                  marginBottom: '25px',
-                  fontSize: '0.95rem',
-                  lineHeight: 1.7,
-                }}>
-                  {member.bio}
-                </Paragraph>
-              )}
-
-              {member.socials && member.socials.length > 0 && (
-                <Space size="middle">
-                  {member.socials.map((social) => {
-                    const IconComponent = getIconForPlatform(social.platform);
-                    return (
-                      <a
-                        key={social.id}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: 'none' }}
-                      >
-                        <div
+                  {/* Social Links */}
+                  {member.socials && member.socials.length > 0 && (
+                    <Space size="middle">
+                      {member.socials.map((social, idx) => (
+                        <a
+                          key={idx}
+                          href={social.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '50%',
-                            background: '#48abe2',
-                            display: 'flex',
+                            display: 'inline-flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            cursor: 'pointer',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            background: '#f8fafc',
                             transition: 'all 0.3s ease',
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#2196f3';
-                            e.currentTarget.style.transform = 'translateY(-3px)';
+                            e.currentTarget.style.background = '#3b82f6';
+                            const icon = e.currentTarget.querySelector('span');
+                            if (icon) (icon as HTMLElement).style.color = '#ffffff';
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#48abe2';
-                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.background = '#f8fafc';
+                            const icon = e.currentTarget.querySelector('span');
+                            if (icon) (icon as HTMLElement).style.color = '#64748b';
                           }}
                         >
-                          <IconComponent style={{ fontSize: '1.3rem', color: '#ffffff' }} />
-                        </div>
-                      </a>
-                    );
-                  })}
-                </Space>
-              )}
-            </Card>
-          </Col>
-        ))}
-      </Row>
-    </div>
+                          {renderSocialIcon(social.platform)}
+                        </a>
+                      ))}
+                    </Space>
+                  )}
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+    </section>
   );
 };
 
