@@ -1,5 +1,4 @@
 import { Typography, Button } from 'antd';
-import { GithubOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
