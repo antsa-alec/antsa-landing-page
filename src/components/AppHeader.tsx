@@ -6,6 +6,9 @@ import antsaIcon from '../assets/antsa-icon.png';
 
 const { Header } = Layout;
 
+const SIGNUP_URL = 'https://au.antsa.ai/sign-in';
+const SIGNIN_URL = 'https://au.antsa.ai/sign-in';
+
 /**
  * APP HEADER - Clean navigation with logo
  * Responsive mobile menu
@@ -15,23 +18,31 @@ const AppHeader = () => {
 
   const menuItems: MenuProps['items'] = [
     {
-      key: 'product',
-      label: <a href="#features">Product</a>,
+      key: 'home',
+      label: <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>,
     },
     {
-      key: 'docs',
-      label: <a href="#trust-standards">Trust & Standards</a>,
+      key: 'the-shift',
+      label: <a href="#the-shift">The Shift</a>,
     },
     {
-      key: 'blog',
+      key: 'the-antsa',
+      label: <a href="#the-antsa">The ANTSA</a>,
+    },
+    {
+      key: 'features',
+      label: <a href="#features">Features</a>,
+    },
+    {
+      key: 'team',
       label: <a href="#team">Our Team</a>,
     },
     {
-      key: 'community',
+      key: 'pricing',
       label: <a href="#pricing">Pricing</a>,
     },
     {
-      key: 'company',
+      key: 'faq',
       label: <a href="#faq">FAQ</a>,
     },
   ];
@@ -111,13 +122,14 @@ const AppHeader = () => {
                 fontWeight: 500,
                 color: '#0f172a',
               }}
+              href={SIGNIN_URL}
             >
               Sign In
             </Button>
             <Button
               type="primary"
               style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                 border: 'none',
                 fontSize: '15px',
                 fontWeight: 500,
@@ -125,6 +137,7 @@ const AppHeader = () => {
                 height: '40px',
                 padding: '0 24px',
               }}
+              href={SIGNUP_URL}
             >
               Sign Up
             </Button>
@@ -182,6 +195,7 @@ const AppHeader = () => {
               fontWeight: 500,
               height: '48px',
             }}
+            href={SIGNIN_URL}
           >
             Sign In
           </Button>
@@ -189,13 +203,14 @@ const AppHeader = () => {
             type="primary"
             block
             style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+              background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
               border: 'none',
               fontSize: '16px',
               fontWeight: 500,
               height: '48px',
               borderRadius: '8px',
             }}
+            href={SIGNUP_URL}
           >
             Sign Up
           </Button>
@@ -221,7 +236,7 @@ const AppHeader = () => {
 
         .ant-menu-horizontal .ant-menu-item:hover,
         .ant-menu-horizontal .ant-menu-item-selected {
-          color: #3b82f6 !important;
+          color: #48abe2 !important;
           border-bottom: none !important;
         }
 

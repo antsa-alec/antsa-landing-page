@@ -8,8 +8,10 @@ import {
   DollarOutlined,
   SettingOutlined,
   MenuOutlined,
-  TrophyOutlined,
   QuestionCircleOutlined,
+  TeamOutlined,
+  ThunderboltOutlined,
+  BulbOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -18,8 +20,8 @@ import FeaturesEditor from '../components/admin/FeaturesEditor';
 import PricingEditor from '../components/admin/PricingEditor';
 import SettingsView from '../components/admin/SettingsView';
 import NavigationEditor from '../components/admin/NavigationEditor';
-import SponsorsEditor from '../components/admin/SponsorsEditor';
 import FAQEditor from '../components/admin/FAQEditor';
+import TeamEditor from '../components/admin/TeamEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -59,7 +61,6 @@ const Admin = () => {
           const data = await response.json();
           setUser(data.user);
         } else {
-          // Token is invalid
           localStorage.removeItem('admin_token');
           setToken(null);
           message.error('Session expired. Please login again.');
@@ -119,15 +120,12 @@ const Admin = () => {
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: 'navigation', icon: <MenuOutlined />, label: 'Navigation' },
     { key: 'hero', icon: <RocketOutlined />, label: 'Hero Section' },
-    { key: 'sponsors', icon: <TrophyOutlined />, label: 'Sponsors' },
+    { key: 'the-shift', icon: <ThunderboltOutlined />, label: 'The Shift' },
+    { key: 'the-antsa', icon: <BulbOutlined />, label: 'The ANTSA' },
     { key: 'features', icon: <AppstoreOutlined />, label: 'Features' },
+    { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
     { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
-    // REMOVED: Testimonials, Team, Contact - not in new design
-    // { key: 'testimonials', icon: <CommentOutlined />, label: 'Testimonials' },
-    // { key: 'team', icon: <TeamOutlined />, label: 'Team' },
-    // { key: 'contact', icon: <PhoneOutlined />, label: 'Contact' },
-    // { key: 'documents', icon: <FileTextOutlined />, label: 'Documents' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
@@ -139,17 +137,22 @@ const Admin = () => {
         return <NavigationEditor auth={authContext} />;
       case 'hero':
         return <HeroEditor auth={authContext} />;
-      case 'sponsors':
-        return <SponsorsEditor auth={authContext} />;
+      case 'the-shift':
+        // Reuse FeaturesEditor pattern for the-shift section
+        return <FeaturesEditor auth={authContext} sectionName="the-shift" />;
+      case 'the-antsa':
+        // Reuse FeaturesEditor pattern for the-antsa section
+        return <FeaturesEditor auth={authContext} sectionName="the-antsa" />;
       case 'features':
         return <FeaturesEditor auth={authContext} />;
+      case 'team':
+        return <TeamEditor auth={authContext} />;
       case 'pricing':
         return <PricingEditor auth={authContext} />;
       case 'faq':
         return <FAQEditor auth={authContext} />;
       case 'settings':
         return <SettingsView auth={authContext} />;
-      // Removed unused sections: testimonials, team, contact, documents
       default:
         return <DashboardView auth={authContext} />;
     }
@@ -229,4 +232,3 @@ const Admin = () => {
 
 export default Admin;
 export { API_BASE_URL };
-

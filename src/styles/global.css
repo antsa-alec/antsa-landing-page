@@ -5,20 +5,20 @@
 
 :root {
   /* ANTSA Brand Colors - Blue Theme */
-  --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-  --secondary-gradient: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  --primary-gradient: linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%);
+  --secondary-gradient: linear-gradient(135deg, #3a9fd4 0%, #48abe2 100%);
   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
   --dark-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   --light-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   
-  --color-primary: #3b82f6;
-  --color-primary-dark: #2563eb;
-  --color-primary-light: #60a5fa;
-  --color-secondary: #60a5fa;
-  --color-accent: #3b82f6;
+  --color-primary: #48abe2;
+  --color-primary-dark: #3a9fd4;
+  --color-primary-light: #7ec8ed;
+  --color-secondary: #7ec8ed;
+  --color-accent: #48abe2;
   --color-success: #10b981;
   --color-warning: #f59e0b;
-  --color-info: #3b82f6;
+  --color-info: #48abe2;
   
   --color-text-primary: #0f172a;
   --color-text-secondary: #475569;
@@ -573,5 +573,18 @@ section[id] {
   .faq-columns {
     flex-direction: column;
   }
+}
+
+/* Footer subscribe input placeholder */
+footer .ant-input::placeholder,
+footer input::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+  opacity: 1 !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.5) !important;
+}
+footer .ant-input,
+footer input {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 

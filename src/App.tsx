@@ -2,13 +2,13 @@ import { ConfigProvider, Layout } from 'antd';
 import { useEffect } from 'react';
 import AppHeader from './components/AppHeader';
 import HeroSection from './components/HeroSection';
+import TheShiftSection from './components/TheShiftSection';
+import TheAntsaSection from './components/TheAntsaSection';
 import FeaturesSection from './components/FeaturesSection';
-import WhyAntsaSection from './components/WhyAntsaSection';
-import TrustStandardsSection from './components/TrustStandardsSection';
 import TeamSection from './components/TeamSection';
 import PricingSection from './components/PricingSection';
 import FAQSection from './components/FAQSection';
-import CTASection from './components/CTASection';
+import ComplianceBadgesStrip from './components/ComplianceBadgesStrip';
 import AppFooter from './components/AppFooter';
 import './styles/global.css';
 
@@ -19,11 +19,11 @@ const { Content } = Layout;
  */
 const theme = {
   token: {
-    colorPrimary: '#3b82f6',
+    colorPrimary: '#48abe2',
     colorSuccess: '#10b981',
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
-    colorInfo: '#3b82f6',
+    colorInfo: '#48abe2',
     colorTextBase: '#0f172a',
     colorBgBase: '#ffffff',
     borderRadius: 12,
@@ -104,13 +104,13 @@ function App() {
         <AppHeader />
         <Content style={{ marginTop: '70px' }}>
           <HeroSection />
+          <TheShiftSection />
+          <TheAntsaSection />
           <FeaturesSection />
-          <WhyAntsaSection />
-          <TrustStandardsSection />
           <TeamSection />
           <PricingSection />
           <FAQSection />
-          <CTASection />
+          <ComplianceBadgesStrip />
         </Content>
         <AppFooter />
       </Layout>

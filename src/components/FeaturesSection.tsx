@@ -94,7 +94,7 @@ const FeaturesSection = () => {
   // Render icon dynamically
   const renderIcon = (iconName: string) => {
     const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
-    return <IconComponent style={{ fontSize: '32px', color: '#3b82f6' }} />;
+    return <IconComponent style={{ fontSize: '32px', color: '#48abe2' }} />;
   };
 
   if (loading) {
@@ -123,7 +123,7 @@ const FeaturesSection = () => {
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: '#3b82f6',
+              color: '#48abe2',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
@@ -145,26 +145,15 @@ const FeaturesSection = () => {
             Supporting{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              safe
+              safe and secure
             </span>{' '}
-            and{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              secure
-            </span>{' '}
-            care between sessions
+            care between sessions.
           </Title>
           <Paragraph
             className="reveal"
@@ -200,7 +189,7 @@ const FeaturesSection = () => {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'translateY(-8px)';
                   e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.borderColor = '#3b82f6';
+                  e.currentTarget.style.borderColor = '#48abe2';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';

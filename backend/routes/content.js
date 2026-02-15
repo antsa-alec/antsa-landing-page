@@ -102,7 +102,7 @@ router.get('/section/:sectionName', (req, res) => {
     });
 
     // Add specific section data
-    if (section.name === 'features') {
+    if (section.name === 'features' || section.name === 'the-shift' || section.name === 'the-antsa') {
       const featuresStmt = db.prepare('SELECT * FROM feature_items WHERE section_id = ? ORDER BY order_index');
       content.items = featuresStmt.all(section.id);
     } else if (section.name === 'pricing') {
@@ -117,7 +117,12 @@ router.get('/section/:sectionName', (req, res) => {
       content.items = testimonialsStmt.all(section.id);
     } else if (section.name === 'team') {
       const teamStmt = db.prepare('SELECT * FROM team_members WHERE section_id = ? ORDER BY order_index');
-      content.members = teamStmt.all(section.id);
+      const members = teamStmt.all(section.id);
+      const socialsStmt = db.prepare('SELECT * FROM team_member_socials WHERE team_member_id = ?');
+      content.members = members.map(member => ({
+        ...member,
+        socials: socialsStmt.all(member.id),
+      }));
     }
 
     res.json({
@@ -1231,6 +1236,77 @@ router.put('/footer-links/:id/category', authenticateToken, (req, res) => {
     res.json({ message: 'Footer link category updated successfully' });
   } catch (error) {
     console.error('Update footer link category error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// ===== SUBSCRIBERS ROUTES =====
+
+// Subscribe (public - no auth required)
+router.post('/subscribe', [
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  body('email').trim().isEmail().withMessage('A valid email is required'),
+], (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+    const { name, email } = req.body;
+
+    // Check if already subscribed
+    const existingStmt = db.prepare('SELECT * FROM subscribers WHERE email = ?');
+    const existing = existingStmt.get(email.toLowerCase());
+
+    if (existing) {
+      if (existing.is_active) {
+        return res.status(409).json({ error: 'This email is already subscribed.' });
+      }
+      // Re-activate existing subscriber
+      const updateStmt = db.prepare(`
+        UPDATE subscribers 
+        SET name = ?, is_active = 1, unsubscribed_at = NULL, subscribed_at = CURRENT_TIMESTAMP 
+        WHERE email = ?
+      `);
+      updateStmt.run(name, email.toLowerCase());
+      return res.json({ message: 'Welcome back! You have been re-subscribed.' });
+    }
+
+    const stmt = db.prepare(`
+      INSERT INTO subscribers (name, email) VALUES (?, ?)
+    `);
+
+    stmt.run(name, email.toLowerCase());
+    
+    res.json({ message: 'Thank you for subscribing!' });
+  } catch (error) {
+    console.error('Subscribe error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get all subscribers (admin only)
+router.get('/subscribers', authenticateToken, (req, res) => {
+  try {
+    const stmt = db.prepare('SELECT * FROM subscribers ORDER BY subscribed_at DESC');
+    const subscribers = stmt.all();
+    res.json({ subscribers });
+  } catch (error) {
+    console.error('Get subscribers error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete subscriber (admin only)
+router.delete('/subscribers/:id', authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+    const stmt = db.prepare('DELETE FROM subscribers WHERE id = ?');
+    stmt.run(id);
+    res.json({ message: 'Subscriber removed successfully' });
+  } catch (error) {
+    console.error('Delete subscriber error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

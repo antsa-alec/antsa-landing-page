@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Card, Button, List } from 'antd';
-import { CheckOutlined } from '@ant-design/icons';
+import { CheckOutlined, MailOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
@@ -9,7 +9,6 @@ interface PricingPlan {
   name: string;
   price: string;
   period: string;
-  description: string;
   features: string[];
   featured?: boolean;
   cta_text: string;
@@ -18,7 +17,6 @@ interface PricingPlan {
 
 /**
  * PRICING SECTION - Three-tier pricing cards
- * Clean, modern pricing display
  */
 const PricingSection = () => {
   const [plans, setPlans] = useState<PricingPlan[]>([]);
@@ -29,16 +27,14 @@ const PricingSection = () => {
       .then((res) => res.json())
       .then((data) => {
         if (data.content && data.content.plans) {
-          // Transform backend data to match component structure
           const transformedPlans = data.content.plans.map((plan: any) => ({
             id: String(plan.id),
             name: plan.name,
             price: plan.price,
-            period: plan.period || '/ month',
-            description: plan.description || 'For individuals',
+            period: plan.period !== undefined && plan.period !== null ? plan.period : '/month',
             features: Array.isArray(plan.features) ? plan.features : [],
             featured: Boolean(plan.featured),
-            cta_text: plan.cta_text || 'Get Started',
+            cta_text: plan.cta_text || (plan.price === 'Contact Us' ? 'Contact Us' : 'Get Started'),
             cta_url: plan.cta_url,
           }));
           setPlans(transformedPlans);
@@ -48,61 +44,64 @@ const PricingSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Default pricing plans
   const defaultPlans: PricingPlan[] = [
     {
       id: '1',
-      name: 'Free',
-      price: '$0',
-      period: '/ month',
-      description: 'For individuals',
-      features: [
-        '2 Team Members',
-        '2 Websites',
-        '2 GB Storage',
-        '2 TB Transfer',
-        'Email Support',
-      ],
-      cta_text: 'Get Started',
-    },
-    {
-      id: '2',
-      name: 'Premium',
+      name: 'Solo Practitioner',
       price: '$79',
-      period: '/ month',
-      description: 'For small teams',
+      period: '/month',
       features: [
-        '5 Team Members',
-        '5 Websites',
-        '5 GB Storage',
-        '5 TB Transfer',
-        'Email Support',
+        'Full platform access',
+        'AI chatbot (jAImee)',
+        'AI Scribe & Templates',
+        'Telehealth & Session Summaries',
+        'Mood & Distress Tracking',
+        'Secure Messaging',
+        'Homework Task Assignment',
+        'Psychoeducation Library',
+        'Automated Reminders',
+        'Psychometric Measures',
       ],
       featured: true,
       cta_text: 'Get Started',
+      cta_url: 'https://au.antsa.ai/sign-in',
+    },
+    {
+      id: '2',
+      name: 'Clinic / Practice',
+      price: 'Contact Us',
+      period: '',
+      features: [
+        'Everything in Solo Practitioner',
+        'Reduced per-licence pricing for practices with multiple practitioner licences',
+        'Multi-practitioner management',
+        'Practice-level reporting',
+      ],
+      featured: false,
+      cta_text: 'Contact Us',
+      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!',
     },
     {
       id: '3',
       name: 'Enterprise',
-      price: '$199',
-      period: '/ month',
-      description: 'For industry leaders',
+      price: 'Contact Us',
+      period: '',
       features: [
-        '100 Team Members',
-        '100 Websites',
-        '100 GB Storage',
-        '100 TB Transfer',
-        'Email Support',
+        'Everything in Clinic / Practice',
+        'Custom integrations',
+        'Dedicated support',
+        'Service-level agreements',
+        'Custom deployment options',
       ],
-      cta_text: 'Get Started',
+      featured: false,
+      cta_text: 'Contact Us',
+      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!',
     },
   ];
 
   const displayPlans = plans.length > 0 ? plans : defaultPlans;
 
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
 
   return (
     <section
@@ -112,12 +111,7 @@ const PricingSection = () => {
         padding: '120px 20px',
       }}
     >
-      <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}
-      >
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <Title
@@ -126,7 +120,7 @@ const PricingSection = () => {
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: '#3b82f6',
+              color: '#48abe2',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
@@ -145,17 +139,17 @@ const PricingSection = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            Choose the plan that works best for{' '}
+            Pricing should be{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
               }}
             >
-              your practice
-            </span>
+              simple
+            </span>.
           </Title>
           <Paragraph
             className="reveal"
@@ -167,162 +161,156 @@ const PricingSection = () => {
               lineHeight: 1.7,
             }}
           >
-            Flexible pricing for practitioners of all sizes, from solo practice to large clinics.
+            One system. Full access. No hidden add-ons.
           </Paragraph>
         </div>
 
         {/* Pricing Cards */}
         <Row gutter={[32, 32]} justify="center">
-          {displayPlans.map((plan, index) => (
-            <Col xs={24} sm={24} md={8} key={plan.id}>
-              <Card
-                className="reveal"
-                style={{
-                  height: '100%',
-                  border: plan.featured ? '2px solid #3b82f6' : '1px solid #e2e8f0',
-                  borderRadius: '16px',
-                  background: '#ffffff',
-                  padding: '32px 24px',
-                  transition: 'all 0.3s ease',
-                  transitionDelay: `${index * 100}ms`,
-                  position: 'relative',
-                }}
-                bodyStyle={{ padding: 0 }}
-                bordered={false}
-                onMouseEnter={(e) => {
-                  if (!plan.featured) {
+          {displayPlans.map((plan, index) => {
+            const isContact = plan.price === 'Contact Us';
+
+            return (
+              <Col xs={24} sm={24} md={8} key={plan.id}>
+                <Card
+                  className="reveal"
+                  style={{
+                    height: '100%',
+                    border: plan.featured ? '2px solid #48abe2' : '1px solid #e2e8f0',
+                    borderRadius: '16px',
+                    background: '#ffffff',
+                    padding: '32px 24px',
+                    transition: 'all 0.3s ease',
+                    transitionDelay: `${index * 100}ms`,
+                    position: 'relative',
+                  }}
+                  bodyStyle={{ padding: 0 }}
+                  bordered={false}
+                  onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-8px)';
                     e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!plan.featured) {
+                  }}
+                  onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
                     e.currentTarget.style.boxShadow = 'none';
-                  }
-                }}
-              >
-                {plan.featured && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '-12px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-                      color: '#ffffff',
-                      padding: '4px 16px',
-                      borderRadius: '20px',
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    Most Popular
-                  </div>
-                )}
-
-                {/* Plan Name */}
-                <Title
-                  level={3}
-                  style={{
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                    marginBottom: '8px',
                   }}
                 >
-                  {plan.name}
-                </Title>
-
-                {/* Price */}
-                <div style={{ marginBottom: '8px' }}>
-                  <span
-                    style={{
-                      fontSize: '48px',
-                      fontWeight: 800,
-                      color: '#0f172a',
-                    }}
-                  >
-                    {plan.price}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '18px',
-                      color: '#64748b',
-                      marginLeft: '4px',
-                    }}
-                  >
-                    {plan.period}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <Paragraph
-                  style={{
-                    fontSize: '15px',
-                    color: '#64748b',
-                    marginBottom: '32px',
-                  }}
-                >
-                  {plan.description}
-                </Paragraph>
-
-                {/* CTA Button */}
-                <Button
-                  type={plan.featured ? 'primary' : 'default'}
-                  block
-                  size="large"
-                  style={{
-                    height: '56px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    borderRadius: '12px',
-                    marginBottom: '32px',
-                    background: plan.featured ? 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)' : '#ffffff',
-                    border: plan.featured ? 'none' : '2px solid #e2e8f0',
-                    color: plan.featured ? '#ffffff' : '#0f172a',
-                  }}
-                  href={plan.cta_url || '#'}
-                >
-                  {plan.cta_text}
-                </Button>
-
-                {/* Features List */}
-                <List
-                  dataSource={plan.features}
-                  renderItem={(feature) => (
-                    <List.Item
+                  {plan.featured && (
+                    <div
                       style={{
-                        border: 'none',
-                        padding: '12px 0',
+                        position: 'absolute',
+                        top: '-12px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                        color: '#ffffff',
+                        padding: '4px 16px',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                        whiteSpace: 'nowrap',
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        <CheckOutlined
-                          style={{
-                            color: '#10b981',
-                            fontSize: '16px',
-                            marginTop: '2px',
-                          }}
-                        />
-                        <span
-                          style={{
-                            fontSize: '15px',
-                            color: '#475569',
-                            flex: 1,
-                          }}
-                        >
-                          {feature}
-                        </span>
-                      </div>
-                    </List.Item>
+                      Most Popular
+                    </div>
                   )}
-                />
-              </Card>
-            </Col>
-          ))}
+
+                  {/* Plan Name */}
+                  <Title
+                    level={3}
+                    style={{
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {plan.name}
+                  </Title>
+
+                  {/* Price */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <span
+                      style={{
+                        fontSize: isContact ? '32px' : '48px',
+                        fontWeight: 800,
+                        color: '#0f172a',
+                      }}
+                    >
+                      {plan.price}
+                    </span>
+                    {plan.period && (
+                      <span
+                        style={{
+                          fontSize: '18px',
+                          color: '#64748b',
+                          marginLeft: '4px',
+                        }}
+                      >
+                        {plan.period}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* CTA Button */}
+                  <Button
+                    type={plan.featured ? 'primary' : 'default'}
+                    block
+                    size="large"
+                    icon={isContact ? <MailOutlined /> : undefined}
+                    style={{
+                      height: '56px',
+                      fontSize: '16px',
+                      fontWeight: 600,
+                      borderRadius: '12px',
+                      marginBottom: '32px',
+                      background: plan.featured ? 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)' : '#ffffff',
+                      border: plan.featured ? 'none' : '2px solid #e2e8f0',
+                      color: plan.featured ? '#ffffff' : '#0f172a',
+                    }}
+                    href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!' : 'https://au.antsa.ai/sign-in')}
+                  >
+                    {plan.cta_text}
+                  </Button>
+
+                  {/* Features List */}
+                  <List
+                    dataSource={plan.features}
+                    renderItem={(feature) => (
+                      <List.Item
+                        style={{
+                          border: 'none',
+                          padding: '10px 0',
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                          <CheckOutlined
+                            style={{
+                              color: '#10b981',
+                              fontSize: '16px',
+                              marginTop: '2px',
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontSize: '14px',
+                              color: '#475569',
+                              flex: 1,
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            {feature}
+                          </span>
+                        </div>
+                      </List.Item>
+                    )}
+                  />
+                </Card>
+              </Col>
+            );
+          })}
         </Row>
       </div>
     </section>

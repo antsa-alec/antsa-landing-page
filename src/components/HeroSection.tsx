@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Typography, Button, Space } from 'antd';
-import { PlayCircleOutlined } from '@ant-design/icons';
+import { MailOutlined } from '@ant-design/icons';
 import antsaLogo from '../assets/antsa-logo.png';
 
 const { Title, Paragraph } = Typography;
@@ -8,14 +8,54 @@ const { Title, Paragraph } = Typography;
 interface HeroContent {
   badge?: string;
   title?: string;
+  title_highlights?: string;
   description?: string;
   cta_primary?: string;
+  cta_primary_url?: string;
   cta_secondary?: string;
+  cta_secondary_url?: string;
 }
 
 /**
- * HERO SECTION - Modern Clean Design
- * Inspired by modern SaaS landing pages
+ * Renders text with highlighted phrases in brand gradient
+ */
+const HighlightedText = ({ text, highlights }: { text: string; highlights: string[] }) => {
+  if (!highlights || highlights.length === 0) {
+    return <>{text}</>;
+  }
+
+  // Build regex to match any highlight phrase
+  const escapedHighlights = highlights.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const regex = new RegExp(`(${escapedHighlights.join('|')})`, 'gi');
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) => {
+        const isHighlight = highlights.some(h => h.toLowerCase() === part.toLowerCase());
+        if (isHighlight) {
+          return (
+            <span
+              key={i}
+              style={{
+                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              {part}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+};
+
+/**
+ * HERO SECTION - Modern Clean Design with brand gradient background
  */
 const HeroSection = () => {
   const [content, setContent] = useState<HeroContent>({});
@@ -33,9 +73,15 @@ const HeroSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  const description = content.description || 'ANTSA is an Australian-built digital mental health system designed to support safe, supervised care between appointments. Brings AI within clinical governance, records, and duty-of-care frameworks, rather than leaving clients to use unregulated tools on their own.';
+  const titleText = content.title || 'Keeping mental health practitioners in the loop when care happens between sessions.';
+  const titleHighlights: string[] = content.title_highlights
+    ? (typeof content.title_highlights === 'string' ? JSON.parse(content.title_highlights) : content.title_highlights)
+    : ['in the loop', 'between sessions'];
+  const descriptionRaw = content.description || 'ANTSA is an Australian-built digital mental health system designed to support safe, supervised care between appointments. ANTSA brings AI within clinical governance, records, and duty-of-care frameworks, rather than leaving clients to use unregulated tools on their own.';
   const ctaPrimary = content.cta_primary || 'Start Your Free Trial';
-  const ctaSecondary = content.cta_secondary || 'Watch Demo';
+  const ctaPrimaryUrl = content.cta_primary_url || 'https://au.antsa.ai/sign-in';
+  const ctaSecondary = content.cta_secondary || 'Book a Demo';
+  const ctaSecondaryUrl = content.cta_secondary_url || 'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo%20of%20the%20ANTSA%20platform.%0A%0APlease%20let%20me%20know%20your%20available%20times.%0A%0AThanks!';
 
   if (loading) {
     return null;
@@ -45,7 +91,7 @@ const HeroSection = () => {
     <section
       id="hero"
       style={{
-        background: '#ffffff',
+        background: 'linear-gradient(160deg, #e0effe 0%, #f0f4ff 30%, #ffffff 60%, #f5f0ff 100%)',
         padding: '160px 20px 120px',
         position: 'relative',
         overflow: 'hidden',
@@ -55,6 +101,32 @@ const HeroSection = () => {
         justifyContent: 'center',
       }}
     >
+      {/* Subtle decorative gradient orbs */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '-200px',
+          right: '-200px',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(72, 171, 226, 0.08) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '-150px',
+          left: '-150px',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(72, 171, 226, 0.06) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+
       <div
         style={{
           maxWidth: '1200px',
@@ -84,63 +156,37 @@ const HeroSection = () => {
           />
         </div>
 
-        {/* Main Title with Gradient Highlight */}
+        {/* Main Title with Highlighted Phrases */}
         <Title
           level={1}
           className="reveal"
           style={{
-            fontSize: 'clamp(36px, 7vw, 72px)',
+            fontSize: 'clamp(32px, 5vw, 56px)',
             fontWeight: 800,
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             marginBottom: '32px',
             color: '#0f172a',
             letterSpacing: '-0.02em',
-            maxWidth: '1000px',
+            maxWidth: '950px',
             margin: '0 auto 32px',
           }}
         >
-          The perfect{' '}
-          <span
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            mental health platform
-          </span>{' '}
-          to build and scale your practice with ease.
+          <HighlightedText text={titleText} highlights={titleHighlights} />
         </Title>
 
         {/* Description */}
         <Paragraph
           className="reveal"
           style={{
-            fontSize: 'clamp(16px, 2.5vw, 20px)',
-            color: '#64748b',
+            fontSize: 'clamp(16px, 2.5vw, 19px)',
+            color: '#475569',
             marginBottom: '48px',
-            maxWidth: '800px',
+            maxWidth: '850px',
             margin: '0 auto 48px',
-            lineHeight: 1.7,
+            lineHeight: 1.75,
           }}
         >
-          {description}
-        </Paragraph>
-
-        <Paragraph
-          className="reveal"
-          style={{
-            fontSize: 'clamp(16px, 2.5vw, 20px)',
-            fontWeight: 700,
-            color: '#0f172a',
-            marginBottom: '48px',
-            maxWidth: '800px',
-            margin: '0 auto 48px',
-            lineHeight: 1.7,
-          }}
-        >
-          Home of the world's first practitioner-overseen AI therapy support chatbot.
+          {descriptionRaw}
         </Paragraph>
 
         {/* CTA Buttons */}
@@ -163,13 +209,13 @@ const HeroSection = () => {
               border: 'none',
               boxShadow: '0 4px 16px rgba(15, 23, 42, 0.3)',
             }}
-            href="#features"
+            href={ctaPrimaryUrl}
           >
             {ctaPrimary}
           </Button>
           <Button
             size="large"
-            icon={<PlayCircleOutlined />}
+            icon={<MailOutlined />}
             style={{
               height: '64px',
               padding: '0 48px',
@@ -180,6 +226,7 @@ const HeroSection = () => {
               border: '2px solid #e2e8f0',
               color: '#0f172a',
             }}
+            href={ctaSecondaryUrl}
           >
             {ctaSecondary}
           </Button>

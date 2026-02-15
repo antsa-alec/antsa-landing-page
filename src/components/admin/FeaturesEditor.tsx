@@ -17,9 +17,10 @@ interface Feature {
 
 interface FeaturesEditorProps {
   auth: AuthContextType;
+  sectionName?: string;
 }
 
-const FeaturesEditor = ({ auth }: FeaturesEditorProps) => {
+const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps) => {
   const [features, setFeatures] = useState<Feature[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -28,17 +29,17 @@ const FeaturesEditor = ({ auth }: FeaturesEditorProps) => {
 
   useEffect(() => {
     fetchFeatures();
-  }, []);
+  }, [sectionName]);
 
   const fetchFeatures = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/content/section/features`);
+      const response = await fetch(`${API_BASE_URL}/content/section/${sectionName}`);
       const data = await response.json();
 
       if (response.ok) {
-        setFeatures(data.content.items || []);
+        setFeatures(data.content?.items || data.items || []);
       } else {
-        message.error('Failed to load features');
+        message.error(`Failed to load ${sectionName} items`);
       }
     } catch (error) {
       console.error('Fetch error:', error);
@@ -120,7 +121,7 @@ const FeaturesEditor = ({ auth }: FeaturesEditorProps) => {
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h3>Feature Cards</h3>
+        <h3>{sectionName === 'features' ? 'Feature Cards' : `${sectionName} Cards`}</h3>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
           Add Feature
         </Button>

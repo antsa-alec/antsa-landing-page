@@ -132,6 +132,89 @@ db.exec(`
     FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
     FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE SET NULL
   );
+
+  CREATE TABLE IF NOT EXISTS team_member_socials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    team_member_id INTEGER NOT NULL,
+    platform TEXT NOT NULL,
+    url TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (team_member_id) REFERENCES team_members(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS faq_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    section_id INTEGER NOT NULL,
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS nav_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    label TEXT NOT NULL,
+    href TEXT NOT NULL,
+    order_index INTEGER DEFAULT 0,
+    parent_id INTEGER,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES nav_items(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS social_links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    platform TEXT NOT NULL UNIQUE,
+    url TEXT NOT NULL,
+    icon TEXT,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS footer_categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS footer_links (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    label TEXT NOT NULL,
+    url TEXT NOT NULL,
+    category_id INTEGER,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES footer_categories(id) ON DELETE SET NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sponsors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    logo_url TEXT,
+    website_url TEXT,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT UNIQUE NOT NULL,
+    value TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    subscribed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    unsubscribed_at DATETIME,
+    is_active BOOLEAN DEFAULT 1
+  );
 `);
 
 export default db;

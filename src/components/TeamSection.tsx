@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Typography, Row, Col, Card, Space } from 'antd';
-import { LinkedinOutlined, TwitterOutlined, GithubOutlined, GlobalOutlined } from '@ant-design/icons';
+import { Typography, Row, Col, Space, Button } from 'antd';
+import { LinkedinOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
@@ -17,8 +17,7 @@ interface TeamMember {
 }
 
 /**
- * TEAM SECTION - Our Team
- * Displays team members with social links
+ * TEAM SECTION - Circular photo cards with LinkedIn buttons
  */
 const TeamSection = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -36,51 +35,40 @@ const TeamSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Default team members if none loaded
   const defaultMembers: TeamMember[] = [
     {
       id: '1',
-      name: 'Dr. Sarah Johnson',
-      role: 'Clinical Director',
-      bio: 'Clinical psychologist with 15+ years experience in digital mental health.',
-      image_url: '',
+      name: 'Sally-Anne McCormack',
+      role: 'Founder & CEO, Clinical Psychologist',
+      bio: 'Founder and CEO of ANTSA. A clinical psychologist with extensive experience in mental health practice, driving the vision for clinician-governed digital care infrastructure.',
+      socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/sally-anne-mccormack/' }],
     },
     {
       id: '2',
-      name: 'Michael Chen',
-      role: 'Chief Technology Officer',
-      bio: 'Experienced engineer passionate about building secure healthcare technology.',
-      image_url: '',
+      name: 'Kiera Macdonald',
+      role: 'CCO, Clinical Psychologist',
+      bio: 'Chief Clinical Officer bringing clinical psychology expertise to ensure ANTSA maintains the highest standards of clinical governance and evidence-based practice.',
+      socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/kiera-macdonald/' }],
     },
     {
       id: '3',
-      name: 'Dr. Emily Roberts',
-      role: 'Head of Clinical Innovation',
-      bio: 'Specialist in evidence-based therapy and AI-assisted clinical practice.',
-      image_url: '',
+      name: 'Amber Macdonald',
+      role: 'CGO, Senior Scientist / Lawyer',
+      bio: 'Chief Governance Officer combining scientific research and legal expertise to ensure ANTSA meets regulatory requirements and professional standards.',
+      socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/amber-macdonald/' }],
+    },
+    {
+      id: '4',
+      name: 'Ben Smith',
+      role: 'CTO, AI Engineer',
+      bio: "Chief Technology Officer leading the technical architecture and AI systems that power ANTSA's practitioner-governed digital care platform.",
+      socials: [],
     },
   ];
 
   const displayMembers = members.length > 0 ? members : defaultMembers;
 
-  if (loading) {
-    return null;
-  }
-
-  // Render social icon based on platform
-  const renderSocialIcon = (platform: string) => {
-    const iconStyle = { fontSize: '18px', color: '#64748b' };
-    switch (platform.toLowerCase()) {
-      case 'linkedin':
-        return <LinkedinOutlined style={iconStyle} />;
-      case 'twitter':
-        return <TwitterOutlined style={iconStyle} />;
-      case 'github':
-        return <GithubOutlined style={iconStyle} />;
-      default:
-        return <GlobalOutlined style={iconStyle} />;
-    }
-  };
+  if (loading) return null;
 
   return (
     <section
@@ -90,12 +78,7 @@ const TeamSection = () => {
         padding: '120px 20px',
       }}
     >
-      <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}
-      >
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <Title
@@ -104,7 +87,7 @@ const TeamSection = () => {
             style={{
               fontSize: '14px',
               fontWeight: 600,
-              color: '#3b82f6',
+              color: '#48abe2',
               marginBottom: '16px',
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
@@ -126,7 +109,7 @@ const TeamSection = () => {
             Meet the{' '}
             <span
               style={{
-                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
+                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -134,156 +117,151 @@ const TeamSection = () => {
             >
               experts
             </span>{' '}
-            behind ANTSA
+            behind ANTSA.
           </Title>
           <Paragraph
             className="reveal"
             style={{
               fontSize: '18px',
               color: '#64748b',
-              maxWidth: '800px',
+              maxWidth: '900px',
               margin: '0 auto',
               lineHeight: 1.7,
             }}
           >
-            Our team combines clinical expertise with cutting-edge technology to deliver safe, practitioner-controlled mental health solutions.
+            ANTSA is a female-owned Australian company founded by a clinical psychologist and built with her two daughters. Together, the team brings deep clinical insight, strong governance, and practical experience in digital health, designing infrastructure that scales without losing clinical accountability.
           </Paragraph>
         </div>
 
-        {/* Team Members Grid */}
-        <Row gutter={[32, 32]}>
+        {/* Team Members Grid - 4 columns */}
+        <Row gutter={[32, 48]} justify="center">
           {displayMembers.map((member, index) => (
-            <Col xs={24} sm={12} lg={8} key={member.id}>
-              <Card
+            <Col xs={24} sm={12} lg={6} key={member.id}>
+              <div
                 className="reveal"
                 style={{
-                  height: '100%',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '16px',
-                  background: '#ffffff',
+                  textAlign: 'center',
                   transition: 'all 0.3s ease',
                   transitionDelay: `${index * 100}ms`,
-                  overflow: 'hidden',
-                }}
-                bodyStyle={{ padding: 0 }}
-                bordered={false}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.borderColor = '#3b82f6';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
                 }}
               >
-                {/* Member Image */}
-                <div
-                  style={{
-                    width: '100%',
-                    height: '280px',
-                    background: member.image_url
-                      ? `url(${member.image_url}) center/cover`
-                      : 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {!member.image_url && (
+                {/* Circular Photo / Placeholder - clickable to LinkedIn */}
+                {(() => {
+                  const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
+                  const photoEl = (
                     <div
                       style={{
-                        width: '120px',
-                        height: '120px',
+                        width: '160px',
+                        height: '160px',
                         borderRadius: '50%',
-                        background: 'rgba(255, 255, 255, 0.2)',
+                        background: member.image_url
+                          ? `url(${member.image_url}) center/cover`
+                          : 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#ffffff',
-                        fontSize: '48px',
-                        fontWeight: 700,
+                        margin: '0 auto 24px',
+                        border: '4px solid #f1f5f9',
+                        boxShadow: '0 8px 24px rgba(72, 171, 226, 0.15)',
+                        cursor: linkedIn ? 'pointer' : 'default',
+                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (linkedIn) {
+                          e.currentTarget.style.transform = 'scale(1.05)';
+                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(72, 171, 226, 0.25)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(72, 171, 226, 0.15)';
                       }}
                     >
-                      {member.name.charAt(0)}
+                      {!member.image_url && (
+                        <span
+                          style={{
+                            color: '#ffffff',
+                            fontSize: '48px',
+                            fontWeight: 700,
+                          }}
+                        >
+                          {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </span>
+                      )}
                     </div>
-                  )}
-                </div>
+                  );
+                  return linkedIn ? (
+                    <a href={linkedIn.url} target="_blank" rel="noopener noreferrer">
+                      {photoEl}
+                    </a>
+                  ) : photoEl;
+                })()}
 
-                {/* Member Info */}
-                <div style={{ padding: '24px' }}>
-                  <Title
-                    level={4}
-                    style={{
-                      fontSize: '22px',
-                      fontWeight: 700,
-                      color: '#0f172a',
-                      marginBottom: '4px',
-                    }}
-                  >
-                    {member.name}
-                  </Title>
-                  <Paragraph
-                    style={{
-                      fontSize: '14px',
-                      color: '#3b82f6',
-                      fontWeight: 600,
-                      marginBottom: '16px',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    {member.role}
-                  </Paragraph>
-                  <Paragraph
-                    style={{
-                      fontSize: '15px',
-                      color: '#64748b',
-                      marginBottom: '20px',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {member.bio}
-                  </Paragraph>
+                {/* Name */}
+                <Title
+                  level={4}
+                  style={{
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: '#0f172a',
+                    marginBottom: '4px',
+                  }}
+                >
+                  {member.name}
+                </Title>
 
-                  {/* Social Links */}
-                  {member.socials && member.socials.length > 0 && (
-                    <Space size="middle">
-                      {member.socials.map((social, idx) => (
-                        <a
+                {/* Role */}
+                <Paragraph
+                  style={{
+                    fontSize: '14px',
+                    color: '#48abe2',
+                    fontWeight: 600,
+                    marginBottom: '12px',
+                  }}
+                >
+                  {member.role}
+                </Paragraph>
+
+                {/* Bio */}
+                <Paragraph
+                  style={{
+                    fontSize: '14px',
+                    color: '#64748b',
+                    marginBottom: '16px',
+                    lineHeight: 1.6,
+                  }}
+                >
+                  {member.bio}
+                </Paragraph>
+
+                {/* LinkedIn Button */}
+                {member.socials && member.socials.length > 0 && (
+                  <Space>
+                    {member.socials.map((social, idx) => (
+                      social.platform === 'linkedin' && (
+                        <Button
                           key={idx}
+                          type="default"
+                          size="small"
+                          icon={<LinkedinOutlined />}
                           href={social.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            background: '#f8fafc',
-                            transition: 'all 0.3s ease',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#3b82f6';
-                            const icon = e.currentTarget.querySelector('span');
-                            if (icon) (icon as HTMLElement).style.color = '#ffffff';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = '#f8fafc';
-                            const icon = e.currentTarget.querySelector('span');
-                            if (icon) (icon as HTMLElement).style.color = '#64748b';
+                            borderRadius: '8px',
+                            borderColor: '#e2e8f0',
+                            color: '#0a66c2',
+                            fontWeight: 500,
+                            fontSize: '13px',
                           }}
                         >
-                          {renderSocialIcon(social.platform)}
-                        </a>
-                      ))}
-                    </Space>
-                  )}
-                </div>
-              </Card>
+                          LinkedIn
+                        </Button>
+                      )
+                    ))}
+                  </Space>
+                )}
+              </div>
             </Col>
           ))}
         </Row>
