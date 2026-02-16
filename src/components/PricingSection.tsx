@@ -184,7 +184,7 @@ const PricingSection = () => {
         {/* Pricing Cards */}
         <Row gutter={[32, 32]} justify="center">
           {displayPlans.map((plan, index) => {
-            const isContact = plan.price === 'Contact Us';
+            const isContact = plan.price === 'Contact Us' || plan.cta_text === 'Contact Us';
 
             return (
               <Col xs={24} sm={24} md={8} key={plan.id}>
@@ -250,7 +250,7 @@ const PricingSection = () => {
                   <div style={{ marginBottom: '24px' }}>
                     <span
                       style={{
-                        fontSize: isContact ? '32px' : '48px',
+                        fontSize: plan.price === 'Contact Us' ? '32px' : plan.price.startsWith('From') ? '36px' : '48px',
                         fontWeight: 800,
                         color: '#0f172a',
                       }}

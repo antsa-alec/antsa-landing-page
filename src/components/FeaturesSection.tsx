@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Typography, Row, Col, Card } from 'antd';
+import { Typography, Row, Col } from 'antd';
 import * as AntIcons from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
@@ -9,11 +9,24 @@ interface Feature {
   title: string;
   description: string;
   icon: string;
+  color?: string;
 }
 
+// Accent colors for feature cards (cycled through)
+const accentColors = [
+  '#48abe2', // ANTSA blue
+  '#10b981', // emerald
+  '#8b5cf6', // violet
+  '#f59e0b', // amber
+  '#ec4899', // pink
+  '#06b6d4', // cyan
+  '#ef4444', // red
+  '#84cc16', // lime
+  '#6366f1', // indigo
+];
+
 /**
- * FEATURES SECTION - Modern Icon Grid
- * Technology showcase with icons
+ * FEATURES SECTION - Bento-style grid with colored accent cards
  */
 const FeaturesSection = () => {
   const [features, setFeatures] = useState<Feature[]>([]);
@@ -31,8 +44,7 @@ const FeaturesSection = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Default features
-  const defaultFeatures = [
+  const defaultFeatures: Feature[] = [
     {
       id: '1',
       title: 'Clinician-Overseen AI Chatbot',
@@ -91,15 +103,32 @@ const FeaturesSection = () => {
 
   const displayFeatures = features.length > 0 ? features : defaultFeatures;
 
-  // Render icon dynamically
-  const renderIcon = (iconName: string) => {
-    const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
-    return <IconComponent style={{ fontSize: '32px', color: '#48abe2' }} />;
+  // Bento layout pattern: alternates between wide (span 2) and narrow (span 1)
+  // Pattern for 9 items: [2,1], [1,2], [2,1], [1,1,1]
+  const getSpan = (index: number): number => {
+    // Row 0: items 0,1 → wide, narrow
+    // Row 1: items 2,3 → narrow, wide
+    // Row 2: items 4,5 → wide, narrow
+    // Row 3: items 6,7,8 → even thirds
+    const row = Math.floor(index / 2);
+    const pos = index % 2;
+
+    if (index >= 8) return 8; // last row: thirds
+    if (index >= 6) return 8; // items 6,7: thirds
+
+    if (row % 2 === 0) {
+      return pos === 0 ? 14 : 10;
+    } else {
+      return pos === 0 ? 10 : 14;
+    }
   };
 
-  if (loading) {
-    return null;
-  }
+  const renderIcon = (iconName: string, color: string) => {
+    const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
+    return <IconComponent style={{ fontSize: '28px', color }} />;
+  };
+
+  if (loading) return null;
 
   return (
     <section
@@ -109,12 +138,7 @@ const FeaturesSection = () => {
         padding: '120px 20px',
       }}
     >
-      <div
-        style={{
-          maxWidth: '1200px',
-          margin: '0 auto',
-        }}
-      >
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>
           <Title
@@ -142,7 +166,7 @@ const FeaturesSection = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            Supporting{' '}
+            What{' '}
             <span
               style={{
                 background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
@@ -151,9 +175,9 @@ const FeaturesSection = () => {
                 backgroundClip: 'text',
               }}
             >
-              safe and secure
+              ANTSA
             </span>{' '}
-            care between sessions.
+            includes.
           </Title>
           <Paragraph
             className="reveal"
@@ -169,61 +193,92 @@ const FeaturesSection = () => {
           </Paragraph>
         </div>
 
-        {/* Feature Grid */}
-        <Row gutter={[32, 32]}>
-          {displayFeatures.map((feature, index) => (
-            <Col xs={24} sm={12} lg={8} key={feature.id}>
-              <Card
-                className="reveal"
-                style={{
-                  height: '100%',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '16px',
-                  background: '#ffffff',
-                  padding: '32px 24px',
-                  transition: 'all 0.3s ease',
-                  transitionDelay: `${index * 50}ms`,
-                }}
-                bodyStyle={{ padding: 0 }}
-                bordered={false}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  e.currentTarget.style.borderColor = '#48abe2';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                  e.currentTarget.style.borderColor = '#e2e8f0';
-                }}
-              >
-                <div style={{ marginBottom: '20px' }}>
-                  {renderIcon(feature.icon)}
+        {/* Bento Feature Grid */}
+        <Row gutter={[20, 20]}>
+          {displayFeatures.map((feature, index) => {
+            const color = feature.color || accentColors[index % accentColors.length];
+            const span = getSpan(index);
+
+            return (
+              <Col xs={24} sm={12} lg={span} key={feature.id}>
+                <div
+                  className="reveal"
+                  style={{
+                    height: '100%',
+                    borderRadius: '16px',
+                    background: '#ffffff',
+                    padding: '32px 28px',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'all 0.3s ease',
+                    transitionDelay: `${index * 50}ms`,
+                    border: '1px solid #e2e8f0',
+                    cursor: 'default',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-6px)';
+                    e.currentTarget.style.boxShadow = `0 20px 40px ${color}20`;
+                    e.currentTarget.style.borderColor = color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = '#e2e8f0';
+                  }}
+                >
+                  {/* Colored top accent bar */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: '4px',
+                      background: `linear-gradient(90deg, ${color} 0%, ${color}88 100%)`,
+                    }}
+                  />
+
+                  {/* Icon with colored background pill */}
+                  <div
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '14px',
+                      background: `${color}12`,
+                      marginBottom: '20px',
+                    }}
+                  >
+                    {renderIcon(feature.icon, color)}
+                  </div>
+
+                  <Title
+                    level={4}
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: '#0f172a',
+                      marginBottom: '10px',
+                    }}
+                  >
+                    {feature.title}
+                  </Title>
+                  <Paragraph
+                    style={{
+                      fontSize: '14px',
+                      color: '#64748b',
+                      marginBottom: 0,
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {feature.description}
+                  </Paragraph>
                 </div>
-                <Title
-                  level={4}
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                    marginBottom: '12px',
-                  }}
-                >
-                  {feature.title}
-                </Title>
-                <Paragraph
-                  style={{
-                    fontSize: '15px',
-                    color: '#64748b',
-                    marginBottom: 0,
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {feature.description}
-                </Paragraph>
-              </Card>
-            </Col>
-          ))}
+              </Col>
+            );
+          })}
         </Row>
       </div>
     </section>

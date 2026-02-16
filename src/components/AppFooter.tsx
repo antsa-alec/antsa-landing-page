@@ -162,7 +162,7 @@ const AppFooter = () => {
                 src={antsaLogo}
                 alt="ANTSA"
                 style={{
-                  height: '40px',
+                  height: '160px',
                   width: 'auto',
                   objectFit: 'contain',
                   borderRadius: '4px',

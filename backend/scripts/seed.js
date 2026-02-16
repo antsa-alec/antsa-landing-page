@@ -273,8 +273,8 @@ async function seed() {
     const featuresId = getSectionId('features');
     const featureContent = [
       { key: 'badge', value: 'FEATURES', type: 'text' },
-      { key: 'title', value: 'Supporting safe and secure care between sessions.', type: 'text' },
-      { key: 'title_highlights', value: JSON.stringify(['safe and secure']), type: 'json' },
+      { key: 'title', value: 'What ANTSA includes.', type: 'text' },
+      { key: 'title_highlights', value: JSON.stringify(['ANTSA']), type: 'json' },
       { key: 'subtitle', value: 'A governed digital mental health system that brings together the core tools practitioners use to support and monitor clients between appointments.', type: 'text' },
     ];
 
