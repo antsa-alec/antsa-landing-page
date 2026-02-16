@@ -23,24 +23,40 @@ const PricingSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/content/section/pricing')
-      .then((res) => res.json())
+    // Try Stripe dynamic pricing first, fall back to DB-seeded content
+    fetch('/api/stripe/pricing')
+      .then((res) => {
+        if (!res.ok) throw new Error('Stripe unavailable');
+        return res.json();
+      })
       .then((data) => {
-        if (data.content && data.content.plans) {
-          const transformedPlans = data.content.plans.map((plan: any) => ({
-            id: String(plan.id),
-            name: plan.name,
-            price: plan.price,
-            period: plan.period !== undefined && plan.period !== null ? plan.period : '/month',
-            features: Array.isArray(plan.features) ? plan.features : [],
-            featured: Boolean(plan.featured),
-            cta_text: plan.cta_text || (plan.price === 'Contact Us' ? 'Contact Us' : 'Get Started'),
-            cta_url: plan.cta_url,
-          }));
-          setPlans(transformedPlans);
+        if (data.plans && data.plans.length > 0) {
+          setPlans(data.plans);
+        } else {
+          throw new Error('No Stripe plans');
         }
       })
-      .catch((err) => console.error('Failed to load pricing:', err))
+      .catch(() => {
+        // Fallback: load from CMS / DB seed
+        fetch('/api/content/section/pricing')
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.content && data.content.plans) {
+              const transformedPlans = data.content.plans.map((plan: any) => ({
+                id: String(plan.id),
+                name: plan.name,
+                price: plan.price,
+                period: plan.period !== undefined && plan.period !== null ? plan.period : '/month',
+                features: Array.isArray(plan.features) ? plan.features : [],
+                featured: Boolean(plan.featured),
+                cta_text: plan.cta_text || (plan.price === 'Contact Us' ? 'Contact Us' : 'Get Started'),
+                cta_url: plan.cta_url,
+              }));
+              setPlans(transformedPlans);
+            }
+          })
+          .catch((err) => console.error('Failed to load pricing:', err));
+      })
       .finally(() => setLoading(false));
   }, []);
 
