@@ -2,7 +2,20 @@ import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Space, Button } from 'antd';
 import { LinkedinOutlined } from '@ant-design/icons';
 
+import photoSallyAnne from '../assets/team-sally-anne.png';
+import photoKiera from '../assets/team-kiera.png';
+import photoAmber from '../assets/team-amber.png';
+import photoBen from '../assets/team-ben.png';
+
 const { Title, Paragraph } = Typography;
+
+// Map team member names to their bundled photo imports
+const teamPhotos: Record<string, string> = {
+  'Sally-Anne McCormack': photoSallyAnne,
+  'Kiera Macdonald': photoKiera,
+  'Amber Macdonald': photoAmber,
+  'Ben Smith': photoBen,
+};
 
 interface TeamMember {
   id: string;
@@ -41,6 +54,7 @@ const TeamSection = () => {
       name: 'Sally-Anne McCormack',
       role: 'Founder & CEO, Clinical Psychologist',
       bio: 'Founder and CEO of ANTSA. A clinical psychologist with extensive experience in mental health practice, driving the vision for clinician-governed digital care infrastructure.',
+      image_url: photoSallyAnne,
       socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/sally-anne-mccormack/' }],
     },
     {
@@ -48,6 +62,7 @@ const TeamSection = () => {
       name: 'Kiera Macdonald',
       role: 'CCO, Clinical Psychologist',
       bio: 'Chief Clinical Officer bringing clinical psychology expertise to ensure ANTSA maintains the highest standards of clinical governance and evidence-based practice.',
+      image_url: photoKiera,
       socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/kiera-macdonald/' }],
     },
     {
@@ -55,6 +70,7 @@ const TeamSection = () => {
       name: 'Amber Macdonald',
       role: 'CGO, Senior Scientist / Lawyer',
       bio: 'Chief Governance Officer combining scientific research and legal expertise to ensure ANTSA meets regulatory requirements and professional standards.',
+      image_url: photoAmber,
       socials: [{ platform: 'linkedin', url: 'https://www.linkedin.com/in/amber-macdonald/' }],
     },
     {
@@ -62,6 +78,7 @@ const TeamSection = () => {
       name: 'Ben Smith',
       role: 'CTO, AI Engineer',
       bio: "Chief Technology Officer leading the technical architecture and AI systems that power ANTSA's practitioner-governed digital care platform.",
+      image_url: photoBen,
       socials: [],
     },
   ];
@@ -148,14 +165,15 @@ const TeamSection = () => {
                 {/* Circular Photo / Placeholder - clickable to LinkedIn */}
                 {(() => {
                   const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
+                  const photoSrc = member.image_url || teamPhotos[member.name];
                   const photoEl = (
                     <div
                       style={{
                         width: '160px',
                         height: '160px',
                         borderRadius: '50%',
-                        background: member.image_url
-                          ? `url(${member.image_url}) center/cover`
+                        background: photoSrc
+                          ? `url(${photoSrc}) center/cover`
                           : 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
                         display: 'flex',
                         alignItems: 'center',
@@ -177,7 +195,7 @@ const TeamSection = () => {
                         e.currentTarget.style.boxShadow = '0 8px 24px rgba(72, 171, 226, 0.15)';
                       }}
                     >
-                      {!member.image_url && (
+                      {!photoSrc && (
                         <span
                           style={{
                             color: '#ffffff',
