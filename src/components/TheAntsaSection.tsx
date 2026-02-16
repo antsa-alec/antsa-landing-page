@@ -83,13 +83,6 @@ const BlueHighlight = ({ text, phrases }: { text: string; phrases: string[] }) =
   );
 };
 
-/**
- * Renders "ANTSA" with "SA" in brand blue
- */
-const AntsaBrand = () => (
-  <span>ANT<span style={{ color: '#48abe2' }}>SA</span></span>
-);
-
 // Blue phrases for each care loop step description (by index)
 const stepHighlights: Record<number, string[]> = {
   0: ['clinically appropriate between-session supports'],
@@ -132,7 +125,6 @@ const TheAntsaSection = () => {
     : ['into the loop'];
   const subtitle = sectionContent.subtitle || 'Between-session care should not sit outside governance. It should sit inside your clinical system. ANTSA is purpose-built infrastructure for modern mental health practice.';
 
-  const careLoopTitle = sectionContent.care_loop_title || 'The ANTSA structured clinical care loop.';
   const careLoopSubtitle = sectionContent.care_loop_subtitle || 'One loop. One record. Human oversight.';
 
   let careLoopSteps: CareLoopStep[] = [];
