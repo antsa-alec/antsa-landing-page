@@ -125,12 +125,11 @@ db.exec(`
     name TEXT NOT NULL,
     role TEXT,
     bio TEXT,
-    image_id INTEGER,
+    image_url TEXT,
     order_index INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
-    FOREIGN KEY (image_id) REFERENCES images(id) ON DELETE SET NULL
+    FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
   );
 
   CREATE TABLE IF NOT EXISTS team_member_socials (
@@ -138,7 +137,9 @@ db.exec(`
     team_member_id INTEGER NOT NULL,
     platform TEXT NOT NULL,
     url TEXT NOT NULL,
+    order_index INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (team_member_id) REFERENCES team_members(id) ON DELETE CASCADE
   );
 
@@ -216,6 +217,27 @@ db.exec(`
     is_active BOOLEAN DEFAULT 1
   );
 `);
+
+// Migrations for existing databases
+try {
+  const tmCols = db.prepare("PRAGMA table_info(team_members)").all();
+  if (!tmCols.some(c => c.name === 'image_url')) {
+    db.exec("ALTER TABLE team_members ADD COLUMN image_url TEXT");
+    console.log('✅ Migrated team_members: added image_url column');
+  }
+
+  const tsCols = db.prepare("PRAGMA table_info(team_member_socials)").all();
+  if (!tsCols.some(c => c.name === 'order_index')) {
+    db.exec("ALTER TABLE team_member_socials ADD COLUMN order_index INTEGER DEFAULT 0");
+    console.log('✅ Migrated team_member_socials: added order_index column');
+  }
+  if (!tsCols.some(c => c.name === 'updated_at')) {
+    db.exec("ALTER TABLE team_member_socials ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    console.log('✅ Migrated team_member_socials: added updated_at column');
+  }
+} catch (e) {
+  // Tables may not exist yet, that's fine
+}
 
 export default db;
 
