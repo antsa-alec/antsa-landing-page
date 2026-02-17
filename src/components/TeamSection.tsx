@@ -9,7 +9,6 @@ import photoBen from '../assets/team-ben.png';
 
 const { Title, Paragraph } = Typography;
 
-// Map team member names to their bundled photo imports
 const teamPhotos: Record<string, string> = {
   'Sally-Anne McCormack': photoSallyAnne,
   'Kiera Macdonald': photoKiera,
@@ -23,6 +22,7 @@ interface TeamMember {
   role: string;
   bio: string;
   image_url?: string;
+  badge_url?: string;
   socials?: {
     platform: string;
     url: string;
@@ -30,7 +30,7 @@ interface TeamMember {
 }
 
 /**
- * TEAM SECTION - Circular photo cards with LinkedIn buttons
+ * TEAM SECTION - Aligned cards with circular photos, badges, and LinkedIn buttons
  */
 const TeamSection = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
@@ -150,119 +150,143 @@ const TeamSection = () => {
           </Paragraph>
         </div>
 
-        {/* Team Members Grid - 4 columns */}
+        {/* Team Members Grid */}
         <Row gutter={[32, 48]} justify="center">
-          {displayMembers.map((member, index) => (
-            <Col xs={24} sm={12} lg={6} key={member.id}>
-              <div
-                className="reveal"
-                style={{
-                  textAlign: 'center',
-                  transition: 'all 0.3s ease',
-                  transitionDelay: `${index * 100}ms`,
-                }}
-              >
-                {/* Circular Photo / Placeholder - clickable to LinkedIn */}
-                {(() => {
-                  const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
-                  const photoSrc = member.image_url || teamPhotos[member.name];
-                  const photoEl = (
-                    <div
-                      style={{
-                        width: '160px',
-                        height: '160px',
-                        borderRadius: '50%',
-                        background: photoSrc
-                          ? `url(${photoSrc}) center/cover`
-                          : 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 24px',
-                        border: '4px solid #f1f5f9',
-                        boxShadow: '0 8px 24px rgba(72, 171, 226, 0.15)',
-                        cursor: linkedIn ? 'pointer' : 'default',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                      }}
-                      onMouseEnter={(e) => {
-                        if (linkedIn) {
-                          e.currentTarget.style.transform = 'scale(1.05)';
-                          e.currentTarget.style.boxShadow = '0 12px 32px rgba(72, 171, 226, 0.25)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(72, 171, 226, 0.15)';
-                      }}
-                    >
-                      {!photoSrc && (
-                        <span
+          {displayMembers.map((member, index) => {
+            const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
+            const photoSrc = member.image_url || teamPhotos[member.name];
+
+            return (
+              <Col xs={24} sm={12} lg={6} key={member.id}>
+                <div
+                  className="reveal"
+                  style={{
+                    textAlign: 'center',
+                    transition: 'all 0.3s ease',
+                    transitionDelay: `${index * 100}ms`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  {/* Photo zone - fixed height */}
+                  <div style={{ minHeight: '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end' }}>
+                    {/* Circular Photo */}
+                    {(() => {
+                      const photoEl = (
+                        <div
                           style={{
-                            color: '#ffffff',
-                            fontSize: '48px',
-                            fontWeight: 700,
+                            width: '160px',
+                            height: '160px',
+                            borderRadius: '50%',
+                            background: photoSrc
+                              ? `url(${photoSrc}) center/cover`
+                              : 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            margin: '0 auto',
+                            border: '4px solid #f1f5f9',
+                            boxShadow: '0 8px 24px rgba(72, 171, 226, 0.15)',
+                            cursor: linkedIn ? 'pointer' : 'default',
+                            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (linkedIn) {
+                              e.currentTarget.style.transform = 'scale(1.05)';
+                              e.currentTarget.style.boxShadow = '0 12px 32px rgba(72, 171, 226, 0.25)';
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 8px 24px rgba(72, 171, 226, 0.15)';
                           }}
                         >
-                          {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </span>
+                          {!photoSrc && (
+                            <span style={{ color: '#ffffff', fontSize: '48px', fontWeight: 700 }}>
+                              {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                            </span>
+                          )}
+                        </div>
+                      );
+
+                      return linkedIn ? (
+                        <a href={linkedIn.url} target="_blank" rel="noopener noreferrer">
+                          {photoEl}
+                        </a>
+                      ) : photoEl;
+                    })()}
+
+                    {/* Badge row - fixed height, sits below photo */}
+                    <div style={{ height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '8px' }}>
+                      {member.badge_url && (
+                        <img
+                          src={member.badge_url}
+                          alt={`${member.name} badge`}
+                          style={{
+                            height: '28px',
+                            width: 'auto',
+                            objectFit: 'contain',
+                            filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))',
+                          }}
+                        />
                       )}
                     </div>
-                  );
-                  return linkedIn ? (
-                    <a href={linkedIn.url} target="_blank" rel="noopener noreferrer">
-                      {photoEl}
-                    </a>
-                  ) : photoEl;
-                })()}
+                  </div>
 
-                {/* Name */}
-                <Title
-                  level={4}
-                  style={{
-                    fontSize: '20px',
-                    fontWeight: 700,
-                    color: '#0f172a',
-                    marginBottom: '4px',
-                  }}
-                >
-                  {member.name}
-                </Title>
+                  {/* Name zone - fixed height */}
+                  <div style={{ minHeight: '32px', marginTop: '8px' }}>
+                    <Title
+                      level={4}
+                      style={{
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        color: '#0f172a',
+                        marginBottom: '0',
+                      }}
+                    >
+                      {member.name}
+                    </Title>
+                  </div>
 
-                {/* Role */}
-                <Paragraph
-                  style={{
-                    fontSize: '14px',
-                    color: '#48abe2',
-                    fontWeight: 600,
-                    marginBottom: '12px',
-                  }}
-                >
-                  {member.role}
-                </Paragraph>
+                  {/* Role zone - fixed height */}
+                  <div style={{ minHeight: '44px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
+                    <Paragraph
+                      style={{
+                        fontSize: '14px',
+                        color: '#48abe2',
+                        fontWeight: 600,
+                        marginBottom: '0',
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {member.role}
+                    </Paragraph>
+                  </div>
 
-                {/* Bio */}
-                <Paragraph
-                  style={{
-                    fontSize: '14px',
-                    color: '#64748b',
-                    marginBottom: '16px',
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {member.bio}
-                </Paragraph>
+                  {/* Bio zone - flex grows to fill remaining space */}
+                  <div style={{ flex: 1, marginTop: '8px' }}>
+                    <Paragraph
+                      style={{
+                        fontSize: '14px',
+                        color: '#64748b',
+                        marginBottom: '0',
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      {member.bio}
+                    </Paragraph>
+                  </div>
 
-                {/* LinkedIn Button */}
-                {member.socials && member.socials.length > 0 && (
-                  <Space>
-                    {member.socials.map((social, idx) => (
-                      social.platform === 'linkedin' && (
+                  {/* LinkedIn zone - always at the bottom */}
+                  <div style={{ minHeight: '40px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {linkedIn ? (
+                      <Space>
                         <Button
-                          key={idx}
                           type="default"
                           size="small"
                           icon={<LinkedinOutlined />}
-                          href={social.url}
+                          href={linkedIn.url}
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
@@ -275,13 +299,13 @@ const TeamSection = () => {
                         >
                           LinkedIn
                         </Button>
-                      )
-                    ))}
-                  </Space>
-                )}
-              </div>
-            </Col>
-          ))}
+                      </Space>
+                    ) : null}
+                  </div>
+                </div>
+              </Col>
+            );
+          })}
         </Row>
       </div>
     </section>

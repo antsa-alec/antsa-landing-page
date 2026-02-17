@@ -241,6 +241,12 @@ try {
     db.exec("ALTER TABLE feature_items ADD COLUMN image_url TEXT");
     console.log('✅ Migrated feature_items: added image_url column');
   }
+
+  const tmCols2 = db.prepare("PRAGMA table_info(team_members)").all();
+  if (!tmCols2.some(c => c.name === 'badge_url')) {
+    db.exec("ALTER TABLE team_members ADD COLUMN badge_url TEXT");
+    console.log('✅ Migrated team_members: added badge_url column');
+  }
 } catch (e) {
   // Tables may not exist yet, that's fine
 }

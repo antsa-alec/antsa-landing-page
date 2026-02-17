@@ -13,6 +13,7 @@ interface TeamMember {
   role: string;
   bio: string;
   image_url?: string;
+  badge_url?: string;
   order_index: number;
 }
 
@@ -48,7 +49,9 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [form] = Form.useForm();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [badgeUrl, setBadgeUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [badgeUploading, setBadgeUploading] = useState(false);
   
   // Social links state
   const [socialsModalVisible, setSocialsModalVisible] = useState(false);
@@ -104,6 +107,7 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     setEditingMember(null);
     form.resetFields();
     setImageUrl(null);
+    setBadgeUrl(null);
     setModalVisible(true);
   };
 
@@ -111,6 +115,7 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     setEditingMember(member);
     form.setFieldsValue(member);
     setImageUrl(member.image_url || null);
+    setBadgeUrl(member.badge_url || null);
     setModalVisible(true);
   };
 
@@ -188,13 +193,12 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
     }
   };
 
-  const handleImageUpload = async (file: File) => {
-    setUploading(true);
+  const uploadFile = async (file: File, key: string): Promise<string | null> => {
     try {
       const formData = new FormData();
       formData.append('image', file);
       formData.append('sectionName', 'team');
-      formData.append('key', `member-${Date.now()}`);
+      formData.append('key', key);
 
       const response = await fetch(`${API_BASE_URL}/images/upload`, {
         method: 'POST',
@@ -206,8 +210,6 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
 
       if (response.ok) {
         const data = await response.json();
-        setImageUrl(data.path);
-        message.success('Image uploaded successfully!');
         return data.path;
       } else {
         message.error('Failed to upload image');
@@ -217,9 +219,27 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
       console.error('Upload error:', error);
       message.error('Upload failed');
       return null;
-    } finally {
-      setUploading(false);
     }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    setUploading(true);
+    const path = await uploadFile(file, `member-${Date.now()}`);
+    if (path) {
+      setImageUrl(path);
+      message.success('Photo uploaded!');
+    }
+    setUploading(false);
+  };
+
+  const handleBadgeUpload = async (file: File) => {
+    setBadgeUploading(true);
+    const path = await uploadFile(file, `badge-${Date.now()}`);
+    if (path) {
+      setBadgeUrl(path);
+      message.success('Badge uploaded!');
+    }
+    setBadgeUploading(false);
   };
 
   const handleDelete = async (id: number) => {
@@ -252,6 +272,7 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
       const payload = {
         ...values,
         image_url: imageUrl,
+        badge_url: badgeUrl,
       };
 
       const response = await fetch(url, {
@@ -340,11 +361,18 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
                 </Popconfirm>,
               ]}
             >
-              <div style={{ textAlign: 'center', marginBottom: 12 }}>
+              <div style={{ textAlign: 'center', marginBottom: 12, position: 'relative', display: 'inline-block', width: '100%' }}>
                 {member.image_url ? (
                   <Avatar size={80} src={member.image_url} />
                 ) : (
                   <Avatar size={80} icon={<UserOutlined />} />
+                )}
+                {member.badge_url && (
+                  <img
+                    src={member.badge_url}
+                    alt="Badge"
+                    style={{ width: 28, height: 28, objectFit: 'contain', marginLeft: 8, verticalAlign: 'top' }}
+                  />
                 )}
               </div>
               <div style={{ textAlign: 'center' }}>
@@ -403,6 +431,35 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
                   Remove Image
                 </Button>
               )}
+            </Space>
+          </Form.Item>
+
+          <Form.Item label="Badge / Icon" tooltip="Small badge shown next to the member's name (e.g. certification, award)">
+            <Space direction="vertical" style={{ width: '100%' }}>
+              {badgeUrl && (
+                <div style={{ marginBottom: 8 }}>
+                  <img src={badgeUrl} alt="Badge" style={{ height: 40, objectFit: 'contain' }} />
+                </div>
+              )}
+              <Space>
+                <Upload
+                  accept="image/*"
+                  showUploadList={false}
+                  beforeUpload={(file) => {
+                    handleBadgeUpload(file);
+                    return false;
+                  }}
+                >
+                  <Button icon={<UploadOutlined />} loading={badgeUploading}>
+                    {badgeUrl ? 'Change Badge' : 'Upload Badge'}
+                  </Button>
+                </Upload>
+                {badgeUrl && (
+                  <Button danger size="small" onClick={() => setBadgeUrl(null)}>
+                    Remove
+                  </Button>
+                )}
+              </Space>
             </Space>
           </Form.Item>
 

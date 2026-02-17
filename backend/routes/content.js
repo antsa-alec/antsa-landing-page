@@ -390,12 +390,12 @@ router.post('/team', [
     const section = sectionStmt.get('team');
 
     const stmt = db.prepare(`
-      INSERT INTO team_members (section_id, name, role, bio, image_url, order_index)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO team_members (section_id, name, role, bio, image_url, badge_url, order_index)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
 
-    const { name, role, bio, image_url, order_index = 0 } = req.body;
-    const result = stmt.run(section.id, name, role, bio, image_url || null, order_index);
+    const { name, role, bio, image_url, badge_url, order_index = 0 } = req.body;
+    const result = stmt.run(section.id, name, role, bio, image_url || null, badge_url || null, order_index);
 
     res.json({ id: result.lastInsertRowid, message: 'Team member created successfully' });
   } catch (error) {
@@ -407,15 +407,15 @@ router.post('/team', [
 router.put('/team/:id', authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { name, role, bio, image_url, order_index } = req.body;
+    const { name, role, bio, image_url, badge_url, order_index } = req.body;
 
     const stmt = db.prepare(`
       UPDATE team_members
-      SET name = ?, role = ?, bio = ?, image_url = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
+      SET name = ?, role = ?, bio = ?, image_url = ?, badge_url = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
 
-    stmt.run(name, role, bio, image_url || null, order_index, id);
+    stmt.run(name, role, bio, image_url || null, badge_url || null, order_index, id);
     res.json({ message: 'Team member updated successfully' });
   } catch (error) {
     console.error('Update team member error:', error);
