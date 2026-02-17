@@ -158,12 +158,12 @@ async function seed() {
     ];
 
     const featureStmt = db.prepare(`
-      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     shiftItems.forEach(item => {
-      featureStmt.run(shiftId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index);
+      featureStmt.run(shiftId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index, null);
     });
 
     console.log('✅ Seeded "The Shift" section');
@@ -262,7 +262,7 @@ async function seed() {
     ];
 
     antsaItems.forEach(item => {
-      featureStmt.run(antsaId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index);
+      featureStmt.run(antsaId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index, null);
     });
 
     console.log('✅ Seeded "The ANTSA" section');
@@ -288,72 +288,72 @@ async function seed() {
     const features = [
       {
         title: 'Clinician-Overseen AI Chatbot',
-        description: "The world's first practitioner-overseen AI therapy support chatbot. Available 24/7 to support clients between sessions with evidence-based conversations.",
+        description: 'Assign the ANTSA chatbot to support clients between sessions as part of your treatment plan. It is activated by you and aligned to the client\u2019s goals and current needs.\n\nClients are informed that interactions form part of the clinical record and are visible to you. You can review conversations, provide feedback, and refine how the chatbot responds over time to ensure it operates within your clinical parameters.\n\nAll conversations sit within the client record. The chatbot does not diagnose, replace therapy, or function independently of your oversight. It extends structured support while keeping the practitioner in the loop.',
         icon: 'RobotOutlined',
         color: '#48abe2',
         gradient: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
         order_index: 1,
       },
       {
-        title: 'AI Scribe & Templates',
-        description: 'Transcribes sessions and generates comprehensive summaries, saving hours of paperwork. Focus on your clients while AI handles the documentation.',
-        icon: 'FileTextOutlined',
+        title: 'Practitioner AI Assistant',
+        description: 'A back-end AI assistant helps you review each client\u2019s recorded data within ANTSA before sessions, including client chatbot conversations, homework tasks such as journalling, mood entries, psychometrics, messaging, and recent engagement.\n\nIt brings this information together to highlight patterns, changes, and areas for discussion. It can also respond to practice-level queries, such as how many clients are scheduled today, or summarise activity across your caseload.\n\nIt does not determine risk, diagnose, or generate treatment plans. Clinical interpretation and decisions remain with you.',
+        icon: 'BulbOutlined',
         color: '#10b981',
         gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
         order_index: 2,
       },
       {
-        title: 'Telehealth & Session Summaries',
-        description: 'Integrated video sessions with automatic transcription and summary generation. Conduct secure telehealth appointments with ease.',
-        icon: 'VideoCameraOutlined',
+        title: 'Single Integrated Clinical Record and Secure Messaging',
+        description: 'Session notes, chatbot conversations, psychometrics, mood tracking, telehealth sessions, messaging, and uploaded documents sit within one secure client file.\n\nYou can upload reports, letters, and external documents directly into the record. Client communication occurs within the platform rather than across external tools, keeping conversations connected to care.\n\nThis reduces fragmentation and supports continuity, visibility, and professional documentation standards.',
+        icon: 'FileProtectOutlined',
         color: '#8b5cf6',
         gradient: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
         order_index: 3,
       },
       {
-        title: 'Psychometric Measures',
-        description: 'Validated assessment tools to track client progress over time. Measure outcomes with standardised psychometric instruments.',
-        icon: 'FormOutlined',
+        title: 'AI Scribe and Structured Templates',
+        description: 'Generate structured session notes using clinical templates aligned with professional standards. The AI scribe can transcribe sessions, draft progress notes, and assist with multiple documentation formats depending on your preferred template.\n\nYou can also dictate private notes directly into the system, allowing you to capture reflections or observations that are not shared with the client. Templates support different clinical needs, including structured progress notes, summaries, and other documentation formats.\n\nAll notes remain editable, reviewable, and practitioner-approved before finalisation. The system assists with drafting, but responsibility for accuracy, interpretation, and clinical content remains with you.',
+        icon: 'FileTextOutlined',
         color: '#f59e0b',
         gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
         order_index: 4,
       },
       {
-        title: 'Automated Reminders',
-        description: 'Keep clients engaged with automated appointment and task reminders. Reduce no-shows and improve treatment adherence.',
-        icon: 'BellOutlined',
-        color: '#ef4444',
-        gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        title: 'Telehealth, Calendar, and Session Summaries',
+        description: 'Conduct secure video sessions within ANTSA. Use the integrated calendar to schedule appointments and generate telehealth links directly from the client record.\n\nAutomatic session summaries support accurate documentation and continuity of care, with sessions and scheduling connected within one system.',
+        icon: 'VideoCameraOutlined',
+        color: '#ec4899',
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
         order_index: 5,
       },
       {
-        title: 'Homework Task Assignment',
-        description: 'Assign and track therapeutic homework. Monitor completion and engagement between sessions to support treatment goals.',
-        icon: 'CheckSquareOutlined',
+        title: 'Mood and Engagement Monitoring',
+        description: 'Track mood entries and engagement patterns between sessions. Identify changes from baseline and shifts in participation earlier, supporting informed discussion and more focused sessions.\n\nClinical interpretation remains your responsibility.',
+        icon: 'LineChartOutlined',
         color: '#06b6d4',
         gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
         order_index: 6,
       },
       {
-        title: 'Psychoeducation Library',
-        description: 'Curated psychoeducation resources to share with clients. Support learning and self-management between appointments.',
-        icon: 'ReadOutlined',
-        color: '#ec4899',
-        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+        title: 'Homework, Between-Session Tasks, and Automated Reminders',
+        description: 'Assign therapeutic tasks aligned with formulation, goals, and client capacity. Schedule reminders for homework, check-ins, and questionnaires within the treatment plan without manual follow-up.\n\nCompletion and engagement become visible within the client record, supporting continuity and therapeutic momentum.',
+        icon: 'CheckSquareOutlined',
+        color: '#ef4444',
+        gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
         order_index: 7,
       },
       {
-        title: 'Mood & Distress Tracking',
-        description: 'Monitor client mood and distress levels between sessions. Identify patterns and intervene early when needed.',
-        icon: 'LineChartOutlined',
+        title: 'Psychometric Measures',
+        description: 'Assign validated questionnaires within the system. Responses are stored directly in the client record for longitudinal comparison and integrated review alongside session notes and engagement data.',
+        icon: 'FormOutlined',
         color: '#14b8a6',
         gradient: 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
         order_index: 8,
       },
       {
-        title: 'Secure Messaging',
-        description: 'Encrypted messaging between practitioner and client. Maintain communication within a secure, governed platform.',
-        icon: 'MessageOutlined',
+        title: 'Client-Facing App',
+        description: 'ANTSA includes a secure client-facing application connected directly to your clinical system. Clients complete assigned tasks, mood tracking, psychometrics, psychoeducation, chatbot conversations, and telehealth sessions within the same environment.\n\nThese activities are accessed through the downloadable ANTSA mobile app, allowing clients to engage with their treatment plan from their own device between sessions.\n\nBetween-session care remains structured, visible, and connected to your record rather than occurring across disconnected apps.',
+        icon: 'MobileOutlined',
         color: '#6366f1',
         gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
         order_index: 9,
@@ -361,7 +361,7 @@ async function seed() {
     ];
 
     features.forEach(item => {
-      featureStmt.run(featuresId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index);
+      featureStmt.run(featuresId, item.title, item.description, item.icon, item.color, item.gradient, item.order_index, null);
     });
 
     console.log('✅ Seeded features section');
@@ -467,7 +467,8 @@ async function seed() {
         featured: 1,
         features: JSON.stringify([
           'Full platform access',
-          'AI chatbot (jAImee)',
+          'Clinician-Overseen AI Chatbot',
+          'Practitioner AI Assistant',
           'AI Scribe & Templates',
           'Telehealth & Session Summaries',
           'Mood & Distress Tracking',

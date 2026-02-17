@@ -235,6 +235,12 @@ try {
     db.exec("ALTER TABLE team_member_socials ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
     console.log('✅ Migrated team_member_socials: added updated_at column');
   }
+
+  const fiCols = db.prepare("PRAGMA table_info(feature_items)").all();
+  if (!fiCols.some(c => c.name === 'image_url')) {
+    db.exec("ALTER TABLE feature_items ADD COLUMN image_url TEXT");
+    console.log('✅ Migrated feature_items: added image_url column');
+  }
 } catch (e) {
   // Tables may not exist yet, that's fine
 }

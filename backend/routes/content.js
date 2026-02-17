@@ -200,12 +200,12 @@ router.post('/features', [
     const section = sectionStmt.get('features');
 
     const stmt = db.prepare(`
-      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    const { title, description, icon, color, gradient, order_index = 0 } = req.body;
-    const result = stmt.run(section.id, title, description, icon, color, gradient, order_index);
+    const { title, description, icon, color, gradient, order_index = 0, image_url } = req.body;
+    const result = stmt.run(section.id, title, description, icon, color, gradient, order_index, image_url || null);
 
     res.json({ id: result.lastInsertRowid, message: 'Feature created successfully' });
   } catch (error) {
@@ -217,15 +217,15 @@ router.post('/features', [
 router.put('/features/:id', authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, icon, color, gradient, order_index } = req.body;
+    const { title, description, icon, color, gradient, order_index, image_url } = req.body;
 
     const stmt = db.prepare(`
       UPDATE feature_items
-      SET title = ?, description = ?, icon = ?, color = ?, gradient = ?, order_index = ?, updated_at = CURRENT_TIMESTAMP
+      SET title = ?, description = ?, icon = ?, color = ?, gradient = ?, order_index = ?, image_url = ?, updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `);
 
-    stmt.run(title, description, icon, color, gradient, order_index, id);
+    stmt.run(title, description, icon, color, gradient, order_index, image_url || null, id);
     res.json({ message: 'Feature updated successfully' });
   } catch (error) {
     console.error('Update feature error:', error);

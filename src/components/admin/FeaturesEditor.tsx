@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Upload } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { TextArea } = Input;
@@ -13,6 +13,7 @@ interface Feature {
   color: string;
   gradient: string;
   order_index: number;
+  image_url: string | null;
 }
 
 interface FeaturesEditorProps {
@@ -25,6 +26,7 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingFeature, setEditingFeature] = useState<Feature | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -82,11 +84,65 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
     }
   };
 
+  const handleImageUpload = async (featureId: number, file: File) => {
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('sectionName', sectionName);
+      formData.append('key', `feature-${featureId}`);
+
+      const uploadResponse = await fetch(`${API_BASE_URL}/images/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${auth.token}`,
+        },
+        body: formData,
+      });
+
+      if (uploadResponse.ok) {
+        const uploadData = await uploadResponse.json();
+        const imageUrl = uploadData.path;
+
+        const updateResponse = await fetch(`${API_BASE_URL}/content/features/${featureId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${auth.token}`,
+          },
+          body: JSON.stringify({
+            ...features.find(f => f.id === featureId),
+            image_url: imageUrl,
+          }),
+        });
+
+        if (updateResponse.ok) {
+          message.success('Image uploaded successfully!');
+          fetchFeatures();
+        } else {
+          message.error('Failed to link image to feature');
+        }
+      } else {
+        message.error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      message.error('Connection error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (values: any) => {
     try {
       const url = editingFeature
         ? `${API_BASE_URL}/content/features/${editingFeature.id}`
         : `${API_BASE_URL}/content/features`;
+
+      const payload = {
+        ...values,
+        image_url: editingFeature?.image_url || values.image_url || null,
+      };
 
       const response = await fetch(url, {
         method: editingFeature ? 'PUT' : 'POST',
@@ -94,7 +150,7 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${auth.token}`,
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -128,12 +184,12 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
       </div>
 
       <List
-        grid={{ gutter: 16, xs: 1, sm: 2, lg: 3 }}
         dataSource={features}
         renderItem={(feature) => (
           <List.Item>
             <Card
               title={feature.title}
+              style={{ width: '100%' }}
               extra={
                 <Space>
                   <Button
@@ -152,10 +208,67 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
                 </Space>
               }
             >
-              <p>{feature.description}</p>
-              <div style={{ marginTop: 8, fontSize: '0.85rem', color: '#999' }}>
-                Icon: {feature.icon}<br />
-                Color: <span style={{ color: feature.color }}>{feature.color}</span>
+              <div style={{ display: 'flex', gap: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ whiteSpace: 'pre-line' }}>{feature.description}</p>
+                  <div style={{ marginTop: 8, fontSize: '0.85rem', color: '#999' }}>
+                    Icon: {feature.icon}<br />
+                    Color: <span style={{ color: feature.color }}>{feature.color}</span>
+                  </div>
+                </div>
+                <div style={{ width: 160, flexShrink: 0 }}>
+                  {feature.image_url ? (
+                    <div style={{ position: 'relative' }}>
+                      <img
+                        src={feature.image_url}
+                        alt={feature.title}
+                        style={{ width: '100%', borderRadius: 8, border: '1px solid #e2e8f0' }}
+                      />
+                      <div style={{ marginTop: 8, textAlign: 'center' }}>
+                        <Upload
+                          showUploadList={false}
+                          beforeUpload={(file) => {
+                            handleImageUpload(feature.id, file);
+                            return false;
+                          }}
+                          accept="image/*"
+                        >
+                          <Button size="small" icon={<UploadOutlined />} loading={uploading}>
+                            Replace
+                          </Button>
+                        </Upload>
+                      </div>
+                    </div>
+                  ) : (
+                    <Upload
+                      showUploadList={false}
+                      beforeUpload={(file) => {
+                        handleImageUpload(feature.id, file);
+                        return false;
+                      }}
+                      accept="image/*"
+                    >
+                      <div
+                        style={{
+                          width: '100%',
+                          height: 120,
+                          borderRadius: 8,
+                          border: '2px dashed #d9d9d9',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          color: '#999',
+                          fontSize: 13,
+                        }}
+                      >
+                        <UploadOutlined style={{ fontSize: 24, marginBottom: 8 }} />
+                        Upload Image
+                      </div>
+                    </Upload>
+                  )}
+                </div>
               </div>
             </Card>
           </List.Item>
@@ -188,7 +301,7 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
             name="description"
             rules={[{ required: true, message: 'Please enter a description' }]}
           >
-            <TextArea rows={4} />
+            <TextArea rows={6} />
           </Form.Item>
 
           <Form.Item
@@ -239,4 +352,3 @@ const FeaturesEditor = ({ auth, sectionName = 'features' }: FeaturesEditorProps)
 };
 
 export default FeaturesEditor;
-

@@ -68,7 +68,8 @@ const PricingSection = () => {
       period: '/month',
       features: [
         'Full platform access',
-        'AI chatbot (jAImee)',
+        'Clinician-Overseen AI Chatbot',
+        'Practitioner AI Assistant',
         'AI Scribe & Templates',
         'Telehealth & Session Summaries',
         'Mood & Distress Tracking',
@@ -199,8 +200,10 @@ const PricingSection = () => {
                     transition: 'all 0.3s ease',
                     transitionDelay: `${index * 100}ms`,
                     position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
-                  bodyStyle={{ padding: 0 }}
+                  bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', flex: 1 }}
                   bordered={false}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translateY(-8px)';
@@ -246,11 +249,11 @@ const PricingSection = () => {
                     {plan.name}
                   </Title>
 
-                  {/* Price */}
-                  <div style={{ marginBottom: '24px' }}>
+                  {/* Price - consistent height block */}
+                  <div style={{ marginBottom: '24px', minHeight: '60px', display: 'flex', alignItems: 'baseline' }}>
                     <span
                       style={{
-                        fontSize: plan.price === 'Contact Us' ? '32px' : plan.price.startsWith('From') ? '36px' : '48px',
+                        fontSize: '40px',
                         fontWeight: 800,
                         color: '#0f172a',
                       }}
@@ -291,38 +294,40 @@ const PricingSection = () => {
                     {plan.cta_text}
                   </Button>
 
-                  {/* Features List */}
-                  <List
-                    dataSource={plan.features}
-                    renderItem={(feature) => (
-                      <List.Item
-                        style={{
-                          border: 'none',
-                          padding: '10px 0',
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                          <CheckOutlined
-                            style={{
-                              color: '#10b981',
-                              fontSize: '16px',
-                              marginTop: '2px',
-                            }}
-                          />
-                          <span
-                            style={{
-                              fontSize: '14px',
-                              color: '#475569',
-                              flex: 1,
-                              lineHeight: 1.5,
-                            }}
-                          >
-                            {feature}
-                          </span>
-                        </div>
-                      </List.Item>
-                    )}
-                  />
+                  {/* Features List - grows to fill space */}
+                  <div style={{ flex: 1 }}>
+                    <List
+                      dataSource={plan.features}
+                      renderItem={(feature) => (
+                        <List.Item
+                          style={{
+                            border: 'none',
+                            padding: '10px 0',
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                            <CheckOutlined
+                              style={{
+                                color: '#10b981',
+                                fontSize: '16px',
+                                marginTop: '2px',
+                              }}
+                            />
+                            <span
+                              style={{
+                                fontSize: '14px',
+                                color: '#475569',
+                                flex: 1,
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              {feature}
+                            </span>
+                          </div>
+                        </List.Item>
+                      )}
+                    />
+                  </div>
                 </Card>
               </Col>
             );
