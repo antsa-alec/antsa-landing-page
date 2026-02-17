@@ -236,66 +236,71 @@ const PricingSection = () => {
                     </div>
                   )}
 
-                  {/* Plan Name */}
-                  <Title
-                    level={3}
-                    style={{
-                      fontSize: '24px',
-                      fontWeight: 700,
-                      color: '#0f172a',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    {plan.name}
-                  </Title>
-
-                  {/* Price - consistent height block */}
-                  <div style={{ marginBottom: '24px', minHeight: '60px', display: 'flex', alignItems: 'baseline' }}>
-                    <span
+                  {/* Header zone - fixed height so buttons & features align across cards */}
+                  <div style={{ minHeight: '240px', display: 'flex', flexDirection: 'column' }}>
+                    {/* Plan Name */}
+                    <Title
+                      level={3}
                       style={{
-                        fontSize: '40px',
-                        fontWeight: 800,
+                        fontSize: '24px',
+                        fontWeight: 700,
                         color: '#0f172a',
+                        marginBottom: '8px',
                       }}
                     >
-                      {plan.price}
-                    </span>
-                    {plan.period && (
+                      {plan.name}
+                    </Title>
+
+                    {/* Price */}
+                    <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
                       <span
                         style={{
-                          fontSize: '18px',
-                          color: '#64748b',
-                          marginLeft: '4px',
+                          fontSize: '40px',
+                          fontWeight: 800,
+                          color: '#0f172a',
                         }}
                       >
-                        {plan.period}
+                        {plan.price}
                       </span>
-                    )}
+                      {plan.period && (
+                        <span
+                          style={{
+                            fontSize: '18px',
+                            color: '#64748b',
+                            marginLeft: '4px',
+                          }}
+                        >
+                          {plan.period}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Spacer pushes button to bottom of header zone */}
+                    <div style={{ flex: 1, minHeight: '16px' }} />
+
+                    {/* CTA Button */}
+                    <Button
+                      type={plan.featured ? 'primary' : 'default'}
+                      block
+                      size="large"
+                      icon={isContact ? <MailOutlined /> : undefined}
+                      style={{
+                        height: '56px',
+                        fontSize: '16px',
+                        fontWeight: 600,
+                        borderRadius: '12px',
+                        background: plan.featured ? 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)' : '#ffffff',
+                        border: plan.featured ? 'none' : '2px solid #e2e8f0',
+                        color: plan.featured ? '#ffffff' : '#0f172a',
+                      }}
+                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!' : 'https://au.antsa.ai/sign-in')}
+                    >
+                      {plan.cta_text}
+                    </Button>
                   </div>
 
-                  {/* CTA Button */}
-                  <Button
-                    type={plan.featured ? 'primary' : 'default'}
-                    block
-                    size="large"
-                    icon={isContact ? <MailOutlined /> : undefined}
-                    style={{
-                      height: '56px',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      borderRadius: '12px',
-                      marginBottom: '32px',
-                      background: plan.featured ? 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)' : '#ffffff',
-                      border: plan.featured ? 'none' : '2px solid #e2e8f0',
-                      color: plan.featured ? '#ffffff' : '#0f172a',
-                    }}
-                    href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!' : 'https://au.antsa.ai/sign-in')}
-                  >
-                    {plan.cta_text}
-                  </Button>
-
-                  {/* Features List - grows to fill space */}
-                  <div style={{ flex: 1 }}>
+                  {/* Features List - grows to fill remaining card space */}
+                  <div style={{ flex: 1, paddingTop: '24px' }}>
                     <List
                       dataSource={plan.features}
                       renderItem={(feature) => (
