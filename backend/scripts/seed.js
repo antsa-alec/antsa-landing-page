@@ -482,20 +482,22 @@ async function seed() {
       },
       {
         name: 'Clinic / Practice',
-        price: 'Contact Us',
+        price: '',
         period: '',
         featured: 0,
         features: JSON.stringify([
           'Everything in Solo Practitioner',
-          'Reduced per-licence pricing for practices with multiple practitioner licences',
+          'Reduced per-licence pricing',
           'Multi-practitioner management',
           'Practice-level reporting',
+          'Encrypted practitioner communication',
+          'Real-time reporting of practitioner usage',
         ]),
         order_index: 2,
       },
       {
         name: 'Enterprise',
-        price: 'Contact Us',
+        price: '',
         period: '',
         featured: 0,
         features: JSON.stringify([

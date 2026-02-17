@@ -23,7 +23,6 @@ const PricingSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Try Stripe dynamic pricing first, fall back to DB-seeded content
     fetch('/api/stripe/pricing')
       .then((res) => {
         if (!res.ok) throw new Error('Stripe unavailable');
@@ -33,30 +32,10 @@ const PricingSection = () => {
         if (data.plans && data.plans.length > 0) {
           setPlans(data.plans);
         } else {
-          throw new Error('No Stripe plans');
+          throw new Error('No plans returned');
         }
       })
-      .catch(() => {
-        // Fallback: load from CMS / DB seed
-        fetch('/api/content/section/pricing')
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.content && data.content.plans) {
-              const transformedPlans = data.content.plans.map((plan: any) => ({
-                id: String(plan.id),
-                name: plan.name,
-                price: plan.price,
-                period: plan.period !== undefined && plan.period !== null ? plan.period : '/month',
-                features: Array.isArray(plan.features) ? plan.features : [],
-                featured: Boolean(plan.featured),
-                cta_text: plan.cta_text || (plan.price === 'Contact Us' ? 'Contact Us' : 'Get Started'),
-                cta_url: plan.cta_url,
-              }));
-              setPlans(transformedPlans);
-            }
-          })
-          .catch((err) => console.error('Failed to load pricing:', err));
-      })
+      .catch((err) => console.error('Failed to load pricing:', err))
       .finally(() => setLoading(false));
   }, []);
 
@@ -80,28 +59,30 @@ const PricingSection = () => {
         'Psychometric Measures',
       ],
       featured: true,
-      cta_text: 'Get Started',
+      cta_text: 'Start Free Trial',
       cta_url: 'https://au.antsa.ai/sign-in',
     },
     {
       id: '2',
       name: 'Clinic / Practice',
-      price: 'Contact Us',
+      price: '',
       period: '',
       features: [
         'Everything in Solo Practitioner',
-        'Reduced per-licence pricing for practices with multiple practitioner licences',
+        'Reduced per-licence pricing',
         'Multi-practitioner management',
         'Practice-level reporting',
+        'Encrypted practitioner communication',
+        'Real-time reporting of practitioner usage',
       ],
       featured: false,
       cta_text: 'Contact Us',
-      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!',
+      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Clinic%20Pricing%20Enquiry',
     },
     {
       id: '3',
       name: 'Enterprise',
-      price: 'Contact Us',
+      price: '',
       period: '',
       features: [
         'Everything in Clinic / Practice',
@@ -112,7 +93,7 @@ const PricingSection = () => {
       ],
       featured: false,
       cta_text: 'Contact Us',
-      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!',
+      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Enterprise%20Enquiry',
     },
   ];
 
@@ -185,7 +166,8 @@ const PricingSection = () => {
         {/* Pricing Cards */}
         <Row gutter={[32, 32]} justify="center">
           {displayPlans.map((plan, index) => {
-            const isContact = plan.price === 'Contact Us' || plan.cta_text === 'Contact Us';
+            const hasPrice = plan.price && /^\$\d/.test(plan.price);
+            const isContact = !hasPrice;
 
             return (
               <Col xs={24} sm={24} md={8} key={plan.id}>
@@ -237,7 +219,7 @@ const PricingSection = () => {
                   )}
 
                   {/* Header zone - fixed height so buttons & features align across cards */}
-                  <div style={{ minHeight: '240px', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ minHeight: '190px', display: 'flex', flexDirection: 'column' }}>
                     {/* Plan Name */}
                     <Title
                       level={3}
@@ -251,29 +233,31 @@ const PricingSection = () => {
                       {plan.name}
                     </Title>
 
-                    {/* Price */}
-                    <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
-                      <span
-                        style={{
-                          fontSize: '40px',
-                          fontWeight: 800,
-                          color: '#0f172a',
-                        }}
-                      >
-                        {plan.price}
-                      </span>
-                      {plan.period && (
+                    {/* Price - only shown for plans with a dollar amount */}
+                    {hasPrice && (
+                      <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
                         <span
                           style={{
-                            fontSize: '18px',
-                            color: '#64748b',
-                            marginLeft: '4px',
+                            fontSize: '40px',
+                            fontWeight: 800,
+                            color: '#0f172a',
                           }}
                         >
-                          {plan.period}
+                          {plan.price}
                         </span>
-                      )}
-                    </div>
+                        {plan.period && (
+                          <span
+                            style={{
+                              fontSize: '18px',
+                              color: '#64748b',
+                              marginLeft: '4px',
+                            }}
+                          >
+                            {plan.period}
+                          </span>
+                        )}
+                      </div>
+                    )}
 
                     {/* Spacer pushes button to bottom of header zone */}
                     <div style={{ flex: 1, minHeight: '16px' }} />
@@ -293,7 +277,7 @@ const PricingSection = () => {
                         border: plan.featured ? 'none' : '2px solid #e2e8f0',
                         color: plan.featured ? '#ffffff' : '#0f172a',
                       }}
-                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20learn%20more%20about%20your%20pricing%20options.%0A%0AThanks!' : 'https://au.antsa.ai/sign-in')}
+                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry' : 'https://au.antsa.ai/sign-in')}
                     >
                       {plan.cta_text}
                     </Button>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Switch, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Tag, Alert } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 interface PricingPlan {
@@ -46,68 +46,40 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
     }
   };
 
-  const handleAdd = () => {
-    setEditingPlan(null);
-    form.resetFields();
-    setModalVisible(true);
-  };
-
   const handleEdit = (plan: PricingPlan) => {
     setEditingPlan(plan);
     form.setFieldsValue({
-      ...plan,
       features: plan.features.join('\n'),
     });
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/content/pricing/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${auth.token}`,
-        },
-      });
-
-      if (response.ok) {
-        message.success('Pricing plan deleted successfully!');
-        fetchPlans();
-      } else {
-        message.error('Failed to delete pricing plan');
-      }
-    } catch (error) {
-      console.error('Delete error:', error);
-      message.error('Connection error');
-    }
-  };
-
   const handleSubmit = async (values: any) => {
+    if (!editingPlan) return;
+
     try {
-      const featuresArray = values.features ? values.features.split('\n').filter((f: string) => f.trim()) : [];
+      const featuresArray = values.features
+        ? values.features.split('\n').filter((f: string) => f.trim())
+        : [];
 
-      const url = editingPlan
-        ? `${API_BASE_URL}/content/pricing/${editingPlan.id}`
-        : `${API_BASE_URL}/content/pricing`;
-
-      const response = await fetch(url, {
-        method: editingPlan ? 'PUT' : 'POST',
+      const response = await fetch(`${API_BASE_URL}/content/pricing/${editingPlan.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${auth.token}`,
         },
         body: JSON.stringify({
-          ...values,
+          ...editingPlan,
           features: featuresArray,
         }),
       });
 
       if (response.ok) {
-        message.success(`Pricing plan ${editingPlan ? 'updated' : 'created'} successfully!`);
+        message.success('Feature list updated successfully!');
         setModalVisible(false);
         fetchPlans();
       } else {
-        message.error('Failed to save pricing plan');
+        message.error('Failed to update feature list');
       }
     } catch (error) {
       console.error('Save error:', error);
@@ -125,11 +97,14 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h3>Pricing Plans</h3>
-        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-          Add Plan
-        </Button>
+      <div style={{ marginBottom: 16 }}>
+        <h3>Pricing Tiers — Feature Lists</h3>
+        <Alert
+          message="Pricing comes from Stripe. Use this editor to manage the feature bullet points shown on each pricing card."
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
       </div>
 
       <List
@@ -145,34 +120,16 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
                 </div>
               }
               extra={
-                <Space>
-                  <Button
-                    type="text"
-                    icon={<EditOutlined />}
-                    onClick={() => handleEdit(plan)}
-                  />
-                  <Popconfirm
-                    title="Delete this plan?"
-                    onConfirm={() => handleDelete(plan.id)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button type="text" danger icon={<DeleteOutlined />} />
-                  </Popconfirm>
-                </Space>
+                <Button
+                  type="text"
+                  icon={<EditOutlined />}
+                  onClick={() => handleEdit(plan)}
+                />
               }
             >
-              <div style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: 8 }}>
-                {plan.price}
-                {plan.period && (
-                  <span style={{ fontSize: '1rem', fontWeight: 'normal', color: '#999' }}>
-                    /{plan.period}
-                  </span>
-                )}
-              </div>
-              <ul>
+              <ul style={{ paddingLeft: 20, margin: 0 }}>
                 {plan.features.map((feature, idx) => (
-                  <li key={idx}>{feature}</li>
+                  <li key={idx} style={{ marginBottom: 4 }}>{feature}</li>
                 ))}
               </ul>
             </Card>
@@ -181,7 +138,7 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
       />
 
       <Modal
-        title={editingPlan ? 'Edit Plan' : 'Add Plan'}
+        title={`Edit features — ${editingPlan?.name || ''}`}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
@@ -191,58 +148,19 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
           form={form}
           layout="vertical"
           onFinish={handleSubmit}
-          initialValues={{ order_index: 0, featured: false }}
         >
-          <Form.Item
-            label="Plan Name"
-            name="name"
-            rules={[{ required: true, message: 'Please enter a plan name' }]}
-          >
-            <Input placeholder="Professional" />
-          </Form.Item>
-
-          <Form.Item
-            label="Price"
-            name="price"
-            rules={[{ required: true, message: 'Please enter a price' }]}
-          >
-            <Input placeholder="$99" />
-          </Form.Item>
-
-          <Form.Item
-            label="Period"
-            name="period"
-          >
-            <Input placeholder="month" />
-          </Form.Item>
-
-          <Form.Item
-            label="Featured"
-            name="featured"
-            valuePropName="checked"
-          >
-            <Switch />
-          </Form.Item>
-
           <Form.Item
             label="Features (one per line)"
             name="features"
-            tooltip="Enter each feature on a new line"
+            tooltip="Each line becomes a bullet point on the pricing card"
           >
-            <Input.TextArea rows={8} placeholder="Feature 1&#10;Feature 2&#10;Feature 3" />
-          </Form.Item>
-
-          <Form.Item
-            label="Order"
-            name="order_index"
-          >
-            <Input type="number" />
+            <Input.TextArea rows={10} placeholder="Feature 1&#10;Feature 2&#10;Feature 3" />
           </Form.Item>
 
           <Form.Item>
             <Space>
               <Button type="primary" htmlType="submit">
-                {editingPlan ? 'Update' : 'Create'}
+                Update Features
               </Button>
               <Button onClick={() => setModalVisible(false)}>
                 Cancel
@@ -256,4 +174,3 @@ const PricingEditor = ({ auth }: PricingEditorProps) => {
 };
 
 export default PricingEditor;
-
