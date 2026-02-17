@@ -1242,11 +1242,52 @@ router.put('/footer-links/:id/category', authenticateToken, (req, res) => {
 
 // ===== SUBSCRIBERS ROUTES =====
 
+async function addToMailchimp(email, name) {
+  const apiKey = process.env.MAILCHIMP_API_KEY;
+  const listId = process.env.MAILCHIMP_LIST_ID;
+
+  if (!apiKey || !listId) {
+    console.warn('Mailchimp not configured – skipping');
+    return { skipped: true };
+  }
+
+  const dc = apiKey.split('-').pop();
+  const url = `https://${dc}.api.mailchimp.com/3.0/lists/${listId}/members`;
+
+  const nameParts = name.trim().split(/\s+/);
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${Buffer.from(`anystring:${apiKey}`).toString('base64')}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email_address: email.toLowerCase(),
+      status: 'subscribed',
+      merge_fields: {
+        FNAME: firstName,
+        LNAME: lastName,
+      },
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok && data.title !== 'Member Exists') {
+    console.error('Mailchimp error:', data.title, data.detail);
+  }
+
+  return data;
+}
+
 // Subscribe (public - no auth required)
 router.post('/subscribe', [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email').trim().isEmail().withMessage('A valid email is required'),
-], (req, res) => {
+], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -1255,7 +1296,7 @@ router.post('/subscribe', [
   try {
     const { name, email } = req.body;
 
-    // Check if already subscribed
+    // Check if already subscribed locally
     const existingStmt = db.prepare('SELECT * FROM subscribers WHERE email = ?');
     const existing = existingStmt.get(email.toLowerCase());
 
@@ -1270,16 +1311,21 @@ router.post('/subscribe', [
         WHERE email = ?
       `);
       updateStmt.run(name, email.toLowerCase());
-      return res.json({ message: 'Welcome back! You have been re-subscribed.' });
+    } else {
+      const stmt = db.prepare(`
+        INSERT INTO subscribers (name, email) VALUES (?, ?)
+      `);
+      stmt.run(name, email.toLowerCase());
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO subscribers (name, email) VALUES (?, ?)
-    `);
+    // Push to Mailchimp (fire-and-forget style, don't block response on failure)
+    try {
+      await addToMailchimp(email, name);
+    } catch (mcErr) {
+      console.error('Mailchimp sync failed (subscriber saved locally):', mcErr.message);
+    }
 
-    stmt.run(name, email.toLowerCase());
-    
-    res.json({ message: 'Thank you for subscribing!' });
+    res.json({ message: existing ? 'Welcome back! You have been re-subscribed.' : 'Thank you for subscribing!' });
   } catch (error) {
     console.error('Subscribe error:', error);
     res.status(500).json({ error: 'Internal server error' });
