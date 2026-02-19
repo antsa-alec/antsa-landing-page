@@ -588,3 +588,19 @@ footer input {
   -webkit-text-fill-color: #ffffff !important;
 }
 
+/* Legal page content styling */
+.legal-content h1 { font-size: 32px; font-weight: 700; color: #0f172a; margin: 40px 0 16px; }
+.legal-content h2 { font-size: 24px; font-weight: 700; color: #0f172a; margin: 36px 0 12px; }
+.legal-content h3 { font-size: 20px; font-weight: 600; color: #0f172a; margin: 28px 0 10px; }
+.legal-content h4 { font-size: 18px; font-weight: 600; color: #1e293b; margin: 24px 0 8px; }
+.legal-content p { margin: 0 0 16px; }
+.legal-content ul, .legal-content ol { margin: 0 0 16px; padding-left: 24px; }
+.legal-content li { margin-bottom: 8px; }
+.legal-content a { color: #48abe2; text-decoration: underline; }
+.legal-content a:hover { color: #2d8bc9; }
+.legal-content strong { font-weight: 600; color: #1e293b; }
+.legal-content table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.legal-content th, .legal-content td { border: 1px solid #e2e8f0; padding: 10px 14px; text-align: left; }
+.legal-content th { background: #f8fafc; font-weight: 600; color: #0f172a; }
+.legal-content blockquote { margin: 16px 0; padding: 12px 20px; border-left: 4px solid #48abe2; background: #f8fafc; color: #475569; }
+

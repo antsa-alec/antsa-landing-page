@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Space, Button } from 'antd';
-import { LinkedinOutlined } from '@ant-design/icons';
+import {
+  LinkedinOutlined,
+  GlobalOutlined,
+  GithubOutlined,
+  FacebookOutlined,
+  InstagramOutlined,
+  MailOutlined,
+  XOutlined,
+  LinkOutlined,
+} from '@ant-design/icons';
 
 import photoSallyAnne from '../assets/team-sally-anne.png';
 import photoKiera from '../assets/team-kiera.png';
@@ -29,9 +38,19 @@ interface TeamMember {
   }[];
 }
 
-/**
- * TEAM SECTION - Aligned cards with circular photos, badges, and LinkedIn buttons
- */
+const getSocialConfig = (platform: string): { icon: React.ReactNode; label: string; color: string } => {
+  switch (platform) {
+    case 'linkedin': return { icon: <LinkedinOutlined />, label: 'LinkedIn', color: '#0a66c2' };
+    case 'website': return { icon: <GlobalOutlined />, label: 'Website', color: '#48abe2' };
+    case 'github': return { icon: <GithubOutlined />, label: 'GitHub', color: '#333' };
+    case 'facebook': return { icon: <FacebookOutlined />, label: 'Facebook', color: '#1877f2' };
+    case 'instagram': return { icon: <InstagramOutlined />, label: 'Instagram', color: '#e4405f' };
+    case 'email': return { icon: <MailOutlined />, label: 'Email', color: '#666' };
+    case 'twitter': case 'x': return { icon: <XOutlined />, label: 'X', color: '#000' };
+    default: return { icon: <LinkOutlined />, label: platform, color: '#666' };
+  }
+};
+
 const TeamSection = () => {
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,8 +172,8 @@ const TeamSection = () => {
         {/* Team Members Grid */}
         <Row gutter={[32, 48]} justify="center">
           {displayMembers.map((member, index) => {
-            const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
             const photoSrc = member.image_url || teamPhotos[member.name];
+            const linkedIn = member.socials?.find(s => s.platform === 'linkedin');
 
             return (
               <Col xs={24} sm={12} lg={6} key={member.id}>
@@ -278,29 +297,35 @@ const TeamSection = () => {
                     </Paragraph>
                   </div>
 
-                  {/* LinkedIn zone - always at the bottom */}
-                  <div style={{ minHeight: '40px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {linkedIn ? (
-                      <Space>
-                        <Button
-                          type="default"
-                          size="small"
-                          icon={<LinkedinOutlined />}
-                          href={linkedIn.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            borderRadius: '8px',
-                            borderColor: '#e2e8f0',
-                            color: '#0a66c2',
-                            fontWeight: 500,
-                            fontSize: '13px',
-                          }}
-                        >
-                          LinkedIn
-                        </Button>
+                  {/* Social links zone - always at the bottom */}
+                  <div style={{ minHeight: '40px', marginTop: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                    {member.socials && member.socials.length > 0 && (
+                      <Space size={8} wrap>
+                        {member.socials.map((social, idx) => {
+                          const config = getSocialConfig(social.platform);
+                          return (
+                            <Button
+                              key={idx}
+                              type="default"
+                              size="small"
+                              icon={config.icon}
+                              href={social.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                borderRadius: '8px',
+                                borderColor: '#e2e8f0',
+                                color: config.color,
+                                fontWeight: 500,
+                                fontSize: '13px',
+                              }}
+                            >
+                              {config.label}
+                            </Button>
+                          );
+                        })}
                       </Space>
-                    ) : null}
+                    )}
                   </div>
                 </div>
               </Col>

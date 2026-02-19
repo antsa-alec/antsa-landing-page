@@ -60,6 +60,11 @@ app.use('/api/images', imageRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/stripe', stripePricingRoutes);
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Serve static files from the dist directory (production)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '..', 'dist');
@@ -70,11 +75,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(distPath, 'index.html'));
   });
 }
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

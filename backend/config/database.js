@@ -216,6 +216,28 @@ db.exec(`
     unsubscribed_at DATETIME,
     is_active BOOLEAN DEFAULT 1
   );
+
+  CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    type TEXT NOT NULL UNIQUE,
+    filename TEXT NOT NULL,
+    original_name TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    path TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS legal_pages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    last_updated TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 // Migrations for existing databases
@@ -247,8 +269,22 @@ try {
     db.exec("ALTER TABLE team_members ADD COLUMN badge_url TEXT");
     console.log('✅ Migrated team_members: added badge_url column');
   }
+
 } catch (e) {
   // Tables may not exist yet, that's fine
+}
+
+// Seed legal pages defaults
+try {
+  const lpCount = db.prepare("SELECT COUNT(*) as cnt FROM legal_pages").get();
+  if (lpCount.cnt === 0) {
+    const ins = db.prepare("INSERT OR IGNORE INTO legal_pages (slug, title, content, last_updated) VALUES (?, ?, ?, ?)");
+    ins.run('privacy-policy', 'Privacy Policy', '', 'February 2026');
+    ins.run('terms-and-conditions', 'Terms & Conditions', '', 'February 2026');
+    console.log('✅ Seeded legal_pages with defaults');
+  }
+} catch (e) {
+  // Will be created on next restart
 }
 
 export default db;

@@ -1357,5 +1357,62 @@ router.delete('/subscribers/:id', authenticateToken, (req, res) => {
   }
 });
 
+// ===== LEGAL PAGES ROUTES =====
+
+// Get legal page by slug (public)
+router.get('/legal/:slug', (req, res) => {
+  try {
+    const { slug } = req.params;
+    const stmt = db.prepare('SELECT * FROM legal_pages WHERE slug = ?');
+    const page = stmt.get(slug);
+
+    if (!page) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
+    res.json({ page });
+  } catch (error) {
+    console.error('Get legal page error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get all legal pages (admin)
+router.get('/legal', authenticateToken, (req, res) => {
+  try {
+    const stmt = db.prepare('SELECT * FROM legal_pages ORDER BY slug');
+    const pages = stmt.all();
+    res.json({ pages });
+  } catch (error) {
+    console.error('Get legal pages error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update legal page (admin)
+router.put('/legal/:slug', authenticateToken, (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { title, content, last_updated } = req.body;
+
+    const stmt = db.prepare(`
+      UPDATE legal_pages
+      SET title = ?, content = ?, last_updated = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE slug = ?
+    `);
+
+    const result = stmt.run(title, content, last_updated || null, slug);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
+    res.json({ message: 'Legal page updated successfully' });
+  } catch (error) {
+    console.error('Update legal page error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 

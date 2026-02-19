@@ -12,6 +12,7 @@ import {
   TeamOutlined,
   ThunderboltOutlined,
   BulbOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -22,6 +23,7 @@ import SettingsView from '../components/admin/SettingsView';
 import NavigationEditor from '../components/admin/NavigationEditor';
 import FAQEditor from '../components/admin/FAQEditor';
 import TeamEditor from '../components/admin/TeamEditor';
+import LegalPagesEditor from '../components/admin/LegalPagesEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -126,6 +128,7 @@ const Admin = () => {
     { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
     { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
+    { key: 'legal', icon: <FileTextOutlined />, label: 'Legal Pages' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
 
@@ -151,6 +154,8 @@ const Admin = () => {
         return <PricingEditor auth={authContext} />;
       case 'faq':
         return <FAQEditor auth={authContext} />;
+      case 'legal':
+        return <LegalPagesEditor auth={authContext} />;
       case 'settings':
         return <SettingsView auth={authContext} />;
       default:
