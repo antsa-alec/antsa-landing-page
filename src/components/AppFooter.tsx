@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Typography, Space, Button, Input, message } from 'antd';
 import {
   InstagramOutlined,
@@ -33,9 +34,10 @@ interface FooterContent {
  * FOOTER - Dark theme with ANTSA logo, social icons, legal links, subscribe
  */
 const AppFooter = () => {
+  const navigate = useNavigate();
   const [footerContent, setFooterContent] = useState<FooterContent>({});
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
-  const [legalLinks, setLegalLinks] = useState<FooterLink[]>([]);
+  const [extraLinks, setExtraLinks] = useState<FooterLink[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Subscribe form state
@@ -44,6 +46,11 @@ const AppFooter = () => {
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeSuccess, setSubscribeSuccess] = useState(false);
   const [subscribeError, setSubscribeError] = useState('');
+
+  const legalPages = [
+    { label: 'Privacy Policy', path: '/privacy-policy' },
+    { label: 'Terms & Conditions', path: '/terms-and-conditions' },
+  ];
 
   useEffect(() => {
     Promise.all([
@@ -59,7 +66,9 @@ const AppFooter = () => {
           setSocialLinks(socialData.links);
         }
         if (linksData.links) {
-          setLegalLinks(linksData.links);
+          // Filter out any legacy legal links that duplicate the hardcoded ones
+          const legalPaths = new Set(['/privacy-policy', '/terms-and-conditions']);
+          setExtraLinks(linksData.links.filter((l: FooterLink) => !legalPaths.has(l.url)));
         }
       })
       .catch((err) => console.error('Failed to load footer data:', err))
@@ -115,13 +124,7 @@ const AppFooter = () => {
     { id: '4', platform: 'email', url: 'mailto:admin@antsa.com.au' },
   ];
 
-  const defaultLegalLinks: FooterLink[] = [
-    { id: '1', label: 'Privacy Policy', url: '/privacy-policy' },
-    { id: '2', label: 'Terms & Conditions', url: '/terms-and-conditions' },
-  ];
-
   const displaySocial = socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
-  const displayLegal = legalLinks.length > 0 ? legalLinks : defaultLegalLinks;
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
@@ -362,12 +365,36 @@ const AppFooter = () => {
             {copyright}
           </Paragraph>
 
-          {/* Legal Links */}
-          <Space size={24}>
-            {displayLegal.map((link) => (
+          {/* Legal + Extra Links */}
+          <Space size={24} wrap>
+            {legalPages.map((page) => (
+              <span
+                key={page.path}
+                onClick={() => navigate(page.path)}
+                role="link"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter') navigate(page.path); }}
+                style={{
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  fontSize: '13px',
+                  transition: 'color 0.3s ease',
+                  cursor: 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
+                }}
+              >
+                {page.label}
+              </span>
+            ))}
+            {extraLinks.map((link) => (
               <Link
                 key={link.id}
                 href={link.url}
+                target={link.url.startsWith('http') ? '_blank' : undefined}
                 style={{
                   color: 'rgba(255, 255, 255, 0.5)',
                   fontSize: '13px',

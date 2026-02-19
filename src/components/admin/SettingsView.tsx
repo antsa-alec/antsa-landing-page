@@ -491,7 +491,8 @@ const SettingsView = ({ auth }: SettingsViewProps) => {
               Footer Links
             </Title>
             <Paragraph style={{ color: '#666', marginBottom: 0 }}>
-              Add custom links that will appear in the footer. Common examples: Privacy Policy, Terms of Service, Support, etc.
+              Add custom links that will appear in the footer alongside the legal pages.
+              Privacy Policy and Terms & Conditions are managed under <strong>Legal Pages</strong>.
             </Paragraph>
           </div>
           <Button type="primary" icon={<PlusOutlined />} onClick={handleAddLink}>
