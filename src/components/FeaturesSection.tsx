@@ -32,8 +32,9 @@ const FeaturesSection = () => {
     fetch('/api/content/section/features')
       .then((res) => res.json())
       .then((data) => {
-        if (data.items) {
-          setFeatures(data.items);
+        const items = data.content?.items || data.items;
+        if (items && items.length > 0) {
+          setFeatures(items);
         }
       })
       .catch((err) => console.error('Failed to load features:', err))
