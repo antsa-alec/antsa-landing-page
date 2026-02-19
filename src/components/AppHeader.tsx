@@ -97,6 +97,7 @@ const AppHeader = () => {
         >
           <Menu
             mode="horizontal"
+            disabledOverflow
             items={menuItems}
             style={{
               border: 'none',
