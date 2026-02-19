@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Typography, Layout, Spin } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const { Title, Paragraph } = Typography;
 const { Content } = Layout;
@@ -62,13 +64,10 @@ const PrivacyPolicy = () => {
             {page?.content ? (
               <div
                 className="legal-content"
-                style={{
-                  fontSize: '16px',
-                  color: '#475569',
-                  lineHeight: 1.8,
-                }}
-                dangerouslySetInnerHTML={{ __html: page.content }}
-              />
+                style={{ fontSize: '16px', color: '#475569', lineHeight: 1.8 }}
+              >
+                <Markdown remarkPlugins={[remarkGfm]}>{page.content}</Markdown>
+              </div>
             ) : (
               <>
                 <Paragraph style={{ fontSize: '16px', color: '#475569', lineHeight: 1.8 }}>

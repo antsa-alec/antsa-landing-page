@@ -18,6 +18,8 @@ import {
   SaveOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
 
 const { Title, Paragraph, Text } = Typography;
@@ -128,8 +130,8 @@ const LegalPagesEditor = ({ auth }: LegalPagesEditorProps) => {
           <FileTextOutlined /> Legal Pages
         </Title>
         <Paragraph type="secondary" style={{ marginTop: 8 }}>
-          Manage your Privacy Policy and Terms & Conditions pages. Content
-          supports HTML formatting.
+          Manage your Privacy Policy and Terms & Conditions pages. Content is
+          written in Markdown.
         </Paragraph>
       </div>
 
@@ -225,10 +227,10 @@ const LegalPagesEditor = ({ auth }: LegalPagesEditorProps) => {
           <Form.Item
             name="content"
             label={
-              <Space>
-                <span>Page Content (HTML)</span>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  Supports HTML tags: &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;a&gt;, &lt;br&gt;
+              <Space direction="vertical" size={0}>
+                <span>Page Content (Markdown)</span>
+                <Text type="secondary" style={{ fontSize: '12px', fontWeight: 400 }}>
+                  # Heading 1 &nbsp; ## Heading 2 &nbsp; **bold** &nbsp; *italic* &nbsp; - bullet list &nbsp; 1. numbered list &nbsp; [link text](url) &nbsp; --- horizontal rule
                 </Text>
               </Space>
             }
@@ -236,7 +238,7 @@ const LegalPagesEditor = ({ auth }: LegalPagesEditorProps) => {
           >
             <TextArea
               rows={20}
-              placeholder={`<h2>1. Introduction</h2>\n<p>Your content here...</p>\n\n<h2>2. Information We Collect</h2>\n<p>Details about data collection...</p>`}
+              placeholder={`## 1. Introduction\n\nYour content here...\n\n## 2. Information We Collect\n\nWe collect the following types of information:\n\n- **Personal details** such as name and email\n- Usage data and analytics\n- Device and browser information\n\n## 3. Contact Us\n\nEmail us at [admin@antsa.com.au](mailto:admin@antsa.com.au).`}
               style={{ fontFamily: 'monospace', fontSize: '13px' }}
             />
           </Form.Item>
@@ -277,8 +279,9 @@ const LegalPagesEditor = ({ auth }: LegalPagesEditorProps) => {
               overflow: 'auto',
               padding: '16px',
             }}
-            dangerouslySetInnerHTML={{ __html: editingPage.content }}
-          />
+          >
+            <Markdown remarkPlugins={[remarkGfm]}>{editingPage.content}</Markdown>
+          </div>
         ) : (
           <Paragraph type="secondary" style={{ textAlign: 'center', padding: '40px 0' }}>
             No content yet. Click Edit to add content.
