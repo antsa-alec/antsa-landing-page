@@ -3,7 +3,7 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
-import db from '../config/database.js';
+import db, { PERSISTENT_DIR } from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,11 +11,12 @@ const __dirname = dirname(__filename);
 
 const router = express.Router();
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = join(__dirname, '..', 'uploads');
+// Store uploads in persistent directory so they survive deployments
+const uploadsDir = join(PERSISTENT_DIR, 'uploads');
 if (!existsSync(uploadsDir)) {
   mkdirSync(uploadsDir, { recursive: true });
 }
+console.log(`📁 Uploads directory: ${uploadsDir}`);
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -77,7 +78,7 @@ router.post('/upload', authenticateToken, upload.single('image'), (req, res) => 
     if (existing) {
       // Delete old file
       try {
-        unlinkSync(join(__dirname, '..', existing.path));
+        unlinkSync(join(PERSISTENT_DIR, existing.path));
       } catch (e) {
         console.error('Error deleting old file:', e);
       }
@@ -194,7 +195,7 @@ router.delete('/:id', authenticateToken, (req, res) => {
 
     // Delete file
     try {
-      const filepath = join(__dirname, '..', image.path);
+      const filepath = join(PERSISTENT_DIR, image.path);
       if (existsSync(filepath)) {
         unlinkSync(filepath);
       }

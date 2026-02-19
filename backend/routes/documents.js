@@ -3,7 +3,7 @@ import multer from 'multer';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { existsSync, mkdirSync, unlinkSync } from 'fs';
-import db from '../config/database.js';
+import db, { PERSISTENT_DIR } from '../config/database.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -11,8 +11,8 @@ const __dirname = dirname(__filename);
 
 const router = express.Router();
 
-// Create documents directory if it doesn't exist
-const documentsDir = join(__dirname, '..', 'uploads', 'documents');
+// Store documents in persistent directory so they survive deployments
+const documentsDir = join(PERSISTENT_DIR, 'uploads', 'documents');
 if (!existsSync(documentsDir)) {
   mkdirSync(documentsDir, { recursive: true });
 }
@@ -75,7 +75,7 @@ router.post('/upload', authenticateToken, upload.single('document'), (req, res) 
     if (existing) {
       // Delete old file
       try {
-        const oldPath = join(__dirname, '..', existing.path);
+        const oldPath = join(PERSISTENT_DIR, existing.path);
         if (existsSync(oldPath)) {
           unlinkSync(oldPath);
         }
@@ -157,7 +157,7 @@ router.get('/:type', (req, res) => {
       return res.status(404).json({ error: 'Document not found' });
     }
 
-    const filepath = join(__dirname, '..', document.path);
+    const filepath = join(PERSISTENT_DIR, document.path);
 
     if (!existsSync(filepath)) {
       return res.status(404).json({ error: 'Document file not found' });
@@ -225,7 +225,7 @@ router.delete('/:type', authenticateToken, (req, res) => {
 
     // Delete file
     try {
-      const filepath = join(__dirname, '..', document.path);
+      const filepath = join(PERSISTENT_DIR, document.path);
       if (existsSync(filepath)) {
         unlinkSync(filepath);
       }

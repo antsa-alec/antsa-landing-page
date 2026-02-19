@@ -1,15 +1,35 @@
 import Database from 'better-sqlite3';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// On Azure App Service, /home persists across deployments but
+// /home/site/wwwroot gets replaced on every deploy. Detect Azure
+// by checking for /home/site (the App Service filesystem marker).
+function getPersistentDir() {
+  if (process.env.DB_PATH) return dirname(process.env.DB_PATH);
+  if (existsSync('/home/site')) {
+    // Running on Azure App Service
+    if (!existsSync('/home/data')) mkdirSync('/home/data', { recursive: true });
+    return '/home/data';
+  }
+  // Local development — use backend/ directory
+  return join(__dirname, '..');
+}
+
+const PERSISTENT_DIR = getPersistentDir();
+
+const DB_FILE = process.env.DB_PATH || join(PERSISTENT_DIR, 'content.db');
+console.log(`💾 Database path: ${DB_FILE}`);
+
 // Try to rebuild better-sqlite3 if it fails to load
 let db;
 try {
-  db = new Database(join(__dirname, '..', 'content.db'));
+  db = new Database(DB_FILE);
 } catch (error) {
   if (error.code === 'ERR_DLOPEN_FAILED') {
     console.log('⚠️  Database module needs rebuilding...');
@@ -18,7 +38,7 @@ try {
         cwd: join(__dirname, '..'),
         stdio: 'inherit'
       });
-      db = new Database(join(__dirname, '..', 'content.db'));
+      db = new Database(DB_FILE);
       console.log('✅ Database module rebuilt successfully');
     } catch (rebuildError) {
       console.error('❌ Failed to rebuild database module:', rebuildError);
@@ -288,4 +308,5 @@ try {
 }
 
 export default db;
+export { PERSISTENT_DIR };
 
