@@ -47,7 +47,7 @@ jobs:
         mkdir -p deploy
         cp -r dist deploy/
         cp -r backend deploy/
-        cp startup.sh deploy/
+        cp startup.sh deploy/startup.sh
         chmod +x deploy/startup.sh
         
         cat > deploy/package.json << 'EOF'
@@ -61,9 +61,6 @@ jobs:
         }
         EOF
 
-        # Create zip for deployment (avoids Oryx/rsync issues)
-        cd deploy && zip -r ../deploy.zip . && cd ..
-
     - name: Login to Azure
       uses: azure/login@v2
       with:
@@ -71,18 +68,19 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Configure startup command
+    - name: Stop app before deploy
+      run: az webapp stop --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.APP_NAME }}
+        package: ./deploy
+
+    - name: Configure and start app
       run: |
         az webapp config set \
           --resource-group ${{ env.RESOURCE_GROUP }} \
           --name ${{ env.APP_NAME }} \
           --startup-file "/home/site/wwwroot/startup.sh"
-
-    - name: Deploy to Azure Web App
-      run: |
-        az webapp deploy \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.APP_NAME }} \
-          --src-path deploy.zip \
-          --type zip \
-          --clean true
+        az webapp start --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
