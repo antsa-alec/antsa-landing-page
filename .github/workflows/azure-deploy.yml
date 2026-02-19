@@ -40,7 +40,6 @@ jobs:
       run: |
         cd backend
         npm ci --production
-        # Rebuild native modules for the target platform
         npm rebuild better-sqlite3
 
     - name: Create deployment package
@@ -51,11 +50,6 @@ jobs:
         cp startup.sh deploy/
         chmod +x deploy/startup.sh
         
-        # Create .deployment file to prevent Azure from running build
-        echo "[config]" > deploy/.deployment
-        echo "SCM_DO_BUILD_DURING_DEPLOYMENT=false" >> deploy/.deployment
-        
-        # Create package.json for Azure
         cat > deploy/package.json << 'EOF'
         {
           "name": "antsa-landing-page",
@@ -66,6 +60,9 @@ jobs:
           "dependencies": {}
         }
         EOF
+
+        # Create zip for deployment (avoids Oryx/rsync issues)
+        cd deploy && zip -r ../deploy.zip . && cd ..
 
     - name: Login to Azure
       uses: azure/login@v2
@@ -82,7 +79,10 @@ jobs:
           --startup-file "/home/site/wwwroot/startup.sh"
 
     - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.APP_NAME }}
-        package: ./deploy
+      run: |
+        az webapp deploy \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.APP_NAME }} \
+          --src-path deploy.zip \
+          --type zip \
+          --clean true
