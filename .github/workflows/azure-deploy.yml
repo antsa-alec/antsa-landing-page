@@ -36,17 +36,12 @@ jobs:
       env:
         NODE_ENV: production
 
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        npm ci --production
-        npm rebuild better-sqlite3
-
     - name: Create deployment package
       run: |
         mkdir -p deploy
         cp -r dist deploy/
         cp -r backend deploy/
+        rm -rf deploy/backend/node_modules
         cp startup.sh deploy/startup.sh
         chmod +x deploy/startup.sh
         
@@ -68,19 +63,17 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-    - name: Stop app before deploy
-      run: az webapp stop --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
-
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: ${{ env.APP_NAME }}
         package: ./deploy
 
-    - name: Configure and start app
+    - name: Restart app
       run: |
         az webapp config set \
           --resource-group ${{ env.RESOURCE_GROUP }} \
           --name ${{ env.APP_NAME }} \
-          --startup-file "/home/site/wwwroot/startup.sh"
-        az webapp start --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
+          --startup-file "/home/site/wwwroot/startup.sh" \
+          --output none
+        az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
