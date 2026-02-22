@@ -92,6 +92,7 @@ db.exec(`
     size INTEGER NOT NULL,
     path TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE,
     UNIQUE(section_id, key)
   );
@@ -261,6 +262,16 @@ db.exec(`
 `);
 
 // Migrations for existing databases
+try {
+  const imgCols = db.prepare("PRAGMA table_info(images)").all();
+  if (!imgCols.some(c => c.name === 'updated_at')) {
+    db.exec("ALTER TABLE images ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    console.log('✅ Migrated images: added updated_at column');
+  }
+} catch (e) {
+  // Table may not exist yet
+}
+
 try {
   const tmCols = db.prepare("PRAGMA table_info(team_members)").all();
   if (!tmCols.some(c => c.name === 'image_url')) {
