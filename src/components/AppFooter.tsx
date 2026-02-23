@@ -292,7 +292,7 @@ const AppFooter = () => {
                       color: '#ffffff',
                       fontSize: '14px',
                     }}
-                    styles={{ input: { color: '#ffffff' } }}
+                    styles={{ input: { color: '#ffffff', background: 'transparent' } }}
                   />
                   <Input
                     id="subscribe-email"
@@ -313,7 +313,7 @@ const AppFooter = () => {
                       color: '#ffffff',
                       fontSize: '14px',
                     }}
-                    styles={{ input: { color: '#ffffff' } }}
+                    styles={{ input: { color: '#ffffff', background: 'transparent' } }}
                   />
                   {subscribeError && (
                     <div style={{ color: '#ef4444', fontSize: '13px', marginTop: '-4px' }}>
@@ -420,6 +420,14 @@ const AppFooter = () => {
         }
         .footer-subscribe-input input {
           color: #ffffff !important;
+          background: transparent !important;
+        }
+        .footer-subscribe-input input:-webkit-autofill,
+        .footer-subscribe-input input:-webkit-autofill:hover,
+        .footer-subscribe-input input:-webkit-autofill:focus {
+          -webkit-text-fill-color: #ffffff !important;
+          -webkit-box-shadow: 0 0 0px 1000px rgba(255,255,255,0.08) inset !important;
+          caret-color: #ffffff;
         }
       `}</style>
     </footer>
