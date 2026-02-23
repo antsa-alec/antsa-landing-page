@@ -265,7 +265,8 @@ db.exec(`
 try {
   const imgCols = db.prepare("PRAGMA table_info(images)").all();
   if (!imgCols.some(c => c.name === 'updated_at')) {
-    db.exec("ALTER TABLE images ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+    // No DEFAULT to stay compatible with older SQLite versions on some hosts
+    db.exec("ALTER TABLE images ADD COLUMN updated_at DATETIME");
     console.log('✅ Migrated images: added updated_at column');
   }
 } catch (e) {
