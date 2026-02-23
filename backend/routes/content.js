@@ -1318,9 +1318,19 @@ router.post('/subscribe', [
       stmt.run(name, email.toLowerCase());
     }
 
-    // Push to Mailchimp (fire-and-forget style, don't block response on failure)
+    // Push to Mailchimp — if Mailchimp rejects the email (e.g. disposable domain)
+    // roll back the local save and return the error to the user.
     try {
-      await addToMailchimp(email, name);
+      const mcResult = await addToMailchimp(email, name);
+      if (mcResult && mcResult.status === 400) {
+        // Mailchimp rejected the email — undo the local save
+        if (existing) {
+          db.prepare(`UPDATE subscribers SET is_active = 0 WHERE email = ?`).run(email.toLowerCase());
+        } else {
+          db.prepare(`DELETE FROM subscribers WHERE email = ?`).run(email.toLowerCase());
+        }
+        return res.status(400).json({ error: mcResult.detail || 'This email address could not be subscribed. Please use a real email address.' });
+      }
     } catch (mcErr) {
       console.error('Mailchimp sync failed (subscriber saved locally):', mcErr.message);
     }
