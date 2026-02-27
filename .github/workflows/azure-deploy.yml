@@ -87,16 +87,19 @@ jobs:
         cp -r dist deploy/
         cp -r backend deploy/
         # node_modules are already installed in CI — include them so startup is fast
-        # better-sqlite3 native binary will be rebuilt for Azure at startup
+        # better-sqlite3 native binary will be rebuilt for Azure at startup via startup.sh
         cp startup.sh deploy/startup.sh
         chmod +x deploy/startup.sh
         
+        # Use startup.sh as the start script so it always runs on every deployment.
+        # startup.sh handles: persistent dir setup, better-sqlite3 rebuild, seeding,
+        # then exec node server.js from the backend directory.
         cat > deploy/package.json << 'EOF'
         {
           "name": "antsa-landing-page",
           "version": "1.0.0",
           "scripts": {
-            "start": "node backend/server.js"
+            "start": "bash /home/site/wwwroot/startup.sh"
           },
           "dependencies": {}
         }
@@ -108,11 +111,6 @@ jobs:
         app-name: ${{ env.APP_NAME }}
         package: ./deploy
 
-    - name: Configure startup and restart
+    - name: Restart app
       run: |
-        az webapp config set \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.APP_NAME }} \
-          --startup-file "/home/site/wwwroot/startup.sh" \
-          --output none
         az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}

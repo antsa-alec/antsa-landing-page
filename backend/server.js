@@ -53,6 +53,12 @@ app.use(cors({
   exposedHeaders: ['Authorization'],
 }));
 
+// Prevent browsers and proxies from caching API responses
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);

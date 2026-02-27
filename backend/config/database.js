@@ -306,17 +306,56 @@ try {
   // Tables may not exist yet, that's fine
 }
 
-// Seed legal pages defaults
+// Ensure legal pages rows exist and populate empty content from defaults.
+// Uses ON CONFLICT DO UPDATE so that:
+//   - if the row doesn't exist → INSERT with seed content
+//   - if the row exists with empty content → UPDATE with seed content
+//   - if the row exists with real content → leave it unchanged (admin-entered content wins)
 try {
-  const lpCount = db.prepare("SELECT COUNT(*) as cnt FROM legal_pages").get();
-  if (lpCount.cnt === 0) {
-    const ins = db.prepare("INSERT OR IGNORE INTO legal_pages (slug, title, content, last_updated) VALUES (?, ?, ?, ?)");
-    ins.run('privacy-policy', 'Privacy Policy', '', 'February 2026');
-    ins.run('terms-and-conditions', 'Terms & Conditions', '', 'February 2026');
-    console.log('✅ Seeded legal_pages with defaults');
-  }
+  const defaultPrivacyPolicy = [
+    '## 1. Introduction',
+    '',
+    'ANTSA Pty Ltd (ABN: 77 664 161 237) ("ANTSA", "we", "us", or "our") is committed to protecting your privacy.',
+    'This Privacy Policy outlines how we collect, use, store and protect your personal information in accordance with the Australian Privacy Principles.',
+    '',
+    '## 2. Contact Us',
+    '',
+    'For privacy enquiries, please contact us at [help@antsa.com.au](mailto:help@antsa.com.au).',
+    '',
+    '*This page is a placeholder — the full Privacy Policy will be published here prior to launch.*',
+  ].join('\n');
+
+  const defaultTermsAndConditions = [
+    '## 1. Agreement to Terms',
+    '',
+    'By accessing or using the ANTSA platform operated by ANTSA Pty Ltd (ABN: 77 664 161 237) (ACN: 664 161 237),',
+    'you agree to be bound by these Terms & Conditions.',
+    '',
+    '## 2. Platform Description',
+    '',
+    'ANTSA provides a digital mental health platform connecting practitioners with clients.',
+    '',
+    '## 3. Contact Us',
+    '',
+    'For questions about these Terms & Conditions, please contact us at [help@antsa.com.au](mailto:help@antsa.com.au).',
+    '',
+    '*This page is a placeholder — the full Terms & Conditions will be published here prior to launch.*',
+  ].join('\n');
+
+  // Upsert: insert or update-if-empty so admin-entered content is never overwritten
+  const upsert = db.prepare(`
+    INSERT INTO legal_pages (slug, title, content, last_updated)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(slug) DO UPDATE SET
+      title       = CASE WHEN legal_pages.content = '' OR legal_pages.content IS NULL THEN excluded.title       ELSE legal_pages.title       END,
+      content     = CASE WHEN legal_pages.content = '' OR legal_pages.content IS NULL THEN excluded.content     ELSE legal_pages.content     END,
+      last_updated= CASE WHEN legal_pages.content = '' OR legal_pages.content IS NULL THEN excluded.last_updated ELSE legal_pages.last_updated END
+  `);
+  upsert.run('privacy-policy',       'Privacy Policy',       defaultPrivacyPolicy,       'February 2026');
+  upsert.run('terms-and-conditions', 'Terms & Conditions',   defaultTermsAndConditions,  'February 2026');
+  console.log('✅ Legal pages seeded/verified');
 } catch (e) {
-  // Will be created on next restart
+  console.error('⚠️  Legal pages seed error:', e.message);
 }
 
 export default db;
