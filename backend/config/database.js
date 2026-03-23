@@ -320,7 +320,7 @@ try {
     '',
     '## 2. Contact Us',
     '',
-    'For privacy enquiries, please contact us at [help@antsa.com.au](mailto:help@antsa.com.au).',
+    'For privacy enquiries, please contact us at [help@antsa.ai](mailto:help@antsa.ai).',
     '',
     '*This page is a placeholder — the full Privacy Policy will be published here prior to launch.*',
   ].join('\n');
@@ -337,7 +337,7 @@ try {
     '',
     '## 3. Contact Us',
     '',
-    'For questions about these Terms & Conditions, please contact us at [help@antsa.com.au](mailto:help@antsa.com.au).',
+    'For questions about these Terms & Conditions, please contact us at [help@antsa.ai](mailto:help@antsa.ai).',
     '',
     '*This page is a placeholder — the full Terms & Conditions will be published here prior to launch.*',
   ].join('\n');
