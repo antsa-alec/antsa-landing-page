@@ -84,6 +84,26 @@ function App() {
     // Initial observation
     observeElements();
 
+    // Scroll to hash anchor after sections have rendered (e.g. navigating from /help to /#features)
+    if (window.location.hash) {
+      const id = window.location.hash.slice(1);
+      const tryScroll = () => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+          return true;
+        }
+        return false;
+      };
+      // Retry briefly in case sections are still mounting
+      if (!tryScroll()) {
+        let attempts = 0;
+        const scrollInterval = setInterval(() => {
+          if (tryScroll() || ++attempts > 10) clearInterval(scrollInterval);
+        }, 150);
+      }
+    }
+
     // Re-observe when new content loads (for dynamically loaded sections)
     const intervalId = setInterval(observeElements, 500);
 
