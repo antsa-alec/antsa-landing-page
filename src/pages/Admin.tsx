@@ -24,6 +24,7 @@ import NavigationEditor from '../components/admin/NavigationEditor';
 import FAQEditor from '../components/admin/FAQEditor';
 import TeamEditor from '../components/admin/TeamEditor';
 import LegalPagesEditor from '../components/admin/LegalPagesEditor';
+import HelpCentreEditor from '../components/admin/HelpCentreEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -128,6 +129,7 @@ const Admin = () => {
     { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
     { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
+    { key: 'help-centre', icon: <QuestionCircleOutlined />, label: 'Help Centre' },
     { key: 'legal', icon: <FileTextOutlined />, label: 'Legal Pages' },
     { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
   ];
@@ -154,6 +156,8 @@ const Admin = () => {
         return <PricingEditor auth={authContext} />;
       case 'faq':
         return <FAQEditor auth={authContext} />;
+      case 'help-centre':
+        return <HelpCentreEditor auth={authContext} />;
       case 'legal':
         return <LegalPagesEditor auth={authContext} />;
       case 'settings':

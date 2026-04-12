@@ -259,6 +259,30 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS help_categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    description TEXT,
+    icon TEXT,
+    parent_id INTEGER,
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES help_categories(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS help_articles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL DEFAULT '',
+    order_index INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES help_categories(id) ON DELETE CASCADE
+  );
 `);
 
 // Migrations for existing databases
@@ -356,6 +380,48 @@ try {
   console.log('✅ Legal pages seeded/verified');
 } catch (e) {
   console.error('⚠️  Legal pages seed error:', e.message);
+}
+
+// Seed help centre categories if empty
+try {
+  const helpCount = db.prepare('SELECT COUNT(*) as count FROM help_categories').get();
+  if (helpCount.count === 0) {
+    const insertCat = db.prepare('INSERT INTO help_categories (name, slug, description, icon, parent_id, order_index) VALUES (?, ?, ?, ?, ?, ?)');
+    const insertArticle = db.prepare('INSERT INTO help_articles (category_id, title, content, order_index) VALUES (?, ?, ?, ?)');
+
+    // Top-level categories
+    const general = insertCat.run('General', 'general', 'General questions about ANTSA', 'QuestionCircleOutlined', null, 0);
+    const practitioners = insertCat.run('For Practitioners', 'for-practitioners', 'Guides for mental health practitioners', 'UserOutlined', null, 1);
+    const clients = insertCat.run('For Clients', 'for-clients', 'Help for clients using the ANTSA app', 'SmileOutlined', null, 2);
+    const organisations = insertCat.run('For Organisations', 'for-organisations', 'Information for clinics and organisations', 'BankOutlined', null, 3);
+
+    // Subcategories under "For Practitioners"
+    const pId = Number(practitioners.lastInsertRowid);
+    const gettingStarted = insertCat.run('Getting Started', 'getting-started', null, null, pId, 0);
+    const clientsMgmt = insertCat.run('Clients', 'clients', null, null, pId, 1);
+    const aiScribe = insertCat.run('AI Scribe', 'ai-scribe', null, null, pId, 2);
+    const templates = insertCat.run('Templates', 'templates', null, null, pId, 3);
+    const homework = insertCat.run('Homework', 'homework', null, null, pId, 4);
+    const questionnaires = insertCat.run('Questionnaires', 'questionnaires', null, null, pId, 5);
+    const psychoed = insertCat.run('Psychoeducation', 'psychoeducation', null, null, pId, 6);
+    const messages = insertCat.run('Messages', 'messages', null, null, pId, 7);
+    const files = insertCat.run('Files', 'files', null, null, pId, 8);
+    const scheduling = insertCat.run('Scheduling & Calendar', 'scheduling-calendar', null, null, pId, 9);
+    const telehealth = insertCat.run('Telehealth', 'telehealth', null, null, pId, 10);
+    const practAI = insertCat.run('Practitioner-Facing AI Assistant', 'practitioner-ai-assistant', null, null, pId, 11);
+    const clientAI = insertCat.run('Client-Facing AI Therapy Chatbot', 'client-ai-chatbot', null, null, pId, 12);
+    const settingsAcct = insertCat.run('Settings & Account', 'settings-account', null, null, pId, 13);
+
+    // Sample articles under "Files" subcategory
+    const filesId = Number(files.lastInsertRowid);
+    insertArticle.run(filesId, 'Uploading Files to ANTSA', 'Guide content coming soon.', 0);
+    insertArticle.run(filesId, 'Organising Your Private Files', 'Guide content coming soon.', 1);
+    insertArticle.run(filesId, 'Sharing Files With Clients', 'Guide content coming soon.', 2);
+
+    console.log('✅ Help centre categories seeded');
+  }
+} catch (e) {
+  console.error('⚠️  Help centre seed error:', e.message);
 }
 
 export default db;
