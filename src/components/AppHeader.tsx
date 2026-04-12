@@ -9,6 +9,14 @@ const { Header } = Layout;
 const SIGNUP_URL = 'https://au.antsa.ai/sign-in';
 const SIGNIN_URL = 'https://au.antsa.ai/sign-in';
 
+/** Prefix anchor links with / when not on the homepage so they navigate back */
+const sectionHref = (hash: string) => {
+  if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+    return `/${hash}`;
+  }
+  return hash;
+};
+
 /**
  * APP HEADER - Clean navigation with logo
  * Responsive mobile menu
@@ -19,31 +27,31 @@ const AppHeader = () => {
   const menuItems: MenuProps['items'] = [
     {
       key: 'home',
-      label: <a href="#hero" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>Home</a>,
+      label: <a href={sectionHref('#hero')} onClick={(e) => { if (window.location.pathname === '/') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}>Home</a>,
     },
     {
       key: 'the-shift',
-      label: <a href="#the-shift">The Shift</a>,
+      label: <a href={sectionHref('#the-shift')}>The Shift</a>,
     },
     {
       key: 'the-antsa',
-      label: <a href="#the-antsa">The ANTSA</a>,
+      label: <a href={sectionHref('#the-antsa')}>The ANTSA</a>,
     },
     {
       key: 'features',
-      label: <a href="#features">Features</a>,
+      label: <a href={sectionHref('#features')}>Features</a>,
     },
     {
       key: 'team',
-      label: <a href="#team">Our Team</a>,
+      label: <a href={sectionHref('#team')}>Our Team</a>,
     },
     {
       key: 'pricing',
-      label: <a href="#pricing">Pricing</a>,
+      label: <a href={sectionHref('#pricing')}>Pricing</a>,
     },
     {
       key: 'faq',
-      label: <a href="#faq">FAQ</a>,
+      label: <a href={sectionHref('#faq')}>FAQ</a>,
     },
     {
       key: 'help',

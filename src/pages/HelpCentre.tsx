@@ -124,29 +124,55 @@ const HelpCentre = () => {
           </div>
         ) : (
           <>
-            {/* Page title */}
-            <Title
-              level={1}
-              style={{
-                fontSize: 'clamp(36px, 5vw, 52px)',
-                fontWeight: 800,
-                color: '#0f172a',
-                marginBottom: '12px',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              Help Centre
-            </Title>
-            <Paragraph
-              style={{
-                fontSize: '18px',
-                color: '#64748b',
-                marginBottom: '56px',
-                lineHeight: 1.7,
-              }}
-            >
-              Guides, resources, and support for practitioners and clients.
-            </Paragraph>
+            {/* Page header — matches landing page section style */}
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <Title
+                level={5}
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#48abe2',
+                  marginBottom: '16px',
+                  textTransform: 'uppercase' as const,
+                  letterSpacing: '0.1em',
+                }}
+              >
+                HELP CENTRE
+              </Title>
+              <Title
+                level={1}
+                style={{
+                  fontSize: 'clamp(32px, 5vw, 48px)',
+                  fontWeight: 800,
+                  color: '#0f172a',
+                  marginBottom: '24px',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Guides, resources, and support for{' '}
+                <span
+                  style={{
+                    background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    backgroundClip: 'text',
+                  }}
+                >
+                  practitioners and clients.
+                </span>
+              </Title>
+              <Paragraph
+                style={{
+                  fontSize: '18px',
+                  color: '#64748b',
+                  maxWidth: '700px',
+                  margin: '0 auto',
+                  lineHeight: 1.7,
+                }}
+              >
+                Access how-to guides for the practitioner platform and client app, download clinical forms and onboarding documents, and find answers to common technical and platform questions.
+              </Paragraph>
+            </div>
 
             {/* Two-column layout: content + sidebar */}
             <div style={{ display: 'flex', gap: '64px', position: 'relative' }}>
