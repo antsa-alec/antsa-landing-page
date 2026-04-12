@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
-import { Typography, Layout, Spin, Collapse } from 'antd';
-import { ArrowLeftOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import { Typography, Layout, Spin, Collapse, ConfigProvider } from 'antd';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import antsaIcon from '../assets/antsa-icon.png';
+import AppHeader from '../components/AppHeader';
 
 const { Title, Paragraph } = Typography;
 const { Content } = Layout;
@@ -85,45 +85,26 @@ const HelpCentre = () => {
     cat.articles.length > 0 ||
     cat.subcategories.some((s) => s.articles.length > 0);
 
+  const theme = {
+    token: {
+      colorPrimary: '#48abe2',
+      colorTextBase: '#0f172a',
+      colorBgBase: '#ffffff',
+      borderRadius: 12,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      fontSize: 16,
+      lineHeight: 1.6,
+    },
+    components: {
+      Layout: { headerBg: '#ffffff', bodyBg: '#ffffff' },
+      Button: { borderRadius: 8, controlHeight: 48, fontWeight: 600 },
+    },
+  };
+
   return (
+    <ConfigProvider theme={theme}>
     <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
-      {/* Compact header */}
-      <div
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 1000,
-          background: '#ffffff',
-          boxShadow: '0 1px 0 rgba(0, 0, 0, 0.05)',
-          padding: '0 24px',
-          display: 'flex',
-          alignItems: 'center',
-          height: '70px',
-        }}
-      >
-        <a
-          href="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            textDecoration: 'none',
-          }}
-        >
-          <img
-            src={antsaIcon}
-            alt="ANTSA"
-            style={{
-              height: '40px',
-              width: '40px',
-              borderRadius: '10px',
-              objectFit: 'contain',
-            }}
-          />
-        </a>
-      </div>
+      <AppHeader />
 
       <Content
         style={{
@@ -136,21 +117,6 @@ const HelpCentre = () => {
           paddingRight: '24px',
         }}
       >
-        {/* Back link */}
-        <a
-          href="/"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            color: '#48abe2',
-            fontSize: '15px',
-            fontWeight: 500,
-            marginBottom: '40px',
-          }}
-        >
-          <ArrowLeftOutlined /> Back to Home
-        </a>
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 0' }}>
@@ -301,6 +267,7 @@ const HelpCentre = () => {
         }
       `}</style>
     </Layout>
+    </ConfigProvider>
   );
 };
 

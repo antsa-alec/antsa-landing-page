@@ -45,6 +45,10 @@ const AppHeader = () => {
       key: 'faq',
       label: <a href="#faq">FAQ</a>,
     },
+    {
+      key: 'help',
+      label: <a href="/help">Help Centre</a>,
+    },
   ];
 
   return (
