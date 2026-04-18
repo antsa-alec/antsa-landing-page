@@ -202,12 +202,13 @@ const HeroSection = () => {
             style={{
               height: '64px',
               padding: '0 48px',
-              fontSize: '18px',
-              fontWeight: 600,
+              fontSize: '20px',
+              fontWeight: 700,
               borderRadius: '12px',
-              background: '#0f172a',
+              background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
               border: 'none',
-              boxShadow: '0 4px 16px rgba(15, 23, 42, 0.3)',
+              color: '#ffffff',
+              boxShadow: '0 8px 24px rgba(72, 171, 226, 0.4)',
             }}
             href={ctaPrimaryUrl}
           >
