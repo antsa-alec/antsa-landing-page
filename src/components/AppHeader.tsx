@@ -6,7 +6,7 @@ import antsaIcon from '../assets/antsa-icon.png';
 
 const { Header } = Layout;
 
-const SIGNUP_URL = 'https://au.antsa.ai/sign-in';
+const SIGNUP_URL = '/free-trial';
 const SIGNIN_URL = 'https://au.antsa.ai/sign-in';
 
 /** Prefix anchor links with / when not on the homepage so they navigate back */

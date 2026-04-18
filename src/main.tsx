@@ -6,6 +6,7 @@ import Admin from './pages/Admin.tsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
 import TermsAndConditions from './pages/TermsAndConditions.tsx';
 import HelpCentre from './pages/HelpCentre.tsx';
+import FreeTrial from './pages/FreeTrial.tsx';
 import { usePageTracking } from './hooks/usePageTracking.ts';
 import './styles/global.css';
 
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="/help" element={<HelpCentre />} />
+        <Route path="/free-trial" element={<FreeTrial />} />
         <Route path="/admin/*" element={<Admin />} />
       </Routes>
     </BrowserRouter>

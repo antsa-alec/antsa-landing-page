@@ -79,7 +79,7 @@ const HeroSection = () => {
     : ['in the loop', 'between sessions'];
   const descriptionRaw = content.description || 'ANTSA is an Australian-built digital mental health system designed to support safe, supervised care between appointments. ANTSA brings AI within clinical governance, records, and duty-of-care frameworks, rather than leaving clients to use unregulated tools on their own.';
   const ctaPrimary = content.cta_primary || 'Start Your Free Trial';
-  const ctaPrimaryUrl = content.cta_primary_url || 'https://au.antsa.ai/sign-in';
+  const ctaPrimaryUrl = content.cta_primary_url || '/free-trial';
   const ctaSecondary = content.cta_secondary || 'Book a Demo';
   const ctaSecondaryUrl = content.cta_secondary_url || 'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo%20of%20the%20ANTSA%20platform.%0A%0APlease%20let%20me%20know%20your%20available%20times.%0A%0AThanks!';
 
