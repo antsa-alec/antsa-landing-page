@@ -41,6 +41,26 @@ const PricingSection = () => {
 
   const defaultPlans: PricingPlan[] = [
     {
+      id: '0',
+      name: 'Free Trial',
+      price: '$0',
+      period: '/14 days',
+      features: [
+        'Full platform access for 14 days',
+        'Up to 3 active clients',
+        'AI Scribe & Templates',
+        'Clinician-Overseen AI Chatbot',
+        'Telehealth & Session Summaries',
+        'Mood & Distress Tracking',
+        'Secure Messaging',
+        'Psychometric Measures',
+        'No credit card required',
+      ],
+      featured: false,
+      cta_text: 'Start Free Trial',
+      cta_url: '/free-trial',
+    },
+    {
       id: '1',
       name: 'Solo Practitioner',
       price: '$79',
@@ -60,7 +80,7 @@ const PricingSection = () => {
       ],
       featured: true,
       cta_text: 'Start Free Trial',
-      cta_url: 'https://au.antsa.ai/sign-in',
+      cta_url: '/free-trial',
     },
     {
       id: '2',
@@ -170,7 +190,7 @@ const PricingSection = () => {
             const isContact = !hasPrice;
 
             return (
-              <Col xs={24} sm={24} md={8} key={plan.id}>
+              <Col xs={24} sm={12} md={6} key={plan.id}>
                 <Card
                   className="reveal"
                   style={{
@@ -277,7 +297,7 @@ const PricingSection = () => {
                         border: plan.featured ? 'none' : '2px solid #e2e8f0',
                         color: plan.featured ? '#ffffff' : '#0f172a',
                       }}
-                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry' : 'https://au.antsa.ai/sign-in')}
+                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry' : '/free-trial')}
                     >
                       {plan.cta_text}
                     </Button>
