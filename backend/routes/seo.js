@@ -219,6 +219,147 @@ function buildSitemapXml() {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
+function escapeHtml(value) {
+  if (value == null) return '';
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Build a human-readable HTML block for the page body. React replaces #root on
+// mount, so this is only seen by non-JS clients (LLM fetchers, link previewers,
+// archive bots). Generated live from the CMS so admin edits show up immediately.
+export function buildSeoBodyHtml(sections, helpArticles = []) {
+  const hero = sections.find((s) => s.name === 'hero')?.content || {};
+  const heroTitle = stripHtml(hero.title) || 'ANTSA — Digital Mental Health Platform';
+  const heroDescription = stripHtml(hero.description) || '';
+
+  const out = [];
+  out.push('<main>');
+  out.push(`<header><h1>${escapeHtml(heroTitle)}</h1>`);
+  if (heroDescription) out.push(`<p>${escapeHtml(heroDescription)}</p>`);
+  out.push('<nav><ul>');
+  for (const r of STATIC_ROUTES) {
+    out.push(`<li><a href="${r.path}">${escapeHtml(r.title)}</a></li>`);
+  }
+  out.push('<li><a href="mailto:admin@antsa.com.au">Contact ANTSA</a></li>');
+  out.push('</ul></nav></header>');
+
+  for (const section of sections) {
+    if (section.name === 'hero') continue;
+    const c = section.content || {};
+    const title = stripHtml(c.title);
+    const subtitle = stripHtml(c.subtitle);
+    const description = stripHtml(c.description);
+
+    if (!title && !subtitle && !description && !section.features?.length && !section.pricing?.length && !section.team?.length && !section.faqs?.length) {
+      continue;
+    }
+
+    out.push('<section>');
+    if (title) out.push(`<h2>${escapeHtml(title)}</h2>`);
+    if (subtitle) out.push(`<p><em>${escapeHtml(subtitle)}</em></p>`);
+    if (description) out.push(`<p>${escapeHtml(description)}</p>`);
+
+    if (section.features?.length) {
+      out.push('<ul>');
+      for (const f of section.features) {
+        out.push(`<li><strong>${escapeHtml(stripHtml(f.title))}</strong> — ${escapeHtml(stripHtml(f.description))}</li>`);
+      }
+      out.push('</ul>');
+    }
+
+    if (section.pricing?.length) {
+      out.push('<ul>');
+      for (const p of section.pricing) {
+        const period = p.period ? `/${stripHtml(p.period)}` : '';
+        out.push(`<li><strong>${escapeHtml(stripHtml(p.name))}</strong> — ${escapeHtml(stripHtml(p.price))}${escapeHtml(period)}`);
+        if (Array.isArray(p.features) && p.features.length) {
+          out.push('<ul>');
+          for (const feat of p.features) {
+            const text = stripHtml(typeof feat === 'string' ? feat : feat?.text || '');
+            if (text) out.push(`<li>${escapeHtml(text)}</li>`);
+          }
+          out.push('</ul>');
+        }
+        out.push('</li>');
+      }
+      out.push('</ul>');
+    }
+
+    if (section.team?.length) {
+      out.push('<ul>');
+      for (const m of section.team) {
+        out.push(`<li><strong>${escapeHtml(stripHtml(m.name))}</strong> — ${escapeHtml(stripHtml(m.role))}${m.bio ? `. ${escapeHtml(stripHtml(m.bio))}` : ''}</li>`);
+      }
+      out.push('</ul>');
+    }
+
+    if (section.testimonials?.length) {
+      out.push('<ul>');
+      for (const t of section.testimonials) {
+        out.push(`<li>"${escapeHtml(stripHtml(t.content))}" — ${escapeHtml(stripHtml(t.name))}${t.role ? `, ${escapeHtml(stripHtml(t.role))}` : ''}</li>`);
+      }
+      out.push('</ul>');
+    }
+
+    if (section.faqs?.length) {
+      out.push('<dl>');
+      for (const f of section.faqs) {
+        out.push(`<dt>${escapeHtml(stripHtml(f.question))}</dt>`);
+        out.push(`<dd>${escapeHtml(stripHtml(f.answer))}</dd>`);
+      }
+      out.push('</dl>');
+    }
+
+    out.push('</section>');
+  }
+
+  if (helpArticles.length) {
+    out.push('<section><h2>Help Centre</h2><ul>');
+    for (const a of helpArticles) {
+      const title = stripHtml(a.title);
+      const body = stripHtml(a.content);
+      if (!title) continue;
+      out.push(`<li><strong>${escapeHtml(title)}</strong>${body ? ` — ${escapeHtml(body.slice(0, 400))}` : ''}</li>`);
+    }
+    out.push('</ul></section>');
+  }
+
+  out.push('<footer><p>ANTSA Pty Ltd · <a href="https://antsa.ai/">antsa.ai</a> · <a href="mailto:admin@antsa.com.au">admin@antsa.com.au</a></p></footer>');
+  out.push('</main>');
+  return out.join('');
+}
+
+// FAQPage JSON-LD — high signal for LLMs and Google rich results.
+export function buildFaqJsonLd(sections) {
+  const all = [];
+  for (const s of sections) {
+    if (Array.isArray(s.faqs)) {
+      for (const f of s.faqs) {
+        const q = stripHtml(f.question);
+        const a = stripHtml(f.answer);
+        if (q && a) all.push({ q, a });
+      }
+    }
+  }
+  if (!all.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: all.map(({ q, a }) => ({
+      '@type': 'Question',
+      name: q,
+      acceptedAnswer: { '@type': 'Answer', text: a },
+    })),
+  };
+}
+
+export { loadAllSections, loadHelpArticles };
+
 function buildRobotsTxt() {
   return [
     'User-agent: *',

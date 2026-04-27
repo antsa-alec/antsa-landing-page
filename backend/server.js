@@ -10,7 +10,8 @@ import documentRoutes from './routes/documents.js';
 import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
-import seoRoutes from './routes/seo.js';
+import seoRoutes, { buildSeoBodyHtml, buildFaqJsonLd, loadAllSections, loadHelpArticles } from './routes/seo.js';
+import { readFileSync } from 'fs';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -84,11 +85,44 @@ app.use('/', seoRoutes);
 // Serve static files from the dist directory (production)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '..', 'dist');
-  app.use(express.static(distPath));
-  
-  // Handle client-side routing - serve index.html for all non-API routes
+  // index: false so GET / falls through to our injection handler instead of
+  // serving the un-injected dist/index.html.
+  app.use(express.static(distPath, { index: false }));
+
+  // Cache the built shell once. We only re-render the injected body per request,
+  // not the file read.
+  let cachedShell = null;
+  const getShell = () => {
+    if (!cachedShell) cachedShell = readFileSync(path.join(distPath, 'index.html'), 'utf8');
+    return cachedShell;
+  };
+
+  // Inject live CMS content into the body so non-JS clients (LLM fetchers,
+  // link previewers, archive bots) see meaningful content. React replaces
+  // #root on mount, so users see no difference. Content reflects the latest
+  // CMS edits because it's read from the DB on every request.
   app.get('*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
+    try {
+      const sections = loadAllSections();
+      const helpArticles = loadHelpArticles();
+      const bodyHtml = buildSeoBodyHtml(sections, helpArticles);
+      const faqLd = buildFaqJsonLd(sections);
+
+      let html = getShell()
+        .replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+
+      if (faqLd) {
+        const faqScript = `<script type="application/ld+json">${JSON.stringify(faqLd)}</script>`;
+        html = html.replace('</head>', `${faqScript}</head>`);
+      }
+
+      res.set('Content-Type', 'text/html; charset=utf-8');
+      res.set('Cache-Control', 'public, max-age=300');
+      res.send(html);
+    } catch (err) {
+      console.error('SSR injection failed, serving plain shell:', err);
+      res.sendFile(path.join(distPath, 'index.html'));
+    }
   });
 }
 
