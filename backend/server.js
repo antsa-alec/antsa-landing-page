@@ -10,6 +10,7 @@ import documentRoutes from './routes/documents.js';
 import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
+import seoRoutes from './routes/seo.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -74,6 +75,11 @@ app.use('/api/contact', contactRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// SEO/discovery routes — served at root so crawlers and LLM agents can find them
+// at the conventional locations (/llms.txt, /robots.txt, /sitemap.xml).
+// These are generated dynamically from the CMS so they reflect live content.
+app.use('/', seoRoutes);
 
 // Serve static files from the dist directory (production)
 if (process.env.NODE_ENV === 'production') {

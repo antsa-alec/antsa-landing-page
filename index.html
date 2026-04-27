@@ -4,8 +4,85 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="ANTSA - Australian-built digital mental health system designed to support safe, supervised care between appointments." />
-    <title>ANTSA - Digital Mental Health Platform</title>
+    <meta name="theme-color" content="#48abe2" />
+    <link rel="canonical" href="https://antsa.ai/" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
+    <link rel="alternate" type="text/plain" title="Machine-readable site summary" href="/llms.txt" />
+
+    <title>ANTSA — Digital Mental Health Platform for Practitioners</title>
+    <meta
+      name="description"
+      content="ANTSA is an Australian-built digital mental health platform that keeps practitioners in the loop between sessions. Clinically governed AI, mood tracking, homework, video sessions, and AI-assisted clinical documentation for psychologists, therapists, and counsellors."
+    />
+    <meta
+      name="keywords"
+      content="digital mental health, mental health platform, practitioner software, psychology software, therapy platform, between-session care, clinical AI, AI therapist, ANTSA, jAImee, Australian mental health"
+    />
+    <meta name="author" content="ANTSA Pty Ltd" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ANTSA" />
+    <meta property="og:title" content="ANTSA — Digital Mental Health Platform for Practitioners" />
+    <meta
+      property="og:description"
+      content="Australian-built digital mental health platform that keeps practitioners in the loop between sessions. Clinically governed AI, mood tracking, homework, video sessions, and AI-assisted clinical notes."
+    />
+    <meta property="og:url" content="https://antsa.ai/" />
+    <meta property="og:image" content="https://antsa.ai/LOGO-BLACK.png" />
+    <meta property="og:locale" content="en_AU" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ANTSA — Digital Mental Health Platform for Practitioners" />
+    <meta
+      name="twitter:description"
+      content="Australian-built digital mental health platform that keeps practitioners in the loop between sessions."
+    />
+    <meta name="twitter:image" content="https://antsa.ai/LOGO-BLACK.png" />
+
+    <!-- Structured data: Organization + SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://antsa.ai/#organization",
+          "name": "ANTSA",
+          "legalName": "ANTSA Pty Ltd",
+          "url": "https://antsa.ai/",
+          "logo": "https://antsa.ai/LOGO-BLACK.png",
+          "email": "admin@antsa.com.au",
+          "description": "Australian-built digital mental health platform connecting practitioners and clients with clinically governed AI, mood tracking, homework, messaging, and video sessions.",
+          "areaServed": ["AU", "US", "GB"],
+          "sameAs": ["https://antsa.com.au"]
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "ANTSA Platform",
+          "applicationCategory": "HealthApplication",
+          "operatingSystem": "Web, iOS, Android",
+          "description": "Digital mental health platform for practitioners and clients. Includes practitioner web app, client mobile app, AI assistant (jAImee), video sessions, and AI-assisted clinical documentation.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "AUD",
+            "description": "Free trial available"
+          },
+          "publisher": { "@id": "https://antsa.ai/#organization" }
+        },
+        {
+          "@type": "WebSite",
+          "url": "https://antsa.ai/",
+          "name": "ANTSA",
+          "publisher": { "@id": "https://antsa.ai/#organization" }
+        }
+      ]
+    }
+    </script>
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-207E2PQKJN"></script>
     <script>
@@ -20,4 +97,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
