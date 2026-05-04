@@ -26,14 +26,19 @@ async function seed() {
     // =========================================================================
     const sections = [
       { name: 'hero', order_index: 1 },
-      { name: 'the-shift', order_index: 2 },
-      { name: 'the-antsa', order_index: 3 },
-      { name: 'features', order_index: 4 },
-      { name: 'team', order_index: 5 },
-      { name: 'pricing', order_index: 6 },
-      { name: 'faq', order_index: 7 },
-      { name: 'compliance', order_index: 8 },
-      { name: 'footer', order_index: 9 },
+      { name: 'trust_strip', order_index: 2 },
+      { name: 'why_switch', order_index: 3 },
+      { name: 'everything_one_login', order_index: 4 },
+      { name: 'the-shift', order_index: 5 },
+      { name: 'the-antsa', order_index: 6 },
+      { name: 'features', order_index: 7 },
+      { name: 'team', order_index: 8 },
+      { name: 'pricing', order_index: 9 },
+      { name: 'faq', order_index: 10 },
+      { name: 'for_clinics', order_index: 11 },
+      { name: 'testimonials', order_index: 12 },
+      { name: 'compliance', order_index: 13 },
+      { name: 'footer', order_index: 14 },
     ];
 
     const sectionStmt = db.prepare(`
@@ -47,7 +52,7 @@ async function seed() {
     });
 
     // Disable old sections that are no longer used
-    const oldSections = ['testimonials', 'contact', 'why-antsa'];
+    const oldSections = ['contact', 'why-antsa'];
     const disableStmt = db.prepare(`UPDATE sections SET enabled = 0 WHERE name = ?`);
     oldSections.forEach(name => disableStmt.run(name));
 
@@ -72,14 +77,30 @@ async function seed() {
     // =========================================================================
     const heroId = getSectionId('hero');
     const heroContent = [
-      { key: 'badge', value: 'AI-Powered Mental Health Platform', type: 'text' },
-      { key: 'title', value: 'Keeping mental health practitioners in the loop when care happens between sessions.', type: 'text' },
-      { key: 'title_highlights', value: JSON.stringify(['in the loop', 'between sessions']), type: 'json' },
-      { key: 'description', value: 'ANTSA is an Australian-built digital mental health system designed to support safe, supervised care between appointments. ANTSA brings AI within clinical governance, records, and duty-of-care frameworks, rather than leaving clients to use unregulated tools on their own.', type: 'text' },
-      { key: 'cta_primary', value: 'Start Your Free Trial', type: 'text' },
-      { key: 'cta_primary_url', value: 'https://au.antsa.ai/sign-in', type: 'text' },
+      { key: 'badge', value: 'BUILT BY CLINICIANS. TRUSTED BY PRACTITIONERS', type: 'text' },
+      {
+        key: 'title',
+        value: 'Support clients between sessions. Reduce admin. One system built for practitioners.',
+        type: 'text',
+      },
+      { key: 'title_highlights', value: JSON.stringify(['Reduce admin.']), type: 'json' },
+      {
+        key: 'description',
+        value:
+          'ANTSA combines client engagement tools, AI documentation, telehealth, reminders, questionnaires and practitioner-visible AI support in one secure Australian system.',
+        type: 'text',
+      },
+      { key: 'cta_primary', value: 'Start Free Trial', type: 'text' },
+      { key: 'cta_primary_url', value: '/free-trial', type: 'text' },
       { key: 'cta_secondary', value: 'Book a Demo', type: 'text' },
-      { key: 'cta_secondary_url', value: 'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo%20of%20the%20ANTSA%20platform.%0A%0APlease%20let%20me%20know%20your%20available%20times.%0A%0AThanks!', type: 'text' },
+      {
+        key: 'cta_secondary_url',
+        value:
+          'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo%20of%20the%20ANTSA%20platform.%0A%0APlease%20let%20me%20know%20your%20available%20times.%0A%0AThanks!',
+        type: 'text',
+      },
+      { key: 'hero_desktop_image', value: '/landing/hero-dashboard.svg', type: 'text' },
+      { key: 'hero_mobile_image', value: '/landing/hero-phone.svg', type: 'text' },
     ];
 
     heroContent.forEach(item => {
@@ -87,6 +108,132 @@ async function seed() {
     });
 
     console.log('✅ Seeded hero content');
+
+    // =========================================================================
+    // TRUST STRIP
+    // =========================================================================
+    const trustStripId = getSectionId('trust_strip');
+    db.prepare('DELETE FROM content WHERE section_id = ?').run(trustStripId);
+    const trustJson = JSON.stringify([
+      { label: 'Australian Hosted', icon: 'GlobalOutlined' },
+      { label: 'Built by Clinicians', icon: 'MedicineBoxOutlined' },
+      { label: 'HIPAA & APP Aligned', icon: 'SafetyCertificateOutlined' },
+      { label: 'No Lock-In', icon: 'UnlockOutlined' },
+      { label: 'Unlimited Clients', icon: 'TeamOutlined' },
+    ]);
+    contentStmt.run(trustStripId, 'items', trustJson, 'json');
+    console.log('✅ Seeded trust strip');
+
+    // =========================================================================
+    // WHY SWITCH (5 cards)
+    // =========================================================================
+    const whyId = getSectionId('why_switch');
+    contentStmt.run(whyId, 'badge', 'WHY PRACTITIONERS SWITCH TO ANTSA', 'text');
+    contentStmt.run(whyId, 'title', 'Why practitioners switch', 'text');
+    contentStmt.run(
+      whyId,
+      'subtitle',
+      'One platform aligned to how modern mental health practice actually works.',
+      'text',
+    );
+    db.prepare('DELETE FROM feature_items WHERE section_id = ?').run(whyId);
+    const whyItems = [
+      ['Less Admin', 'AI scribe, automated session summaries, and structured templates cut documentation time so you can focus on clients.', 'FileTextOutlined', '#48abe2', 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)', 1],
+      ['Better Client Engagement', 'Homework, journaling, messaging, and ANTSAbot keep clients connected between sessions — all visible to you.', 'TeamOutlined', '#10b981', 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 2],
+      ['Fewer Subscriptions', 'Telehealth, forms, mood tracking, and notes in one login instead of stitching tools together.', 'AppstoreOutlined', '#8b5cf6', 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', 3],
+      ['Stay In The Loop', 'See between-session activity, mood trends, and alerts so nothing important is missed.', 'EyeOutlined', '#f59e0b', 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', 4],
+      ['Secure & Compliant', 'Australian hosting, clinical governance, and privacy-aligned design built for health professionals.', 'SafetyOutlined', '#06b6d4', 'linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)', 5],
+    ];
+    const whyStmt = db.prepare(`
+      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const row of whyItems) {
+      whyStmt.run(whyId, row[0], row[1], row[2], row[3], row[4], row[5], null);
+    }
+    console.log('✅ Seeded why_switch');
+
+    // =========================================================================
+    // EVERYTHING ONE LOGIN (tiles with images)
+    // =========================================================================
+    const eolId = getSectionId('everything_one_login');
+    contentStmt.run(eolId, 'badge', 'EVERYTHING IN ONE LOGIN', 'text');
+    contentStmt.run(eolId, 'title', 'Your whole practice stack, unified', 'text');
+    contentStmt.run(
+      eolId,
+      'subtitle',
+      'Dashboard, client app, telehealth, AI notes, and outcomes — without tab overload.',
+      'text',
+    );
+    db.prepare('DELETE FROM feature_items WHERE section_id = ?').run(eolId);
+    const eolTiles = [
+      ['Practitioner Dashboard', "See what's happening between sessions.", 'DashboardOutlined', '#48abe2', 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)', 1, '/landing/tile-dashboard.svg'],
+      ['Client App', 'Engage and support clients anytime, anywhere.', 'MobileOutlined', '#10b981', 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', 2, '/landing/tile-client-app.svg'],
+      ['Telehealth', 'Built-in secure video for every session.', 'VideoCameraOutlined', '#8b5cf6', 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)', 3, '/landing/tile-telehealth.svg'],
+      ['AI Scribe & Notes', 'Automated notes and session summaries.', 'EditOutlined', '#f59e0b', 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)', 4, '/landing/tile-ai-scribe.svg'],
+      ['Mood Tracking', 'Monitor progress and identify patterns early.', 'LineChartOutlined', '#06b6d4', 'linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)', 5, '/landing/tile-mood.svg'],
+    ];
+    const eolStmt = db.prepare(`
+      INSERT INTO feature_items (section_id, title, description, icon, color, gradient, order_index, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const t of eolTiles) {
+      eolStmt.run(eolId, t[0], t[1], t[2], t[3], t[4], t[5], t[6]);
+    }
+    console.log('✅ Seeded everything_one_login');
+
+    // =========================================================================
+    // FOR CLINICS
+    // =========================================================================
+    const fcId = getSectionId('for_clinics');
+    contentStmt.run(fcId, 'title', 'For Clinics & Enterprises', 'text');
+    contentStmt.run(
+      fcId,
+      'subtitle',
+      'Need multi-practitioner access, reporting, integrations or enterprise rollout? ANTSA scales with your organisation.',
+      'text',
+    );
+    contentStmt.run(
+      fcId,
+      'checklist',
+      JSON.stringify([
+        'Role-based access',
+        'Advanced reporting',
+        'Integrations & API access',
+        'Dedicated onboarding',
+      ]),
+      'json',
+    );
+    contentStmt.run(fcId, 'cta_label', 'Talk to Us', 'text');
+    contentStmt.run(fcId, 'cta_href', 'mailto:admin@antsa.com.au?subject=Enterprise%20ANTSA', 'text');
+    console.log('✅ Seeded for_clinics');
+
+    // =========================================================================
+    // TESTIMONIALS (section enabled — carousel content)
+    // =========================================================================
+    const testimonialsSectionId = getSectionId('testimonials');
+    db.prepare('UPDATE sections SET enabled = 1 WHERE id = ?').run(testimonialsSectionId);
+    db.prepare('DELETE FROM testimonials WHERE section_id = ?').run(testimonialsSectionId);
+    contentStmt.run(testimonialsSectionId, 'badge', 'TRUSTED BY PRACTITIONERS', 'text');
+    contentStmt.run(testimonialsSectionId, 'title', 'Trusted by practitioners', 'text');
+    contentStmt.run(
+      testimonialsSectionId,
+      'subtitle',
+      'Teams use ANTSA to stay connected to clients and reduce administrative load.',
+      'text',
+    );
+    db.prepare(`
+      INSERT INTO testimonials (section_id, name, role, content, rating, order_index)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(
+      testimonialsSectionId,
+      'Psychologist',
+      'Private Practice',
+      'ANTSA has transformed the way I support my clients between sessions. I save time, stay in the loop, and my clients feel more supported.',
+      5,
+      1,
+    );
+    console.log('✅ Seeded testimonials');
 
     // =========================================================================
     // THE SHIFT SECTION
@@ -287,8 +434,8 @@ async function seed() {
 
     const features = [
       {
-        title: 'Clinician-Overseen AI Chatbot',
-        description: 'Assign the ANTSA chatbot to support clients between sessions as part of your treatment plan. It is activated by you and aligned to the client\u2019s goals and current needs.\n\nClients are informed that interactions form part of the clinical record and are visible to you. You can review conversations, provide feedback, and refine how the chatbot responds over time to ensure it operates within your clinical parameters.\n\nAll conversations sit within the client record. The chatbot does not diagnose, replace therapy, or function independently of your oversight. It extends structured support while keeping the practitioner in the loop.',
+        title: 'Clinician-Overseen ANTSAbot',
+        description: 'Assign ANTSAbot to support clients between sessions as part of your treatment plan. It is activated by you and aligned to the client\u2019s goals and current needs.\n\nClients are informed that interactions form part of the clinical record and are visible to you. You can review conversations, provide feedback, and refine how ANTSAbot responds over time to ensure it operates within your clinical parameters.\n\nAll conversations sit within the client record. ANTSAbot does not diagnose, replace therapy, or function independently of your oversight. It extends structured support while keeping the practitioner in the loop.',
         icon: 'RobotOutlined',
         color: '#48abe2',
         gradient: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
@@ -467,7 +614,7 @@ async function seed() {
         featured: 1,
         features: JSON.stringify([
           'Full platform access',
-          'Clinician-Overseen AI Chatbot',
+          'Clinician-Overseen ANTSAbot',
           'Practitioner AI Assistant',
           'AI Scribe & Templates',
           'Telehealth & Session Summaries',
@@ -586,7 +733,7 @@ async function seed() {
         order_index: 9,
       },
       {
-        question: 'Can ANTSA be used without assigning the AI chatbot?',
+        question: 'Can ANTSA be used without assigning ANTSAbot?',
         answer: 'Yes. All AI-assisted components are practitioner-assigned. The system can be used for engagement, mood tracking, telehealth, and documentation without AI support if preferred.',
         order_index: 10,
       },

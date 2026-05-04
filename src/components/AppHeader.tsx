@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
-import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { MenuOutlined, CloseOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import antsaIcon from '../assets/antsa-icon.png';
 
 const { Header } = Layout;
 
 const SIGNUP_URL = '/free-trial';
 const SIGNIN_URL = 'https://au.antsa.ai/sign-in';
+const DEMO_MAIL =
+  'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo.';
 
-/** Prefix anchor links with / when not on the homepage so they navigate back */
 const sectionHref = (hash: string) => {
   if (typeof window !== 'undefined' && window.location.pathname !== '/') {
     return `/${hash}`;
@@ -17,46 +17,45 @@ const sectionHref = (hash: string) => {
   return hash;
 };
 
-/**
- * APP HEADER - Clean navigation with logo
- * Responsive mobile menu
- */
 const AppHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const menuItems: MenuProps['items'] = [
-    {
-      key: 'home',
-      label: <a href={sectionHref('#hero')} onClick={(e) => { if (window.location.pathname === '/') { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); } }}>Home</a>,
-    },
-    {
-      key: 'the-shift',
-      label: <a href={sectionHref('#the-shift')}>The Shift</a>,
-    },
-    {
-      key: 'the-antsa',
-      label: <a href={sectionHref('#the-antsa')}>The ANTSA</a>,
-    },
+  const desktopNav: MenuProps['items'] = [
     {
       key: 'features',
-      label: <a href={sectionHref('#features')}>Features</a>,
+      label: <a href={sectionHref('#why-switch')}>Features</a>,
     },
     {
-      key: 'team',
-      label: <a href={sectionHref('#team')}>Our Team</a>,
+      key: 'for-clinics',
+      label: <a href={sectionHref('#for-clinics')}>For Clinics</a>,
     },
     {
       key: 'pricing',
       label: <a href={sectionHref('#pricing')}>Pricing</a>,
     },
     {
-      key: 'faq',
-      label: <a href={sectionHref('#faq')}>FAQ</a>,
+      key: 'about',
+      label: <a href={sectionHref('#team')}>About Us</a>,
     },
     {
-      key: 'help',
-      label: <a href="/help">Help Centre</a>,
+      key: 'resources',
+      label: 'Resources',
+      children: [
+        { key: 'faq', label: <a href={sectionHref('#faq')}>FAQ</a> },
+        { key: 'help', label: <a href="/help">Help Centre</a> },
+        { key: 'team', label: <a href={sectionHref('#team')}>Our Team</a> },
+        { key: 'the-shift', label: <a href={sectionHref('#the-shift')}>The Shift</a> },
+        { key: 'the-antsa', label: <a href={sectionHref('#the-antsa')}>The ANTSA</a> },
+      ],
     },
+  ];
+
+  const mobileItems: MenuProps['items'] = [
+    ...desktopNav,
+    { type: 'divider' },
+    { key: 'login', label: <a href={SIGNIN_URL}>Log In</a> },
+    { key: 'trial', label: <a href={SIGNUP_URL}>Start Free Trial</a> },
+    { key: 'demo', label: <a href={DEMO_MAIL}>Book a Demo</a> },
   ];
 
   return (
@@ -69,170 +68,99 @@ const AppHeader = () => {
           right: 0,
           zIndex: 1000,
           background: '#ffffff',
-          boxShadow: '0 1px 0 rgba(0, 0, 0, 0.05)',
-          padding: '0 24px',
+          boxShadow: '0 1px 0 rgba(0, 0, 0, 0.06)',
+          padding: '0 20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           height: '70px',
         }}
       >
-        {/* Logo */}
-        <div
+        <a
+          href={sectionHref('#hero')}
           style={{
             display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            cursor: 'pointer',
+            flexDirection: 'column',
+            lineHeight: 1.1,
+            textDecoration: 'none',
           }}
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={(e) => {
+            if (window.location.pathname === '/') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
         >
-          <img 
-            src={antsaIcon} 
-            alt="ANTSA" 
+          <span
             style={{
-              height: '40px',
-              width: '40px',
-              borderRadius: '10px',
-              objectFit: 'contain',
+              fontWeight: 800,
+              fontSize: '1.35rem',
+              color: '#48abe2',
+              letterSpacing: '-0.02em',
             }}
-          />
-        </div>
+          >
+            antsa
+          </span>
+          <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.08em' }}>
+            FOR PROFESSIONALS
+          </span>
+        </a>
 
-        {/* Desktop Navigation */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '32px',
+            gap: 16,
           }}
         >
           <Menu
             mode="horizontal"
             disabledOverflow
-            items={menuItems}
+            items={desktopNav}
             style={{
               border: 'none',
               background: 'transparent',
-              fontSize: '15px',
+              fontSize: '14px',
               fontWeight: 500,
+              minWidth: 0,
             }}
             className="desktop-menu"
           />
 
-          {/* Auth Buttons */}
-          <div
-            style={{
-              display: 'flex',
-              gap: '12px',
-            }}
-            className="desktop-auth"
-          >
-            <Button
-              type="text"
-              style={{
-                fontSize: '15px',
-                fontWeight: 500,
-                color: '#0f172a',
-              }}
-              href={SIGNIN_URL}
-            >
-              Sign In
+          <div className="desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Button type="link" href={SIGNIN_URL} style={{ color: '#0f172a', fontWeight: 500, padding: '0 8px' }}>
+              Log In
             </Button>
-            <Button
-              type="primary"
-              style={{
-                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                border: 'none',
-                fontSize: '15px',
-                fontWeight: 500,
-                borderRadius: '8px',
-                height: '40px',
-                padding: '0 24px',
-              }}
-              href={SIGNUP_URL}
-            >
-              Sign Up
+            <Button type="primary" href={SIGNUP_URL} style={{ background: '#48abe2', borderColor: '#48abe2', fontWeight: 600 }}>
+              Start Free Trial
+            </Button>
+            <Button icon={<CalendarOutlined />} href={DEMO_MAIL} style={{ borderColor: '#48abe2', color: '#48abe2', fontWeight: 600 }}>
+              Book a Demo
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
           <Button
             className="mobile-menu-button"
             type="text"
             icon={<MenuOutlined style={{ fontSize: '20px' }} />}
             onClick={() => setMobileMenuOpen(true)}
-            style={{
-              display: 'none',
-            }}
+            style={{ display: 'none' }}
           />
         </div>
       </Header>
 
-      {/* Mobile Drawer Menu */}
       <Drawer
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <img 
-              src={antsaIcon} 
-              alt="ANTSA" 
-              style={{
-                height: '32px',
-                width: '32px',
-                borderRadius: '6px',
-                objectFit: 'contain',
-              }}
-            />
-          </div>
-        }
+        title={<span style={{ fontWeight: 700, color: '#48abe2' }}>antsa</span>}
         placement="right"
         onClose={() => setMobileMenuOpen(false)}
         open={mobileMenuOpen}
         closeIcon={<CloseOutlined />}
       >
-        <Menu
-          mode="vertical"
-          items={menuItems}
-          style={{
-            border: 'none',
-            fontSize: '16px',
-          }}
-          onClick={() => setMobileMenuOpen(false)}
-        />
-        <div style={{ marginTop: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <Button
-            type="text"
-            block
-            style={{
-              fontSize: '16px',
-              fontWeight: 500,
-              height: '48px',
-            }}
-            href={SIGNIN_URL}
-          >
-            Sign In
-          </Button>
-          <Button
-            type="primary"
-            block
-            style={{
-              background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-              border: 'none',
-              fontSize: '16px',
-              fontWeight: 500,
-              height: '48px',
-              borderRadius: '8px',
-            }}
-            href={SIGNUP_URL}
-          >
-            Sign Up
-          </Button>
-        </div>
+        <Menu mode="vertical" items={mobileItems} style={{ border: 'none' }} onClick={() => setMobileMenuOpen(false)} />
       </Drawer>
 
-      {/* Responsive Styles */}
       <style>{`
-        @media (max-width: 992px) {
+        @media (max-width: 1100px) {
           .desktop-menu,
           .desktop-auth {
             display: none !important;
@@ -241,18 +169,10 @@ const AppHeader = () => {
             display: inline-flex !important;
           }
         }
-
         .ant-menu-horizontal .ant-menu-item,
         .ant-menu-horizontal .ant-menu-submenu {
           border-bottom: none !important;
         }
-
-        .ant-menu-horizontal .ant-menu-item:hover,
-        .ant-menu-horizontal .ant-menu-item-selected {
-          color: #48abe2 !important;
-          border-bottom: none !important;
-        }
-
         .ant-menu-horizontal .ant-menu-item::after {
           display: none !important;
         }

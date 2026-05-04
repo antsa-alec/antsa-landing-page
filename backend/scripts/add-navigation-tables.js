@@ -137,12 +137,12 @@ try {
       `);
 
       const defaultFaqs = [
-        ['What is ANTSA?', 'ANTSA is an AI-powered mental health platform that connects practitioners with clients. It includes tools like jAImee (our AI chatbot), AI Scribe for session transcription, and comprehensive practitioner dashboards.', 1],
+        ['What is ANTSA?', 'ANTSA is an AI-powered mental health platform that connects practitioners with clients. It includes tools like ANTSAbot (our AI assistant), AI Scribe for session transcription, and comprehensive practitioner dashboards.', 1],
         ['How does the free trial work?', 'Our 30-day free trial gives you full access to all features with no credit card required. You can add unlimited clients, use all AI features, and experience the full platform before deciding on a paid plan.', 2],
         ['Is my data secure?', 'Absolutely. All data is encrypted and securely hosted on Australian servers. We comply with Australian privacy laws and healthcare data regulations to ensure your client information is protected.', 3],
         ['Can I cancel anytime?', 'Yes, there are no minimum terms or lock-in contracts. You can cancel your subscription at any time, and you\'ll continue to have access until the end of your billing period.', 4],
         ['What support do you offer?', 'We offer email support for all plans, with priority support for paid subscribers. Clinic owners also get a dedicated account manager for personalized assistance.', 5],
-        ['How does jAImee work?', 'jAImee is our AI mental health assistant that provides 24/7 support to clients between sessions. It uses evidence-based conversations and is overseen by practitioners to ensure quality care.', 6],
+        ['How does ANTSAbot work?', 'ANTSAbot is our AI mental health assistant that provides 24/7 support to clients between sessions. It uses evidence-based conversations and is overseen by practitioners to ensure quality care.', 6],
       ];
 
       defaultFaqs.forEach(([question, answer, order]) => {
@@ -220,7 +220,7 @@ try {
       insertLink.run('Features', '#features', 1, productCat.id);
       insertLink.run('Pricing', '#pricing', 2, productCat.id);
       insertLink.run('AI Scribe', '#features', 3, productCat.id);
-      insertLink.run('jAImee', '#features', 4, productCat.id);
+      insertLink.run('ANTSAbot', '#features', 4, productCat.id);
     }
 
     if (companyCat) {

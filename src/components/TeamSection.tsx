@@ -143,16 +143,7 @@ const TeamSection = () => {
             }}
           >
             Meet the{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              experts
-            </span>{' '}
+            <span style={{ color: '#48abe2' }}>experts</span>{' '}
             behind ANTSA.
           </Title>
           <Paragraph
@@ -200,7 +191,7 @@ const TeamSection = () => {
                             borderRadius: '50%',
                             background: photoSrc
                               ? `url(${photoSrc}) center/cover`
-                              : 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                              : '#48abe2',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',

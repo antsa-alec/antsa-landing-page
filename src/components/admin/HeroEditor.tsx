@@ -28,7 +28,13 @@ const HeroEditor = ({ auth }: HeroEditorProps) => {
           badge: data.content.badge || '',
           title: data.content.title || '',
           subtitle: data.content.subtitle || '',
+          title_highlights:
+            typeof data.content.title_highlights === 'string'
+              ? data.content.title_highlights
+              : JSON.stringify(data.content.title_highlights || []),
           description: data.content.description || '',
+          hero_desktop_image: data.content.hero_desktop_image || '',
+          hero_mobile_image: data.content.hero_mobile_image || '',
           cta_primary: data.content.cta_primary || '',
           cta_primary_url: data.content.cta_primary_url || '',
           cta_secondary: data.content.cta_secondary || '',
@@ -54,13 +60,24 @@ const HeroEditor = ({ auth }: HeroEditorProps) => {
   const handleSave = async (values: any) => {
     setSaving(true);
     try {
+      let highlights: string[] = [];
+      if (values.title_highlights) {
+        try {
+          highlights = JSON.parse(values.title_highlights);
+        } catch {
+          message.error('Title highlights must be valid JSON array');
+          setSaving(false);
+          return;
+        }
+      }
+      const content = { ...values, title_highlights: highlights };
       const response = await fetch(`${API_BASE_URL}/content/section/hero`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${auth.token}`,
         },
-        body: JSON.stringify({ content: values }),
+        body: JSON.stringify({ content }),
       });
 
       if (response.ok) {
@@ -107,6 +124,27 @@ const HeroEditor = ({ auth }: HeroEditorProps) => {
           tooltip="The primary headline"
         >
           <Input placeholder="Transform Mental Healthcare" size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Title highlights (JSON array of phrases to color)"
+          name="title_highlights"
+        >
+          <Input placeholder='["Reduce admin."]' size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Hero desktop image URL"
+          name="hero_desktop_image"
+        >
+          <Input placeholder="/landing/hero-dashboard.svg" size="large" />
+        </Form.Item>
+
+        <Form.Item
+          label="Hero phone image URL"
+          name="hero_mobile_image"
+        >
+          <Input placeholder="/landing/hero-phone.svg" size="large" />
         </Form.Item>
 
         <Form.Item

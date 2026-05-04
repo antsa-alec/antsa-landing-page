@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="560" viewBox="0 0 280 560" fill="none">
+  <rect x="16" y="24" width="248" height="512" rx="36" fill="#0F172A"/>
+  <rect x="28" y="48" width="224" height="464" rx="24" fill="#F8FAFC"/>
+  <text x="140" y="88" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#0F172A">Daily Check-in</text>
+  <circle cx="100" cy="140" r="16" fill="#FBBF24"/>
+  <circle cx="140" cy="140" r="16" fill="#34D399"/>
+  <circle cx="180" cy="140" r="16" fill="#48ABE2"/>
+  <rect x="48" y="200" width="184" height="44" rx="8" fill="#EEF2FF" stroke="#C7D2FE"/>
+  <text x="140" y="228" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" fill="#3730A3">Today&apos;s tasks</text>
+  <rect x="48" y="260" width="184" height="36" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="48" y="306" width="184" height="36" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="140" y="520" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#64748B">Client app preview</text>
+</svg>
