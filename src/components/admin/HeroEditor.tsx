@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, message, Spin, Space } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
+import ImageUploadField from './ImageUploadField';
 
 const { TextArea } = Input;
 
@@ -134,17 +135,29 @@ const HeroEditor = ({ auth }: HeroEditorProps) => {
         </Form.Item>
 
         <Form.Item
-          label="Hero desktop image URL"
+          label="Hero desktop image"
           name="hero_desktop_image"
+          tooltip="Recommended 1440×900 — used as the large product mockup on the right of the hero"
         >
-          <Input placeholder="/landing/hero-dashboard.svg" size="large" />
+          <ImageUploadField
+            sectionName="hero"
+            imageKey="hero_desktop_image"
+            token={auth.token}
+            placeholder="/landing/dashboard.png"
+          />
         </Form.Item>
 
         <Form.Item
-          label="Hero phone image URL"
+          label="Hero phone image"
           name="hero_mobile_image"
+          tooltip="Recommended 9:19 portrait — used as the floating phone mockup"
         >
-          <Input placeholder="/landing/hero-phone.svg" size="large" />
+          <ImageUploadField
+            sectionName="hero"
+            imageKey="hero_mobile_image"
+            token={auth.token}
+            placeholder="/landing/mobile-sign-in.png"
+          />
         </Form.Item>
 
         <Form.Item

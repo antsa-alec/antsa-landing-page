@@ -16,6 +16,7 @@ import {
   SafetyOutlined,
   DeploymentUnitOutlined,
   BankOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -30,6 +31,7 @@ import LegalPagesEditor from '../components/admin/LegalPagesEditor';
 import HelpCentreEditor from '../components/admin/HelpCentreEditor';
 import TrustStripEditor from '../components/admin/TrustStripEditor';
 import ForClinicsEditor from '../components/admin/ForClinicsEditor';
+import SectionsManager from '../components/admin/SectionsManager';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -126,6 +128,7 @@ const Admin = () => {
 
   const menuItems = [
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+    { key: 'sections', icon: <EyeOutlined />, label: 'Sections (visibility)' },
     { key: 'navigation', icon: <MenuOutlined />, label: 'Navigation' },
     { key: 'hero', icon: <RocketOutlined />, label: 'Hero Section' },
     { key: 'trust-strip', icon: <SafetyOutlined />, label: 'Trust strip' },
@@ -147,6 +150,8 @@ const Admin = () => {
     switch (selectedMenu) {
       case 'dashboard':
         return <DashboardView auth={authContext} />;
+      case 'sections':
+        return <SectionsManager auth={authContext} />;
       case 'navigation':
         return <NavigationEditor auth={authContext} />;
       case 'hero':

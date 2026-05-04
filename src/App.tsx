@@ -15,6 +15,7 @@ import ForClinicsBand from './components/ForClinicsBand';
 import TestimonialsSection from './components/TestimonialsSection';
 import ComplianceBadgesStrip from './components/ComplianceBadgesStrip';
 import AppFooter from './components/AppFooter';
+import Section from './components/Section';
 import './styles/global.css';
 
 const { Content } = Layout;
@@ -115,19 +116,19 @@ function App() {
       <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
         <AppHeader />
         <Content style={{ marginTop: '70px' }}>
-          <HeroSplit />
-          <TrustStrip />
-          <WhySwitchSection />
-          <EverythingOneLoginSection />
-          <TheShiftSection />
-          <TheAntsaSection />
-          <FeaturesSection />
-          <TeamSection />
-          <PricingSection />
-          <FAQSection />
-          <ForClinicsBand />
-          <TestimonialsSection />
-          <ComplianceBadgesStrip />
+          <Section name="hero"><HeroSplit /></Section>
+          <Section name="trust_strip"><TrustStrip /></Section>
+          <Section name="why_switch"><WhySwitchSection /></Section>
+          <Section name="everything_one_login"><EverythingOneLoginSection /></Section>
+          <Section name="the-shift"><TheShiftSection /></Section>
+          <Section name="the-antsa"><TheAntsaSection /></Section>
+          <Section name="features"><FeaturesSection /></Section>
+          <Section name="team"><TeamSection /></Section>
+          <Section name="pricing"><PricingSection /></Section>
+          <Section name="faq"><FAQSection /></Section>
+          <Section name="for_clinics"><ForClinicsBand /></Section>
+          <Section name="testimonials"><TestimonialsSection /></Section>
+          <Section name="compliance"><ComplianceBadgesStrip /></Section>
         </Content>
         <AppFooter />
       </Layout>

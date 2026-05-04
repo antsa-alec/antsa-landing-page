@@ -81,6 +81,60 @@ router.get('/', optionalAuth, (req, res) => {
   }
 });
 
+// Get section visibility map (public). Returns ALL sections regardless of
+// enabled flag so the frontend can decide what to render. Frontend gates
+// rendering on `enabled` here.
+router.get('/sections-meta', (req, res) => {
+  try {
+    const rows = db
+      .prepare('SELECT name, enabled, order_index FROM sections ORDER BY order_index')
+      .all();
+    res.json({
+      sections: rows.map((r) => ({
+        name: r.name,
+        enabled: !!r.enabled,
+        order_index: r.order_index,
+      })),
+    });
+  } catch (error) {
+    console.error('Get sections meta error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update a section's enabled/order (admin only).
+router.patch('/sections/:sectionName', authenticateToken, (req, res) => {
+  try {
+    const { sectionName } = req.params;
+    const { enabled, order_index } = req.body || {};
+    const sets = [];
+    const args = [];
+    if (typeof enabled === 'boolean' || enabled === 0 || enabled === 1) {
+      sets.push('enabled = ?');
+      args.push(enabled ? 1 : 0);
+    }
+    if (typeof order_index === 'number') {
+      sets.push('order_index = ?');
+      args.push(order_index);
+    }
+    if (!sets.length) {
+      return res.status(400).json({ error: 'Nothing to update' });
+    }
+    sets.push('updated_at = CURRENT_TIMESTAMP');
+    args.push(sectionName);
+    const r = db
+      .prepare(`UPDATE sections SET ${sets.join(', ')} WHERE name = ?`)
+      .run(...args);
+    if (r.changes === 0) {
+      return res.status(404).json({ error: 'Section not found' });
+    }
+    res.json({ message: 'Section updated' });
+  } catch (error) {
+    console.error('Patch section error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get content by section (public)
 router.get('/section/:sectionName', (req, res) => {
   try {
