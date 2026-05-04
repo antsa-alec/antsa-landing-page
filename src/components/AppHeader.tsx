@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined, CloseOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import antsaLogo from '../assets/antsa-logo.png';
 
 const { Header } = Layout;
 
@@ -80,8 +81,7 @@ const AppHeader = () => {
           href={sectionHref('#hero')}
           style={{
             display: 'flex',
-            flexDirection: 'column',
-            lineHeight: 1.1,
+            alignItems: 'center',
             textDecoration: 'none',
           }}
           onClick={(e) => {
@@ -90,20 +90,13 @@ const AppHeader = () => {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
           }}
+          aria-label="ANTSA For Professionals — home"
         >
-          <span
-            style={{
-              fontWeight: 800,
-              fontSize: '1.35rem',
-              color: '#48abe2',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            antsa
-          </span>
-          <span style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, letterSpacing: '0.08em' }}>
-            FOR PROFESSIONALS
-          </span>
+          <img
+            src={antsaLogo}
+            alt="ANTSA For Professionals"
+            style={{ height: 44, width: 'auto', display: 'block' }}
+          />
         </a>
 
         <div
@@ -150,7 +143,13 @@ const AppHeader = () => {
       </Header>
 
       <Drawer
-        title={<span style={{ fontWeight: 700, color: '#48abe2' }}>antsa</span>}
+        title={
+          <img
+            src={antsaLogo}
+            alt="ANTSA For Professionals"
+            style={{ height: 32, width: 'auto', display: 'block' }}
+          />
+        }
         placement="right"
         onClose={() => setMobileMenuOpen(false)}
         open={mobileMenuOpen}
