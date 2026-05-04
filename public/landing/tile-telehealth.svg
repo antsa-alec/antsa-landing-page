@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220" fill="none">
-  <rect width="400" height="220" rx="10" fill="#0F172A"/>
-  <rect x="24" y="24" width="120" height="80" rx="8" fill="#1E293B" stroke="#334155"/>
-  <rect x="256" y="24" width="120" height="80" rx="8" fill="#1E293B" stroke="#334155"/>
-  <circle cx="200" cy="110" r="32" fill="#48ABE2" opacity="0.3"/>
-  <path d="M186 102 L200 116 L220 96" stroke="#FFFFFF" stroke-width="3" fill="none"/>
-  <text x="200" y="200" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#94A3B8">Telehealth session</text>
-</svg>

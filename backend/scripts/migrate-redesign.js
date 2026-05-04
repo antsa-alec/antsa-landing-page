@@ -7,6 +7,7 @@ import db from '../config/database.js';
 
 const MARKER_SECTIONS = 'redesign_2026_sections_v1_done';
 const MARKER_JAIMEE = 'redesign_2026_jaimee_rename_done';
+const MARKER_REAL_SCREENSHOTS_V2 = 'redesign_2026_real_screenshots_v2_done';
 
 function getSetting(key) {
   try {
@@ -357,10 +358,63 @@ function runJaimeeRename() {
   console.log('✅ redesign_2026: jAImee → ANTSAbot rename applied');
 }
 
+/**
+ * v2 — point hero + EOL feature_items at real product PNGs (committed under
+ * /landing/*.png by the build) and replace any leftover SVG paths from v1.
+ */
+function runRealScreenshotsV2() {
+  if (getSetting(MARKER_REAL_SCREENSHOTS_V2) === '1') return;
+
+  const heroId = getSectionId('hero');
+  const contentUpsert = db.prepare(`
+    INSERT INTO content (section_id, key, value, type)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(section_id, key) DO UPDATE SET
+      value = excluded.value,
+      type = excluded.type,
+      updated_at = CURRENT_TIMESTAMP
+  `);
+  if (heroId) {
+    // Replace the SVG placeholder if no admin override has been set.
+    const replaceIfPlaceholder = (key, newPath) => {
+      const row = db
+        .prepare('SELECT value FROM content WHERE section_id = ? AND key = ?')
+        .get(heroId, key);
+      const v = row?.value || '';
+      if (!row || v === '' || v.endsWith('.svg') || v.includes('/landing/hero-')) {
+        contentUpsert.run(heroId, key, newPath, 'text');
+      }
+    };
+    replaceIfPlaceholder('hero_desktop_image', '/landing/dashboard.png');
+    replaceIfPlaceholder('hero_mobile_image', '/landing/mobile-sign-in.png');
+  }
+
+  // EOL tiles — swap each placeholder svg for its png counterpart.
+  const eolId = getSectionId('everything_one_login');
+  if (eolId) {
+    const swap = (titleLike, png) => {
+      db.prepare(
+        `UPDATE feature_items SET image_url = ?, updated_at = CURRENT_TIMESTAMP
+         WHERE section_id = ? AND title LIKE ?
+           AND (image_url IS NULL OR image_url = '' OR image_url LIKE '%/tile-%.svg' OR image_url LIKE '%/landing/tile-%')`,
+      ).run(png, eolId, titleLike);
+    };
+    swap('Practitioner Dashboard%', '/landing/dashboard.png');
+    swap('Client App%', '/landing/clients-list.png');
+    swap('Telehealth%', '/landing/calendar.png');
+    swap('AI Scribe%', '/landing/templates.png');
+    swap('Mood%', '/landing/client-detail-overview.png');
+  }
+
+  setSetting(MARKER_REAL_SCREENSHOTS_V2, '1');
+  console.log('✅ redesign_2026: real product screenshots applied');
+}
+
 export function runRedesignMigrations() {
   try {
     runSectionsMigration();
     runJaimeeRename();
+    runRealScreenshotsV2();
   } catch (e) {
     console.error('⚠️ redesign_2026 migration error:', e.message);
   }

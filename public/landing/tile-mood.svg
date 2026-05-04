@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" viewBox="0 0 400 220" fill="none">
-  <rect width="400" height="220" rx="10" fill="#EFF6FF"/>
-  <text x="40" y="40" font-family="system-ui,sans-serif" font-size="12" font-weight="600" fill="#0F172A">Mood trend</text>
-  <path d="M40 160 L100 120 L160 140 L220 90 L280 110 L360 70" stroke="#48ABE2" stroke-width="3" fill="none"/>
-  <circle cx="100" cy="120" r="6" fill="#FBBF24"/>
-  <circle cx="220" cy="90" r="6" fill="#34D399"/>
-  <circle cx="360" cy="70" r="6" fill="#F87171"/>
-  <text x="200" y="200" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10" fill="#64748B">Mood tracking</text>
-</svg>

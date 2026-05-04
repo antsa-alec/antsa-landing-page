@@ -81,8 +81,8 @@ const HeroSplit = () => {
   const ctaSecondaryUrl =
     content.cta_secondary_url ||
     'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA';
-  const desktopImg = content.hero_desktop_image || '/landing/hero-dashboard.svg';
-  const mobileImg = content.hero_mobile_image || '/landing/hero-phone.svg';
+  const desktopImg = content.hero_desktop_image || '/landing/dashboard.png';
+  const mobileImg = content.hero_mobile_image || '/landing/mobile-sign-in.png';
 
   if (loading) return null;
 

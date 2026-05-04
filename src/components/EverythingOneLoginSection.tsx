@@ -10,32 +10,35 @@ interface Tile {
   image_url?: string | null;
 }
 
-/** Fallback tiles — SVG placeholders until CMS / screenshot captures are wired */
+/**
+ * Fallback tiles — real product PNGs captured via the Playwright harness.
+ * Live values come from CMS (`feature_items` for `everything_one_login`).
+ */
 const DEFAULT_TILES: Tile[] = [
   {
     title: 'Practitioner dashboard',
     description: 'See clients, sessions, messages, and tasks at a glance.',
-    image_url: '/landing/tile-dashboard.svg',
+    image_url: '/landing/dashboard.png',
   },
   {
     title: 'Client records',
     description: 'Structured engagement and clinical context in one place.',
-    image_url: '/landing/tile-ai-scribe.svg',
+    image_url: '/landing/clients-list.png',
   },
   {
     title: 'Telehealth',
     description: 'Schedule and run secure video sessions from your calendar.',
-    image_url: '/landing/tile-telehealth.svg',
+    image_url: '/landing/calendar.png',
   },
   {
-    title: 'Client app',
-    description: 'Homework, mood, messaging — practitioner-visible by design.',
-    image_url: '/landing/tile-client-app.svg',
+    title: 'AI scribe & notes',
+    description: 'Reusable templates and AI summaries for faster documentation.',
+    image_url: '/landing/templates.png',
   },
   {
-    title: 'Engagement & mood',
-    description: 'Track participation and wellbeing signals between sessions.',
-    image_url: '/landing/tile-mood.svg',
+    title: 'Client overview',
+    description: 'Mood, tasks, sessions, and snapshot at a glance.',
+    image_url: '/landing/client-detail-overview.png',
   },
 ];
 
@@ -108,24 +111,35 @@ const EverythingOneLoginSection = () => {
                 bordered={false}
                 cover={
                   item.image_url ? (
-                    <img
-                      alt={`${item.title} — ${item.description}`}
-                      src={item.image_url}
+                    <div
                       style={{
-                        height: 140,
-                        objectFit: 'cover',
-                        borderBottom: '1px solid #e2e8f0',
+                        aspectRatio: '16 / 10',
                         background: '#f8fafc',
+                        overflow: 'hidden',
+                        borderBottom: '1px solid #e2e8f0',
                       }}
-                    />
+                    >
+                      <img
+                        alt={`${item.title} — ${item.description}`}
+                        src={item.image_url}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          objectPosition: 'top left',
+                          display: 'block',
+                        }}
+                      />
+                    </div>
                   ) : null
                 }
-                bodyStyle={{ padding: 16 }}
+                bodyStyle={{ padding: 18 }}
                 style={{
-                  borderRadius: 12,
+                  borderRadius: 14,
                   border: '1px solid #e2e8f0',
                   overflow: 'hidden',
                   height: '100%',
+                  boxShadow: '0 1px 2px rgba(15, 23, 42, 0.04)',
                 }}
               >
                 <Title level={5} style={{ marginTop: 0, color: '#0f172a', fontSize: 15 }}>
