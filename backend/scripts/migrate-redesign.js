@@ -8,6 +8,8 @@ import db from '../config/database.js';
 const MARKER_SECTIONS = 'redesign_2026_sections_v1_done';
 const MARKER_JAIMEE = 'redesign_2026_jaimee_rename_done';
 const MARKER_REAL_SCREENSHOTS_V2 = 'redesign_2026_real_screenshots_v2_done';
+const MARKER_HEADER_CTAS_V3 = 'redesign_2026_header_ctas_v3_done';
+const CALENDLY_URL = 'https://calendly.com/sally-anne-mcc';
 
 function getSetting(key) {
   try {
@@ -410,11 +412,69 @@ function runRealScreenshotsV2() {
   console.log('✅ redesign_2026: real product screenshots applied');
 }
 
+/**
+ * v3 — header section (CMS-driven nav bar) + Book-a-Demo migrated from
+ * the old mailto: link to a Calendly URL. Hero `cta_secondary_url` is
+ * upgraded too, but only if it's still the mailto placeholder so manual
+ * edits are preserved.
+ */
+function runHeaderCtasV3() {
+  if (getSetting(MARKER_HEADER_CTAS_V3) === '1') return;
+
+  // Create the header section so admins can edit nav-bar URLs/labels.
+  db.prepare(
+    `INSERT INTO sections (name, enabled, order_index)
+     VALUES ('header', 1, 0)
+     ON CONFLICT(name) DO UPDATE SET enabled = 1, updated_at = CURRENT_TIMESTAMP`,
+  ).run();
+  const headerId = getSectionId('header');
+  const upsert = db.prepare(`
+    INSERT INTO content (section_id, key, value, type)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(section_id, key) DO UPDATE SET
+      value = excluded.value,
+      type = excluded.type,
+      updated_at = CURRENT_TIMESTAMP
+  `);
+  // Only set if no admin override already.
+  const setIfMissing = (key, val) => {
+    const row = db
+      .prepare('SELECT value FROM content WHERE section_id = ? AND key = ?')
+      .get(headerId, key);
+    if (!row || row.value === '' || row.value == null) {
+      upsert.run(headerId, key, val, 'text');
+    }
+  };
+  setIfMissing('signin_url', 'https://au.antsa.ai/sign-in');
+  setIfMissing('signin_label', 'Log In');
+  setIfMissing('signup_url', '/free-trial');
+  setIfMissing('signup_label', 'Start Free Trial');
+  setIfMissing('demo_url', CALENDLY_URL);
+  setIfMissing('demo_label', 'Book a Demo');
+
+  // Migrate hero's secondary CTA to Calendly only if it's still the
+  // mailto placeholder, so manual edits aren't clobbered.
+  const heroId = getSectionId('hero');
+  if (heroId) {
+    const heroCta = db
+      .prepare('SELECT value FROM content WHERE section_id = ? AND key = ?')
+      .get(heroId, 'cta_secondary_url');
+    const v = heroCta?.value || '';
+    if (!heroCta || v === '' || v.startsWith('mailto:')) {
+      upsert.run(heroId, 'cta_secondary_url', CALENDLY_URL, 'text');
+    }
+  }
+
+  setSetting(MARKER_HEADER_CTAS_V3, '1');
+  console.log('✅ redesign_2026: header CTAs (Book a Demo → Calendly) applied');
+}
+
 export function runRedesignMigrations() {
   try {
     runSectionsMigration();
     runJaimeeRename();
     runRealScreenshotsV2();
+    runHeaderCtasV3();
   } catch (e) {
     console.error('⚠️ redesign_2026 migration error:', e.message);
   }

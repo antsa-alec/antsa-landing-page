@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined, CloseOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -6,10 +6,17 @@ import antsaLogo from '../assets/antsa-logo.png';
 
 const { Header } = Layout;
 
-const SIGNUP_URL = '/free-trial';
-const SIGNIN_URL = 'https://au.antsa.ai/sign-in';
-const DEMO_MAIL =
-  'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA&body=Hi%20ANTSA%20team%2C%0A%0AI%E2%80%99d%20like%20to%20book%20a%20demo.';
+// Defaults — overridden at runtime by CMS values from /api/content/section/header
+const DEFAULTS = {
+  signup_url: '/free-trial',
+  signup_label: 'Start Free Trial',
+  signin_url: 'https://au.antsa.ai/sign-in',
+  signin_label: 'Log In',
+  demo_url: 'https://calendly.com/sally-anne-mcc',
+  demo_label: 'Book a Demo',
+};
+
+const isExternal = (url: string) => /^https?:\/\//i.test(url);
 
 const sectionHref = (hash: string) => {
   if (typeof window !== 'undefined' && window.location.pathname !== '/') {
@@ -20,6 +27,27 @@ const sectionHref = (hash: string) => {
 
 const AppHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cfg, setCfg] = useState(DEFAULTS);
+
+  useEffect(() => {
+    fetch('/api/content/section/header')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const c = d?.content || {};
+        setCfg({
+          signup_url: c.signup_url || DEFAULTS.signup_url,
+          signup_label: c.signup_label || DEFAULTS.signup_label,
+          signin_url: c.signin_url || DEFAULTS.signin_url,
+          signin_label: c.signin_label || DEFAULTS.signin_label,
+          demo_url: c.demo_url || DEFAULTS.demo_url,
+          demo_label: c.demo_label || DEFAULTS.demo_label,
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  const externalProps = (url: string) =>
+    isExternal(url) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   const desktopNav: MenuProps['items'] = [
     {
@@ -54,9 +82,30 @@ const AppHeader = () => {
   const mobileItems: MenuProps['items'] = [
     ...desktopNav,
     { type: 'divider' },
-    { key: 'login', label: <a href={SIGNIN_URL}>Log In</a> },
-    { key: 'trial', label: <a href={SIGNUP_URL}>Start Free Trial</a> },
-    { key: 'demo', label: <a href={DEMO_MAIL}>Book a Demo</a> },
+    {
+      key: 'login',
+      label: (
+        <a href={cfg.signin_url} {...externalProps(cfg.signin_url)}>
+          {cfg.signin_label}
+        </a>
+      ),
+    },
+    {
+      key: 'trial',
+      label: (
+        <a href={cfg.signup_url} {...externalProps(cfg.signup_url)}>
+          {cfg.signup_label}
+        </a>
+      ),
+    },
+    {
+      key: 'demo',
+      label: (
+        <a href={cfg.demo_url} {...externalProps(cfg.demo_url)}>
+          {cfg.demo_label}
+        </a>
+      ),
+    },
   ];
 
   return (
@@ -121,14 +170,29 @@ const AppHeader = () => {
           />
 
           <div className="desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Button type="link" href={SIGNIN_URL} style={{ color: '#0f172a', fontWeight: 500, padding: '0 8px' }}>
-              Log In
+            <Button
+              type="link"
+              href={cfg.signin_url}
+              {...externalProps(cfg.signin_url)}
+              style={{ color: '#0f172a', fontWeight: 500, padding: '0 8px' }}
+            >
+              {cfg.signin_label}
             </Button>
-            <Button type="primary" href={SIGNUP_URL} style={{ background: '#48abe2', borderColor: '#48abe2', fontWeight: 600 }}>
-              Start Free Trial
+            <Button
+              type="primary"
+              href={cfg.signup_url}
+              {...externalProps(cfg.signup_url)}
+              style={{ background: '#48abe2', borderColor: '#48abe2', fontWeight: 600 }}
+            >
+              {cfg.signup_label}
             </Button>
-            <Button icon={<CalendarOutlined />} href={DEMO_MAIL} style={{ borderColor: '#48abe2', color: '#48abe2', fontWeight: 600 }}>
-              Book a Demo
+            <Button
+              icon={<CalendarOutlined />}
+              href={cfg.demo_url}
+              {...externalProps(cfg.demo_url)}
+              style={{ borderColor: '#48abe2', color: '#48abe2', fontWeight: 600 }}
+            >
+              {cfg.demo_label}
             </Button>
           </div>
 

@@ -21,6 +21,7 @@ import {
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
 import HeroEditor from '../components/admin/HeroEditor';
+import HeaderEditor from '../components/admin/HeaderEditor';
 import FeaturesEditor from '../components/admin/FeaturesEditor';
 import PricingEditor from '../components/admin/PricingEditor';
 import SettingsView from '../components/admin/SettingsView';
@@ -129,6 +130,7 @@ const Admin = () => {
   const menuItems = [
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: 'sections', icon: <EyeOutlined />, label: 'Sections (visibility)' },
+    { key: 'header', icon: <MenuOutlined />, label: 'Header CTAs' },
     { key: 'navigation', icon: <MenuOutlined />, label: 'Navigation' },
     { key: 'hero', icon: <RocketOutlined />, label: 'Hero Section' },
     { key: 'trust-strip', icon: <SafetyOutlined />, label: 'Trust strip' },
@@ -152,6 +154,8 @@ const Admin = () => {
         return <DashboardView auth={authContext} />;
       case 'sections':
         return <SectionsManager auth={authContext} />;
+      case 'header':
+        return <HeaderEditor auth={authContext} />;
       case 'navigation':
         return <NavigationEditor auth={authContext} />;
       case 'hero':
