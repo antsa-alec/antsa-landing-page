@@ -6,7 +6,7 @@ const router = express.Router();
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://antsa.ai';
 
 const STATIC_ROUTES = [
-  { path: '/', title: 'ANTSA — Digital Mental Health Platform' },
+  { path: '/', title: 'ANTSA — Support clients between sessions. Reduce admin.' },
   { path: '/free-trial', title: 'Free Trial' },
   { path: '/help', title: 'Help Centre' },
   { path: '/privacy-policy', title: 'Privacy Policy' },
@@ -27,7 +27,9 @@ function loadAllSections() {
     .all();
 
   const contentStmt = db.prepare('SELECT key, value, type FROM content WHERE section_id = ?');
-  const featuresStmt = db.prepare('SELECT title, description FROM feature_items WHERE section_id = ? ORDER BY order_index');
+  const featuresStmt = db.prepare(
+    'SELECT title, description, image_url FROM feature_items WHERE section_id = ? ORDER BY order_index',
+  );
   const pricingStmt = db.prepare('SELECT name, price, period, features FROM pricing_plans WHERE section_id = ? ORDER BY order_index');
   const teamStmt = db.prepare('SELECT name, role, bio FROM team_members WHERE section_id = ? ORDER BY order_index');
   const testimonialsStmt = db.prepare('SELECT name, role, content FROM testimonials WHERE section_id = ? ORDER BY order_index');
@@ -77,9 +79,12 @@ function loadHelpArticles() {
 
 function buildLlmsTxt(sections) {
   const hero = sections.find((s) => s.name === 'hero')?.content || {};
-  const tagline = stripHtml(hero.title) || 'ANTSA — Digital Mental Health Platform';
-  const summary = stripHtml(hero.description) ||
-    'Australian-built digital mental health platform that keeps practitioners in the loop between sessions.';
+  const tagline =
+    stripHtml(hero.title) ||
+    'Support clients between sessions. Reduce admin. One system built for practitioners.';
+  const summary =
+    stripHtml(hero.description) ||
+    'Australian-built mental health platform for practitioners: client engagement, AI documentation (including ANTSAbot), telehealth, and measures — one secure Australian-hosted login.';
 
   const lines = [];
   lines.push('# ANTSA');
@@ -87,6 +92,11 @@ function buildLlmsTxt(sections) {
   lines.push(`> ${summary}`);
   lines.push('');
   lines.push(tagline);
+  lines.push('');
+  lines.push('## Highlights');
+  lines.push('- Why practitioners switch — streamlined admin and engagement (`why_switch`)');
+  lines.push('- Everything in one login — dashboard, clients, telehealth, client app, mood (`everything_one_login`)');
+  lines.push('- For clinics — governance, onboarding, and collaboration (`for_clinics`)');
   lines.push('');
   lines.push('## Pages');
   for (const r of STATIC_ROUTES) {
@@ -141,7 +151,11 @@ function buildLlmsFullTxt(sections, helpArticles) {
       lines.push('');
       lines.push('### Features');
       for (const f of section.features) {
-        lines.push(`- **${stripHtml(f.title)}** — ${stripHtml(f.description)}`);
+        const img =
+          f.image_url && String(f.image_url).trim()
+            ? ` (screenshot: ${stripHtml(f.image_url)})`
+            : '';
+        lines.push(`- **${stripHtml(f.title)}** — ${stripHtml(f.description)}${img}`);
       }
     }
 
@@ -234,7 +248,9 @@ function escapeHtml(value) {
 // archive bots). Generated live from the CMS so admin edits show up immediately.
 export function buildSeoBodyHtml(sections, helpArticles = []) {
   const hero = sections.find((s) => s.name === 'hero')?.content || {};
-  const heroTitle = stripHtml(hero.title) || 'ANTSA — Digital Mental Health Platform';
+  const heroTitle =
+    stripHtml(hero.title) ||
+    'Support clients between sessions. Reduce admin. One system built for practitioners.';
   const heroDescription = stripHtml(hero.description) || '';
 
   const out = [];
@@ -251,11 +267,51 @@ export function buildSeoBodyHtml(sections, helpArticles = []) {
   for (const section of sections) {
     if (section.name === 'hero') continue;
     const c = section.content || {};
+
+    if (section.name === 'trust_strip') {
+      const trustItems = Array.isArray(c.items) ? c.items : [];
+      if (trustItems.length) {
+        out.push('<section aria-label="Trust indicators"><h2>Trust and hosting</h2><ul>');
+        for (const it of trustItems) {
+          out.push(`<li>${escapeHtml(stripHtml(it.label))}</li>`);
+        }
+        out.push('</ul></section>');
+      }
+      continue;
+    }
+
+    if (section.name === 'for_clinics') {
+      out.push('<section id="for-clinics">');
+      const t = stripHtml(c.title);
+      const sub = stripHtml(c.subtitle);
+      if (t) out.push(`<h2>${escapeHtml(t)}</h2>`);
+      if (sub) out.push(`<p>${escapeHtml(sub)}</p>`);
+      const list = Array.isArray(c.checklist) ? c.checklist : [];
+      if (list.length) {
+        out.push('<ul>');
+        for (const x of list) {
+          out.push(`<li>${escapeHtml(stripHtml(x))}</li>`);
+        }
+        out.push('</ul>');
+      }
+      out.push('</section>');
+      continue;
+    }
+
     const title = stripHtml(c.title);
     const subtitle = stripHtml(c.subtitle);
     const description = stripHtml(c.description);
 
-    if (!title && !subtitle && !description && !section.features?.length && !section.pricing?.length && !section.team?.length && !section.faqs?.length) {
+    if (
+      !title &&
+      !subtitle &&
+      !description &&
+      !section.features?.length &&
+      !section.pricing?.length &&
+      !section.team?.length &&
+      !section.testimonials?.length &&
+      !section.faqs?.length
+    ) {
       continue;
     }
 
@@ -267,7 +323,12 @@ export function buildSeoBodyHtml(sections, helpArticles = []) {
     if (section.features?.length) {
       out.push('<ul>');
       for (const f of section.features) {
-        out.push(`<li><strong>${escapeHtml(stripHtml(f.title))}</strong> — ${escapeHtml(stripHtml(f.description))}</li>`);
+        const img = f.image_url
+          ? ` <img src="${escapeHtml(f.image_url)}" alt="${escapeHtml(stripHtml(f.title))}" />`
+          : '';
+        out.push(
+          `<li><strong>${escapeHtml(stripHtml(f.title))}</strong> — ${escapeHtml(stripHtml(f.description))}${img}</li>`,
+        );
       }
       out.push('</ul>');
     }

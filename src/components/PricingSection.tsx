@@ -157,17 +157,7 @@ const PricingSection = () => {
               letterSpacing: '-0.02em',
             }}
           >
-            Pricing should be{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              simple
-            </span>.
+            Pricing should be <span style={{ color: '#48abe2' }}>simple</span>.
           </Title>
           <Paragraph
             className="reveal"
@@ -223,7 +213,7 @@ const PricingSection = () => {
                         top: '-12px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
+                        background: '#48abe2',
                         color: '#ffffff',
                         padding: '4px 16px',
                         borderRadius: '20px',
@@ -293,7 +283,7 @@ const PricingSection = () => {
                         fontSize: '16px',
                         fontWeight: 600,
                         borderRadius: '12px',
-                        background: plan.featured ? 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)' : '#ffffff',
+                        background: plan.featured ? '#48abe2' : '#ffffff',
                         border: plan.featured ? 'none' : '2px solid #e2e8f0',
                         color: plan.featured ? '#ffffff' : '#0f172a',
                       }}

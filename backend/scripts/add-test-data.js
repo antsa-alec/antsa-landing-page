@@ -57,14 +57,14 @@ try {
     {
       name: 'Dr. Mark Thompson',
       role: 'Psychiatrist',
-      content: 'The insights from jAImee conversations give me valuable context before sessions. It\'s like having an extra set of eyes on client wellbeing 24/7.',
+      content: 'The insights from ANTSAbot conversations give me valuable context before sessions. It\'s like having an extra set of eyes on client wellbeing 24/7.',
       rating: 5,
       order_index: 2
     },
     {
       name: 'Lisa Martinez',
       role: 'Counselor',
-      content: 'My clients love having access to jAImee between our sessions. They feel more supported, and I can see the positive impact in their progress.',
+      content: 'My clients love having access to ANTSAbot between our sessions. They feel more supported, and I can see the positive impact in their progress.',
       rating: 5,
       order_index: 3
     },

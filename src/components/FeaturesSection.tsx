@@ -139,16 +139,7 @@ const FeaturesSection = () => {
             }}
           >
             What{' '}
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              ANTSA
-            </span>{' '}
+            <span style={{ color: '#48abe2', fontWeight: 800 }}>ANTSA</span>{' '}
             includes.
           </Title>
           <Paragraph

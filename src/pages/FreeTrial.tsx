@@ -45,7 +45,7 @@ const theme = {
 const features = [
   {
     icon: <RobotOutlined style={{ fontSize: '28px', color: '#48abe2' }} />,
-    title: 'jAImee AI Chatbot',
+    title: 'ANTSAbot AI assistant',
     description: 'A clinician-overseen chatbot that supports your clients between sessions, aligned to their treatment goals and visible in the clinical record.',
   },
   {
@@ -79,7 +79,7 @@ const trialIncludes = [
   'Full platform access for 14 days',
   'Up to 3 active clients',
   'AI Scribe and clinical templates',
-  'jAImee AI chatbot for client support',
+  'ANTSAbot AI assistant for client support',
   'Telehealth and session summaries',
   'Mood tracking and psychometrics',
   'Secure messaging and homework tasks',

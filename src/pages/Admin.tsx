@@ -13,6 +13,9 @@ import {
   ThunderboltOutlined,
   BulbOutlined,
   FileTextOutlined,
+  SafetyOutlined,
+  DeploymentUnitOutlined,
+  BankOutlined,
 } from '@ant-design/icons';
 import LoginPage from '../components/admin/LoginPage';
 import DashboardView from '../components/admin/DashboardView';
@@ -25,6 +28,8 @@ import FAQEditor from '../components/admin/FAQEditor';
 import TeamEditor from '../components/admin/TeamEditor';
 import LegalPagesEditor from '../components/admin/LegalPagesEditor';
 import HelpCentreEditor from '../components/admin/HelpCentreEditor';
+import TrustStripEditor from '../components/admin/TrustStripEditor';
+import ForClinicsEditor from '../components/admin/ForClinicsEditor';
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -123,11 +128,15 @@ const Admin = () => {
     { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
     { key: 'navigation', icon: <MenuOutlined />, label: 'Navigation' },
     { key: 'hero', icon: <RocketOutlined />, label: 'Hero Section' },
+    { key: 'trust-strip', icon: <SafetyOutlined />, label: 'Trust strip' },
+    { key: 'why-switch', icon: <DeploymentUnitOutlined />, label: 'Why Switch' },
+    { key: 'everything-one-login', icon: <AppstoreOutlined />, label: 'Everything One Login' },
     { key: 'the-shift', icon: <ThunderboltOutlined />, label: 'The Shift' },
     { key: 'the-antsa', icon: <BulbOutlined />, label: 'The ANTSA' },
     { key: 'features', icon: <AppstoreOutlined />, label: 'Features' },
     { key: 'team', icon: <TeamOutlined />, label: 'Team' },
     { key: 'pricing', icon: <DollarOutlined />, label: 'Pricing' },
+    { key: 'for-clinics', icon: <BankOutlined />, label: 'For Clinics band' },
     { key: 'faq', icon: <QuestionCircleOutlined />, label: 'FAQ' },
     { key: 'help-centre', icon: <QuestionCircleOutlined />, label: 'Help Centre' },
     { key: 'legal', icon: <FileTextOutlined />, label: 'Legal Pages' },
@@ -142,6 +151,14 @@ const Admin = () => {
         return <NavigationEditor auth={authContext} />;
       case 'hero':
         return <HeroEditor auth={authContext} />;
+      case 'trust-strip':
+        return <TrustStripEditor auth={authContext} />;
+      case 'why-switch':
+        return <FeaturesEditor auth={authContext} sectionName="why_switch" />;
+      case 'everything-one-login':
+        return <FeaturesEditor auth={authContext} sectionName="everything_one_login" />;
+      case 'for-clinics':
+        return <ForClinicsEditor auth={authContext} />;
       case 'the-shift':
         // Reuse FeaturesEditor pattern for the-shift section
         return <FeaturesEditor auth={authContext} sectionName="the-shift" />;

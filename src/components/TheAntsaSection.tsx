@@ -45,10 +45,8 @@ const HighlightedText = ({ text, highlights }: { text: string; highlights: strin
             <span
               key={i}
               style={{
-                background: 'linear-gradient(135deg, #48abe2 0%, #7ec8ed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                color: '#48abe2',
+                fontWeight: 700,
               }}
             >
               {part}
@@ -110,7 +108,9 @@ const TheAntsaSection = () => {
         if (data.content) {
           setSectionContent(data.content);
         }
-        if (data.items) {
+        if (data.content?.items?.length) {
+          setItems(data.content.items);
+        } else if (data.items) {
           setItems(data.items);
         }
       })

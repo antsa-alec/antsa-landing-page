@@ -48,7 +48,13 @@ router.get('/', optionalAuth, (req, res) => {
       });
 
       // Add specific section data
-      if (section.name === 'features') {
+      if (
+        section.name === 'features' ||
+        section.name === 'the-shift' ||
+        section.name === 'the-antsa' ||
+        section.name === 'why_switch' ||
+        section.name === 'everything_one_login'
+      ) {
         content.items = featuresStmt.all(section.id);
       } else if (section.name === 'pricing') {
         const plans = pricingStmt.all(section.id);
@@ -102,7 +108,13 @@ router.get('/section/:sectionName', (req, res) => {
     });
 
     // Add specific section data
-    if (section.name === 'features' || section.name === 'the-shift' || section.name === 'the-antsa') {
+    if (
+      section.name === 'features' ||
+      section.name === 'the-shift' ||
+      section.name === 'the-antsa' ||
+      section.name === 'why_switch' ||
+      section.name === 'everything_one_login'
+    ) {
       const featuresStmt = db.prepare('SELECT * FROM feature_items WHERE section_id = ? ORDER BY order_index');
       content.items = featuresStmt.all(section.id);
     } else if (section.name === 'pricing') {

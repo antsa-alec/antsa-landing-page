@@ -48,7 +48,7 @@ const DashboardView = ({ auth: _auth }: DashboardViewProps) => {
               valueStyle={{ color: '#10b981' }}
             />
             <Paragraph style={{ marginTop: 8, marginBottom: 0, color: '#666' }}>
-              jAImee, AI Scribe, kAI, Dashboard, Client Tools, Homework
+              ANTSAbot, AI Scribe, kAI, Dashboard, Client Tools, Homework
             </Paragraph>
           </Card>
         </Col>

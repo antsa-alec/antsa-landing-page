@@ -604,3 +604,14 @@ footer input {
 .legal-content th { background: #f8fafc; font-weight: 600; color: #0f172a; }
 .legal-content blockquote { margin: 16px 0; padding: 12px 20px; border-left: 4px solid #48abe2; background: #f8fafc; color: #475569; }
 
+/* 2026 landing — section eyebrow / kicker */
+.landing-eyebrow {
+  display: inline-block;
+  color: #48abe2;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
