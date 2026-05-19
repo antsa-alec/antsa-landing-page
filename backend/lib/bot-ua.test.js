@@ -50,8 +50,23 @@ for (const ua of BOT_UAS) {
   });
 }
 
+// Strings that contain 'bot', 'crawler', or 'spider' as substrings of a
+// larger word — word-boundary anchors must prevent false positives here.
+const EDGE_CASE_HUMAN_UAS = [
+  'iRobot/1.0',
+  'Bothersome/1.0',
+  'SpiderMan/1.0',
+  'Mozilla/5.0 (compatible; RoboBrowser)',
+];
+
 for (const ua of HUMAN_UAS) {
   test(`human: ${ua.slice(0, 60)}`, () => {
+    assert.equal(isBotUA(ua), false);
+  });
+}
+
+for (const ua of EDGE_CASE_HUMAN_UAS) {
+  test(`edge-case human (word-boundary): ${ua}`, () => {
     assert.equal(isBotUA(ua), false);
   });
 }

@@ -51,9 +51,11 @@ const BOT_UA_RE = new RegExp(
     'ia_archiver',
     'Pingdom',
     // Generic fallthroughs — last so specific names rank in logs
-    'bot',
-    'crawler',
-    'spider',
+    // Word-boundary anchors prevent false matches on substrings like
+    // 'iRobot', 'Bothersome', 'SpiderMan'.
+    '\\bbot\\b',
+    '\\bcrawler\\b',
+    '\\bspider\\b',
   ].join('|'),
   'i',
 );
