@@ -12,9 +12,7 @@ import documentRoutes from './routes/documents.js';
 import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
-import seoRoutes, { buildSeoBodyHtml, buildFaqJsonLd, loadAllSections, loadHelpArticles } from './routes/seo.js';
-import { isBotUA } from './lib/bot-ua.js';
-import { readFileSync } from 'fs';
+import seoRoutes from './routes/seo.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -87,61 +85,46 @@ app.get('/api/health', (req, res) => {
 // These are generated dynamically from the CMS so they reflect live content.
 app.use('/', seoRoutes);
 
-// Serve static files from the dist directory (production)
+// Serve static files and SSR (production)
 if (process.env.NODE_ENV === 'production') {
   const distPath = path.join(__dirname, '..', 'dist');
-  // index: false so GET / falls through to our injection handler instead of
-  // serving the un-injected dist/index.html.
-  app.use(express.static(distPath, { index: false }));
+  const distClientPath = path.join(distPath, 'client');
 
-  // Cache the built shell once. We only re-render the injected body per request,
-  // not the file read.
-  let cachedShell = null;
-  const getShell = () => {
-    if (!cachedShell) cachedShell = readFileSync(path.join(distPath, 'index.html'), 'utf8');
-    return cachedShell;
-  };
+  // Serve static assets built by Vike (JS chunks, CSS, fonts).
+  app.use(express.static(distClientPath, { index: false }));
 
-  // Catch-all SPA handler.
-  //
-  // Humans get the clean shell — React mounts into an empty #root, so there is
-  // nothing for it to flash-replace. (That replace was the visible "FOUC" on
-  // antsa.ai.)
-  //
-  // Bots that read raw HTML (LLM scrapers like GPTBot/ClaudeBot, search
-  // engines, link previewers) get the injected SEO body. This preserves the
-  // original goal of giving non-JS scrapers full marketing content without
-  // requiring them to execute the SPA.
-  //
-  // FAQ JSON-LD is injected for everyone — it lives in <head>, is invisible,
-  // and helps any crawler that does parse it (Google rich results, etc.).
-  app.get('*', (req, res) => {
+  // Admin SPA carve-out. Vike never sees /admin/*; we serve the admin
+  // shell directly and React mounts client-side as today.
+  // The admin SPA shell lives at dist/index.html (top-level Vite output),
+  // not inside dist/client/ which is the Vike SSR client bundle.
+  const adminShell = path.join(distPath, 'index.html');
+  app.get('/admin', (_req, res) => {
+    res.sendFile(adminShell);
+  });
+  app.get(/^\/admin\/.+$/, (_req, res) => {
+    res.sendFile(adminShell);
+  });
+
+  // Everything else (the 5 public marketing routes) goes through Vike.
+  // Vike's auto-discovery of dist/server/entry.mjs doesn't work in our
+  // Azure App Service layout (server.js sits in backend/, dist/ sits in
+  // the wwwroot above it). Import the production entry explicitly per
+  // https://github.com/brillout/vite-plugin-server-entry#manual-import
+  await import('../dist/server/entry.mjs');
+  const { renderPage } = await import('vike/server');
+  app.get('*', async (req, res, next) => {
+    const pageContextInit = { urlOriginal: req.originalUrl, headersOriginal: req.headers };
     try {
-      const sections = loadAllSections();
-      const faqLd = buildFaqJsonLd(sections);
-      const isBot = isBotUA(req.get('user-agent'));
-
-      let html = getShell();
-
-      if (isBot) {
-        const helpArticles = loadHelpArticles();
-        const bodyHtml = buildSeoBodyHtml(sections, helpArticles);
-        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
-      }
-
-      if (faqLd) {
-        const faqScript = `<script type="application/ld+json">${JSON.stringify(faqLd)}</script>`;
-        html = html.replace('</head>', `${faqScript}</head>`);
-      }
-
-      res.set('Content-Type', 'text/html; charset=utf-8');
-      // Bot vs human variants must not share a cache entry.
-      res.set('Vary', 'User-Agent');
-      res.set('Cache-Control', 'public, max-age=300');
-      res.send(html);
+      const pageContext = await renderPage(pageContextInit);
+      const { httpResponse } = pageContext;
+      if (!httpResponse) return next();
+      res.status(httpResponse.statusCode);
+      httpResponse.headers.forEach(([name, value]) => res.setHeader(name, value));
+      res.setHeader('Cache-Control', 'no-store');
+      httpResponse.pipe(res);
     } catch (err) {
-      console.error('SSR injection failed, serving plain shell:', err);
-      res.sendFile(path.join(distPath, 'index.html'));
+      console.error('Vike SSR error:', err);
+      res.status(500).sendFile(path.join(distClientPath, 'index.html'));
     }
   });
 }
