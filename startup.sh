@@ -36,18 +36,10 @@ fi
 # ── Native module rebuild ─────────────────────────────────────────────────────
 # node_modules are shipped in the deployment package (installed in CI), so we
 # don't need a full `npm install`. We only rebuild the better-sqlite3 native
-# addon — twice: once for backend/node_modules (used by the Express app) and
-# once for the root node_modules (used by the Vike SSR bundle when it imports
-# backend/ssr/data-providers.js → backend/config/database.js).
-
-if [ -d /home/site/wwwroot/node_modules/better-sqlite3 ]; then
-  echo "🔨 Rebuilding better-sqlite3 at root..."
-  cd /home/site/wwwroot
-  npm rebuild better-sqlite3
-fi
-
+# addon because the CI runner (ubuntu-latest) may differ from the Azure runtime.
 cd /home/site/wwwroot/backend
-echo "🔨 Rebuilding better-sqlite3 in backend..."
+
+echo "🔨 Rebuilding better-sqlite3 for current Node/platform..."
 npm rebuild better-sqlite3
 echo "✅ Native module ready"
 
