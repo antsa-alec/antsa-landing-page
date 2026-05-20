@@ -6,7 +6,7 @@ import Admin from './pages/Admin.tsx';
 import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
 import TermsAndConditions from './pages/TermsAndConditions.tsx';
 import HelpCentre from './pages/HelpCentre.tsx';
-import FreeTrial from './pages/FreeTrial.tsx';
+import FreeTrial from './pages-legacy/FreeTrial.tsx';
 import HelpChatWidget from './components/HelpChatWidget.tsx';
 import { usePageTracking } from './hooks/usePageTracking.ts';
 import './styles/global.css';
