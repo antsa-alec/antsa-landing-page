@@ -1,15 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Layout, Menu, Button, Drawer } from 'antd';
 import { MenuOutlined, CloseOutlined, CalendarOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import antsaLogo from '../assets/antsa-logo.png';
-import type { ChromeData, HeaderConfig } from '../pages/chrome-data';
 
 const { Header } = Layout;
 
-// Defaults — overridden by CMS values piped through pageContext at SSR time.
-// Both server and client first-render use the same source of truth (the `chrome`
-// prop), so the rendered output is identical and hydration is clean.
+// Defaults — overridden at runtime by CMS values from /api/content/section/header
 const DEFAULTS = {
   signup_url: '/free-trial',
   signup_label: 'Start Free Trial',
@@ -21,25 +18,33 @@ const DEFAULTS = {
 
 const isExternal = (url: string) => /^https?:\/\//i.test(url);
 
-const resolveCfg = (h: HeaderConfig | null | undefined) => ({
-  signup_url: h?.signup_url || DEFAULTS.signup_url,
-  signup_label: h?.signup_label || DEFAULTS.signup_label,
-  signin_url: h?.signin_url || DEFAULTS.signin_url,
-  signin_label: h?.signin_label || DEFAULTS.signin_label,
-  demo_url: h?.demo_url || DEFAULTS.demo_url,
-  demo_label: h?.demo_label || DEFAULTS.demo_label,
-});
+const sectionHref = (hash: string) => {
+  if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+    return `/${hash}`;
+  }
+  return hash;
+};
 
-type AppHeaderProps = { chrome?: ChromeData; urlPathname?: string };
-
-const AppHeader = ({ chrome, urlPathname = '/' }: AppHeaderProps) => {
+const AppHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const cfg = resolveCfg(chrome?.header);
+  const [cfg, setCfg] = useState(DEFAULTS);
 
-  // Use the URL passed down from Vike's pageContext (available on both server
-  // and client first render) instead of reading window.location, which is
-  // undefined on the server and would cause a hydration mismatch.
-  const sectionHref = (hash: string) => (urlPathname === '/' ? hash : `/${hash}`);
+  useEffect(() => {
+    fetch('/api/content/section/header')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const c = d?.content || {};
+        setCfg({
+          signup_url: c.signup_url || DEFAULTS.signup_url,
+          signup_label: c.signup_label || DEFAULTS.signup_label,
+          signin_url: c.signin_url || DEFAULTS.signin_url,
+          signin_label: c.signin_label || DEFAULTS.signin_label,
+          demo_url: c.demo_url || DEFAULTS.demo_url,
+          demo_label: c.demo_label || DEFAULTS.demo_label,
+        });
+      })
+      .catch(() => {});
+  }, []);
 
   const externalProps = (url: string) =>
     isExternal(url) ? { target: '_blank', rel: 'noopener noreferrer' } : {};

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Typography, Button, Space } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 
@@ -15,8 +16,6 @@ interface HeroContent {
   hero_desktop_image?: string;
   hero_mobile_image?: string;
 }
-
-type HeroSplitProps = { section?: { content?: HeroContent } };
 
 const HighlightedText = ({ text, highlights }: { text: string; highlights: string[] }) => {
   if (!highlights?.length) return <>{text}</>;
@@ -43,8 +42,19 @@ const HighlightedText = ({ text, highlights }: { text: string; highlights: strin
 /**
  * Hero — split layout matching practitioner landing mock (text left, product visuals right).
  */
-const HeroSplit = ({ section }: HeroSplitProps) => {
-  const content: HeroContent = section?.content ?? {};
+const HeroSplit = () => {
+  const [content, setContent] = useState<HeroContent>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/content/section/hero')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.content) setContent(data.content);
+      })
+      .catch((err) => console.error('Failed to load hero content:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const titleText =
     content.title ||
@@ -73,6 +83,8 @@ const HeroSplit = ({ section }: HeroSplitProps) => {
     'mailto:admin@antsa.com.au?subject=Book%20a%20Demo%20-%20ANTSA';
   const desktopImg = content.hero_desktop_image || '/landing/dashboard.png';
   const mobileImg = content.hero_mobile_image || '/landing/mobile-sign-in.png';
+
+  if (loading) return null;
 
   return (
     <section
