@@ -13,7 +13,7 @@ export default defineConfig({
     // bundled server entry resolves them from disk at runtime — Vite/Rollup can't
     // serialize the `better-sqlite3` native addon and rewriting `__filename`
     // would corrupt it. We resolve via a relative path from dist/server/entries.
-    external: ['better-sqlite3', 'express'],
+    external: ['better-sqlite3'],
     noExternal: [],
   },
   resolve: {
