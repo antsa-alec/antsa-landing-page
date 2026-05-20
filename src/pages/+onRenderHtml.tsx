@@ -20,7 +20,7 @@ const onRenderHtml: OnRenderHtmlAsync = async (pageContext) => {
       </Layout>
     </StyleProvider>,
   );
-  const styleTag = extractStyle(cache, true);
+  const styleTag = extractStyle(cache);
 
   // config.Head is a user-defined meta field; cast config to access it
   const config = pageContext.config as Record<string, unknown>;
