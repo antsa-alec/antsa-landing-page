@@ -18,23 +18,9 @@ interface PricingPlan {
 /**
  * PRICING SECTION - Three-tier pricing cards
  */
-type PricingProps = { section?: { content?: { plans?: PricingPlan[] } } };
-
-const PricingSection = ({ section }: PricingProps) => {
-  // Seed with server-rendered CMS plans for SSR; refresh from live Stripe on the client.
-  const rawSeed = Array.isArray(section?.content?.plans)
-    ? (section!.content!.plans as PricingPlan[])
-    : [];
-  const seedPlans: PricingPlan[] = rawSeed.map((p) => ({
-    ...p,
-    cta_text: p.cta_text || (p.price && /^\$\d/.test(p.price) ? 'Start Free Trial' : 'Contact Us'),
-    cta_url:
-      p.cta_url ||
-      (p.price && /^\$\d/.test(p.price)
-        ? '/free-trial'
-        : 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry'),
-  }));
-  const [plans, setPlans] = useState<PricingPlan[]>(seedPlans);
+const PricingSection = () => {
+  const [plans, setPlans] = useState<PricingPlan[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/stripe/pricing')
@@ -45,9 +31,12 @@ const PricingSection = ({ section }: PricingProps) => {
       .then((data) => {
         if (data.plans && data.plans.length > 0) {
           setPlans(data.plans);
+        } else {
+          throw new Error('No plans returned');
         }
       })
-      .catch((err) => console.error('Failed to load pricing:', err));
+      .catch((err) => console.error('Failed to load pricing:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   const defaultPlans: PricingPlan[] = [
@@ -129,6 +118,8 @@ const PricingSection = ({ section }: PricingProps) => {
   ];
 
   const displayPlans = plans.length > 0 ? plans : defaultPlans;
+
+  if (loading) return null;
 
   return (
     <section
