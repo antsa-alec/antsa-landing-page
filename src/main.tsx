@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
 import Admin from './pages/Admin.tsx';
-import PrivacyPolicy from './pages/PrivacyPolicy.tsx';
+import PrivacyPolicy from './pages-legacy/PrivacyPolicy.tsx';
 import TermsAndConditions from './pages/TermsAndConditions.tsx';
 import HelpCentre from './pages/HelpCentre.tsx';
 import FreeTrial from './pages-legacy/FreeTrial.tsx';
