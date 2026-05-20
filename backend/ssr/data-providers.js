@@ -18,3 +18,39 @@ export function loadLegalPage(slug) {
     return null;
   }
 }
+
+/**
+ * Load the full help centre category tree for SSR.
+ * Returns the same shape as GET /api/content/help: { categories: Category[] }
+ */
+export function loadHelpForFrontend() {
+  try {
+    const categories = db
+      .prepare('SELECT * FROM help_categories WHERE parent_id IS NULL ORDER BY order_index')
+      .all();
+
+    const subCatStmt = db.prepare(
+      'SELECT * FROM help_categories WHERE parent_id = ? ORDER BY order_index'
+    );
+    const articlesStmt = db.prepare(
+      'SELECT * FROM help_articles WHERE category_id = ? ORDER BY order_index'
+    );
+
+    const tree = categories.map((cat) => {
+      const subcategories = subCatStmt.all(cat.id).map((sub) => ({
+        ...sub,
+        articles: articlesStmt.all(sub.id),
+      }));
+      return {
+        ...cat,
+        articles: articlesStmt.all(cat.id),
+        subcategories,
+      };
+    });
+
+    return { categories: tree };
+  } catch (err) {
+    console.error('loadHelpForFrontend() failed:', err);
+    return { categories: [] };
+  }
+}

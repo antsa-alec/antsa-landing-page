@@ -20,6 +20,30 @@ export type SsrLegalPage = {
   last_updated: string;
 };
 
+export type HelpArticle = {
+  id: number;
+  title: string;
+  content: string;
+  order_index: number;
+};
+
+export type HelpSubCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  articles: HelpArticle[];
+};
+
+export type HelpCategory = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  articles: HelpArticle[];
+  subcategories: HelpSubCategory[];
+};
+
 export function loadAllSections(): SsrSectionRow[];
 export function loadHelpArticles(): SsrHelpArticle[];
 export function loadLegalPage(slug: string): SsrLegalPage | null;
+export function loadHelpForFrontend(): { categories: HelpCategory[] };

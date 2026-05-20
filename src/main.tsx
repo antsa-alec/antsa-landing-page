@@ -5,7 +5,7 @@ import App from './App.tsx';
 import Admin from './pages/Admin.tsx';
 import PrivacyPolicy from './pages-legacy/PrivacyPolicy.tsx';
 import TermsAndConditions from './pages-legacy/TermsAndConditions.tsx';
-import HelpCentre from './pages/HelpCentre.tsx';
+import HelpCentre from './pages-legacy/HelpCentre.tsx';
 import FreeTrial from './pages-legacy/FreeTrial.tsx';
 import HelpChatWidget from './components/HelpChatWidget.tsx';
 import { usePageTracking } from './hooks/usePageTracking.ts';
