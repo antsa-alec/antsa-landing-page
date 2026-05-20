@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Typography, Space, Button, Input, message } from 'antd';
 import {
   InstagramOutlined,
@@ -34,7 +33,6 @@ interface FooterContent {
  * FOOTER - Dark theme with ANTSA logo, social icons, legal links, subscribe
  */
 const AppFooter = () => {
-  const navigate = useNavigate();
   const [footerContent, setFooterContent] = useState<FooterContent>({});
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
   const [extraLinks, setExtraLinks] = useState<FooterLink[]>([]);
@@ -125,6 +123,7 @@ const AppFooter = () => {
   ];
 
   const displaySocial = socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
+  void loading; // setLoading is used to track fetch progress; suppress unused var warning
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
@@ -135,8 +134,6 @@ const AppFooter = () => {
       default: return <MailOutlined />;
     }
   };
-
-  if (loading) return null;
 
   return (
     <footer
@@ -368,17 +365,14 @@ const AppFooter = () => {
           {/* Legal + Extra Links */}
           <Space size={24} wrap>
             {legalPages.map((page) => (
-              <span
+              <a
                 key={page.path}
-                onClick={() => navigate(page.path)}
-                role="link"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') navigate(page.path); }}
+                href={page.path}
                 style={{
                   color: 'rgba(255, 255, 255, 0.5)',
                   fontSize: '13px',
+                  textDecoration: 'none',
                   transition: 'color 0.3s ease',
-                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#ffffff';
@@ -388,7 +382,7 @@ const AppFooter = () => {
                 }}
               >
                 {page.label}
-              </span>
+              </a>
             ))}
             {extraLinks.map((link) => (
               <Link

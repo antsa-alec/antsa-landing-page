@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -24,22 +23,11 @@ const accentColors = [
   '#6366f1',
 ];
 
-const FeaturesSection = () => {
-  const [features, setFeatures] = useState<Feature[]>([]);
-  const [loading, setLoading] = useState(true);
+type FeaturesProps = { section?: { content?: { items?: Feature[] } } };
 
-  useEffect(() => {
-    fetch('/api/content/section/features')
-      .then((res) => res.json())
-      .then((data) => {
-        const items = data.content?.items || data.items;
-        if (items && items.length > 0) {
-          setFeatures(items);
-        }
-      })
-      .catch((err) => console.error('Failed to load features:', err))
-      .finally(() => setLoading(false));
-  }, []);
+const FeaturesSection = ({ section }: FeaturesProps) => {
+  const rawItems = section?.content?.items;
+  const features: Feature[] = Array.isArray(rawItems) ? rawItems : [];
 
   const defaultFeatures: Feature[] = [
     {
@@ -99,8 +87,6 @@ const FeaturesSection = () => {
   ];
 
   const displayFeatures = features.length > 0 ? features : defaultFeatures;
-
-  if (loading) return null;
 
   return (
     <section

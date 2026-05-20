@@ -1,10 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Typography, Button } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 const { Paragraph, Text } = Typography;
-
-const API_BASE_URL = '/api';
 
 interface Testimonial {
   id: number;
@@ -14,43 +12,18 @@ interface Testimonial {
   rating: number;
 }
 
-const TestimonialsSection = () => {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [badge, setBadge] = useState('TRUSTED BY PRACTITIONERS');
-  const [sectionTitle, setSectionTitle] = useState('Trusted by practitioners');
-  const [loading, setLoading] = useState(true);
+type TestimonialsProps = {
+  section?: {
+    content?: { badge?: string; title?: string; items?: Testimonial[] };
+  };
+};
+
+const TestimonialsSection = ({ section }: TestimonialsProps) => {
+  const c = section?.content ?? {};
+  const badge = c.badge || 'TRUSTED BY PRACTITIONERS';
+  const sectionTitle = c.title || 'Trusted by practitioners';
+  const testimonials: Testimonial[] = Array.isArray(c.items) ? c.items : [];
   const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    let ignore = false;
-    (async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/content/section/testimonials`);
-        const data = await response.json();
-        if (ignore || !response.ok) return;
-        if (data.content?.badge) setBadge(data.content.badge);
-        if (data.content?.title) setSectionTitle(data.content.title);
-        if (data.content?.items?.length) {
-          setTestimonials(data.content.items);
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    })();
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{ padding: '80px 20px', textAlign: 'center', color: '#94a3b8' }}>
-        Loading…
-      </div>
-    );
-  }
 
   if (testimonials.length === 0) return null;
 

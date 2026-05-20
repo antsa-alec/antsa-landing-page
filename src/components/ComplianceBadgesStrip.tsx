@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography, Row, Col } from 'antd';
 import { SafetyOutlined, GlobalOutlined, MedicineBoxOutlined } from '@ant-design/icons';
 
@@ -14,24 +13,23 @@ interface Badge {
  * COMPLIANCE BADGES STRIP - Slim strip above footer
  * Shows GDPR, Australian Privacy Principles, HIPAA badges
  */
-const ComplianceBadgesStrip = () => {
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [loading, setLoading] = useState(true);
+type ComplianceProps = {
+  section?: { content?: { badges?: Badge[] | string } };
+};
 
-  useEffect(() => {
-    fetch('/api/content/section/compliance')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.content && data.content.badges) {
-          const parsed = typeof data.content.badges === 'string'
-            ? JSON.parse(data.content.badges)
-            : data.content.badges;
-          setBadges(parsed);
-        }
-      })
-      .catch((err) => console.error('Failed to load compliance badges:', err))
-      .finally(() => setLoading(false));
-  }, []);
+const ComplianceBadgesStrip = ({ section }: ComplianceProps) => {
+  const rawBadges = section?.content?.badges;
+  let badges: Badge[] = [];
+  if (Array.isArray(rawBadges)) {
+    badges = rawBadges;
+  } else if (typeof rawBadges === 'string') {
+    try {
+      const parsed = JSON.parse(rawBadges);
+      if (Array.isArray(parsed)) badges = parsed;
+    } catch {
+      /* ignore */
+    }
+  }
 
   const defaultBadges: Badge[] = [
     { title: 'GDPR Compliant', description: 'European data protection standards', icon: 'SafetyOutlined' },
@@ -50,8 +48,6 @@ const ComplianceBadgesStrip = () => {
       default: return <SafetyOutlined style={iconStyle} />;
     }
   };
-
-  if (loading) return null;
 
   return (
     <section

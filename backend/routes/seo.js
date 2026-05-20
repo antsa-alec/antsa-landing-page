@@ -27,13 +27,29 @@ function loadAllSections() {
     .all();
 
   const contentStmt = db.prepare('SELECT key, value, type FROM content WHERE section_id = ?');
+  // Mirror the wire shape of GET /api/content/section/:name — components were built
+  // against that endpoint, so SSR data should expose the same fields.
   const featuresStmt = db.prepare(
-    'SELECT title, description, image_url FROM feature_items WHERE section_id = ? ORDER BY order_index',
+    'SELECT * FROM feature_items WHERE section_id = ? ORDER BY order_index',
   );
-  const pricingStmt = db.prepare('SELECT name, price, period, features FROM pricing_plans WHERE section_id = ? ORDER BY order_index');
-  const teamStmt = db.prepare('SELECT name, role, bio FROM team_members WHERE section_id = ? ORDER BY order_index');
-  const testimonialsStmt = db.prepare('SELECT name, role, content FROM testimonials WHERE section_id = ? ORDER BY order_index');
-  const faqStmt = db.prepare('SELECT question, answer FROM faq_items WHERE section_id = ? ORDER BY order_index');
+  const pricingStmt = db.prepare('SELECT * FROM pricing_plans WHERE section_id = ? ORDER BY order_index');
+  const teamStmt = db.prepare('SELECT * FROM team_members WHERE section_id = ? ORDER BY order_index');
+  let teamSocialsStmt = null;
+  try {
+    teamSocialsStmt = db.prepare('SELECT * FROM team_member_socials WHERE team_member_id = ?');
+  } catch {
+    teamSocialsStmt = null;
+  }
+  const testimonialsStmt = db.prepare('SELECT * FROM testimonials WHERE section_id = ? ORDER BY order_index');
+  const faqStmt = db.prepare('SELECT * FROM faq_items WHERE section_id = ? ORDER BY order_index');
+
+  const FEATURE_ITEM_SECTIONS = new Set([
+    'features',
+    'the-shift',
+    'the-antsa',
+    'why_switch',
+    'everything_one_login',
+  ]);
 
   return sections.map((section) => {
     const content = {};
@@ -44,18 +60,44 @@ function loadAllSections() {
         content[row.key] = row.value;
       }
     }
+
     const extras = {};
-    try { extras.features = featuresStmt.all(section.id); } catch {}
     try {
-      extras.pricing = pricingStmt.all(section.id).map((p) => ({
+      const features = featuresStmt.all(section.id);
+      extras.features = features;
+      if (FEATURE_ITEM_SECTIONS.has(section.name) && features.length) {
+        content.items = features;
+      }
+    } catch {}
+    try {
+      const plans = pricingStmt.all(section.id).map((p) => ({
         ...p,
         features: (() => {
           try { return p.features ? JSON.parse(p.features) : []; } catch { return []; }
         })(),
       }));
+      extras.pricing = plans;
+      if (section.name === 'pricing' && plans.length) {
+        content.plans = plans;
+      }
     } catch {}
-    try { extras.team = teamStmt.all(section.id); } catch {}
-    try { extras.testimonials = testimonialsStmt.all(section.id); } catch {}
+    try {
+      const team = teamStmt.all(section.id);
+      extras.team = team;
+      if (section.name === 'team' && team.length) {
+        content.members = team.map((m) => ({
+          ...m,
+          socials: teamSocialsStmt ? teamSocialsStmt.all(m.id) : [],
+        }));
+      }
+    } catch {}
+    try {
+      const testimonials = testimonialsStmt.all(section.id);
+      extras.testimonials = testimonials;
+      if (section.name === 'testimonials' && testimonials.length) {
+        content.items = testimonials;
+      }
+    } catch {}
     try { extras.faqs = faqStmt.all(section.id); } catch {}
 
     return { name: section.name, content, ...extras };

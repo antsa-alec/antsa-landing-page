@@ -1,13 +1,6 @@
-import { Button, Typography } from 'antd';
+import App from '../../App';
+import type { HomeData } from './+data';
 
-const { Title, Paragraph } = Typography;
-
-export default function Page() {
-  return (
-    <main style={{ padding: 40 }}>
-      <Title level={1}>ANTSA SSR scaffold</Title>
-      <Paragraph>Vike is rendering this server-side with AntD styles inlined.</Paragraph>
-      <Button type="primary">Sample button</Button>
-    </main>
-  );
+export default function Page(props: HomeData) {
+  return <App sections={props.sections ?? []} />;
 }

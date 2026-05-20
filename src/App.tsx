@@ -1,6 +1,4 @@
-import { ConfigProvider, Layout } from 'antd';
 import { useEffect } from 'react';
-import AppHeader from './components/AppHeader';
 import HeroSplit from './components/HeroSplit';
 import TrustStrip from './components/TrustStrip';
 import WhySwitchSection from './components/WhySwitchSection';
@@ -14,72 +12,33 @@ import FAQSection from './components/FAQSection';
 import ForClinicsBand from './components/ForClinicsBand';
 import TestimonialsSection from './components/TestimonialsSection';
 import ComplianceBadgesStrip from './components/ComplianceBadgesStrip';
-import AppFooter from './components/AppFooter';
 import Section from './components/Section';
+import type { SectionRow } from './pages/index/+data';
 import './styles/global.css';
 
-const { Content } = Layout;
-
-const theme = {
-  token: {
-    colorPrimary: '#48abe2',
-    colorSuccess: '#10b981',
-    colorWarning: '#f59e0b',
-    colorError: '#ef4444',
-    colorInfo: '#48abe2',
-    colorTextBase: '#0f172a',
-    colorBgBase: '#ffffff',
-    borderRadius: 10,
-    fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    fontSize: 16,
-    lineHeight: 1.6,
-  },
-  components: {
-    Layout: {
-      headerBg: '#ffffff',
-      bodyBg: '#ffffff',
-    },
-    Card: {
-      borderRadiusLG: 12,
-    },
-    Button: {
-      borderRadius: 8,
-      controlHeight: 44,
-      fontWeight: 600,
-    },
-  },
-};
-
-function App() {
+function App({ sections = [] }: { sections?: SectionRow[] }) {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
+          if (entry.isIntersecting) entry.target.classList.add('active');
         });
       },
-      {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px',
-      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' },
     );
 
-    const observeElements = () => {
-      const revealElements = document.querySelectorAll(
-        '.reveal, .reveal-left, .reveal-right, .reveal-scale',
-      );
-      revealElements.forEach((el) => {
-        if (!el.classList.contains('observed')) {
-          el.classList.add('observed');
-          observer.observe(el);
-        }
-      });
+    const observe = () => {
+      document
+        .querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale')
+        .forEach((el) => {
+          if (!el.classList.contains('observed')) {
+            el.classList.add('observed');
+            observer.observe(el);
+          }
+        });
     };
 
-    observeElements();
+    observe();
 
     if (window.location.hash) {
       const id = window.location.hash.slice(1);
@@ -93,46 +52,39 @@ function App() {
       };
       if (!tryScroll()) {
         let attempts = 0;
-        const scrollInterval = setInterval(() => {
-          if (tryScroll() || ++attempts > 10) clearInterval(scrollInterval);
+        const interval = setInterval(() => {
+          if (tryScroll() || ++attempts > 10) clearInterval(interval);
         }, 150);
       }
     }
 
-    const intervalId = setInterval(observeElements, 500);
-
+    const intervalId = setInterval(observe, 500);
     return () => {
       clearInterval(intervalId);
-      const revealElements = document.querySelectorAll(
-        '.reveal, .reveal-left, .reveal-right, .reveal-scale',
-      );
-      revealElements.forEach((el) => observer.unobserve(el));
       observer.disconnect();
     };
   }, []);
 
+  const byName = Object.fromEntries((sections ?? []).map((s) => [s.name, s]));
+
   return (
-    <ConfigProvider theme={theme}>
-      <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
-        <AppHeader />
-        <Content style={{ marginTop: '70px' }}>
-          <Section name="hero"><HeroSplit /></Section>
-          <Section name="trust_strip"><TrustStrip /></Section>
-          <Section name="why_switch"><WhySwitchSection /></Section>
-          <Section name="everything_one_login"><EverythingOneLoginSection /></Section>
-          <Section name="the-shift"><TheShiftSection /></Section>
-          <Section name="the-antsa"><TheAntsaSection /></Section>
-          <Section name="features"><FeaturesSection /></Section>
-          <Section name="team"><TeamSection /></Section>
-          <Section name="pricing"><PricingSection /></Section>
-          <Section name="faq"><FAQSection /></Section>
-          <Section name="for_clinics"><ForClinicsBand /></Section>
-          <Section name="testimonials"><TestimonialsSection /></Section>
-          <Section name="compliance"><ComplianceBadgesStrip /></Section>
-        </Content>
-        <AppFooter />
-      </Layout>
-    </ConfigProvider>
+    <>
+      <Section name="hero"><HeroSplit section={byName.hero} /></Section>
+      <Section name="trust_strip"><TrustStrip section={byName.trust_strip} /></Section>
+      <Section name="why_switch"><WhySwitchSection section={byName.why_switch} /></Section>
+      <Section name="everything_one_login">
+        <EverythingOneLoginSection section={byName.everything_one_login} />
+      </Section>
+      <Section name="the-shift"><TheShiftSection section={byName['the-shift']} /></Section>
+      <Section name="the-antsa"><TheAntsaSection section={byName['the-antsa']} /></Section>
+      <Section name="features"><FeaturesSection section={byName.features} /></Section>
+      <Section name="team"><TeamSection section={byName.team} /></Section>
+      <Section name="pricing"><PricingSection section={byName.pricing} /></Section>
+      <Section name="faq"><FAQSection section={byName.faq} /></Section>
+      <Section name="for_clinics"><ForClinicsBand section={byName.for_clinics} /></Section>
+      <Section name="testimonials"><TestimonialsSection section={byName.testimonials} /></Section>
+      <Section name="compliance"><ComplianceBadgesStrip section={byName.compliance} /></Section>
+    </>
   );
 }
 

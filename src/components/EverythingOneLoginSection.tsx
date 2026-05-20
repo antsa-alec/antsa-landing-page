@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography, Card } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -42,30 +41,16 @@ const DEFAULT_TILES: Tile[] = [
   },
 ];
 
-const EverythingOneLoginSection = () => {
-  const [badge, setBadge] = useState('EVERYTHING IN ONE LOGIN');
-  const [title, setTitle] = useState('Your whole practice stack, unified');
-  const [subtitle, setSubtitle] = useState('');
-  const [items, setItems] = useState<Tile[]>([]);
-  const [loading, setLoading] = useState(true);
+type EverythingProps = {
+  section?: { content?: { badge?: string; title?: string; subtitle?: string; items?: Tile[] } };
+};
 
-  useEffect(() => {
-    fetch('/api/content/section/everything_one_login')
-      .then((res) => res.json())
-      .then((data) => {
-        const c = data.content || {};
-        if (c.badge) setBadge(c.badge);
-        if (c.title) setTitle(c.title);
-        if (c.subtitle) setSubtitle(c.subtitle);
-        const list = data.content?.items || [];
-        if (Array.isArray(list) && list.length) setItems(list);
-        else setItems(DEFAULT_TILES);
-      })
-      .catch(() => setItems(DEFAULT_TILES))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return null;
+const EverythingOneLoginSection = ({ section }: EverythingProps) => {
+  const c = section?.content ?? {};
+  const badge = c.badge || 'EVERYTHING IN ONE LOGIN';
+  const title = c.title || 'Your whole practice stack, unified';
+  const subtitle = c.subtitle || '';
+  const items: Tile[] = Array.isArray(c.items) && c.items.length ? c.items : DEFAULT_TILES;
 
   return (
     <section id="everything-one-login" style={{ padding: '72px 20px', background: '#ffffff' }}>

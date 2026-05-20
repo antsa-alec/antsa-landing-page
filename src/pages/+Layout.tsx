@@ -35,10 +35,7 @@ export default function Layout({ children }: { pageContext: unknown; children: R
       <AntLayout style={{ minHeight: '100vh', background: '#ffffff' }}>
         <AppHeader />
         <Content style={{ marginTop: '70px' }}>{children}</Content>
-        {/* AppFooter uses useNavigate (React Router) which is not available on the server */}
-        <ClientOnly>
-          <AppFooter />
-        </ClientOnly>
+        <AppFooter />
         <ClientOnly>
           <HelpChatWidget />
         </ClientOnly>
