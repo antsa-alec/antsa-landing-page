@@ -4,6 +4,7 @@ import AppHeader from '../components/AppHeader';
 import AppFooter from '../components/AppFooter';
 import HelpChatWidget from '../components/HelpChatWidget';
 import ClientOnly from '../ssr/ClientOnly';
+import type { ChromeData } from './chrome-data';
 
 const { Content } = AntLayout;
 
@@ -29,13 +30,27 @@ const theme = {
   },
 };
 
-export default function Layout({ children }: { pageContext: unknown; children: ReactNode }) {
+type LayoutPageContext = {
+  data?: { chrome?: ChromeData };
+  urlPathname?: string;
+};
+
+export default function Layout({
+  pageContext,
+  children,
+}: {
+  pageContext: unknown;
+  children: ReactNode;
+}) {
+  const ctx = (pageContext ?? {}) as LayoutPageContext;
+  const chrome = ctx.data?.chrome;
+  const urlPathname = ctx.urlPathname ?? '/';
   return (
     <ConfigProvider theme={theme}>
       <AntLayout style={{ minHeight: '100vh', background: '#ffffff' }}>
-        <AppHeader />
+        <AppHeader chrome={chrome} urlPathname={urlPathname} />
         <Content style={{ marginTop: '70px' }}>{children}</Content>
-        <AppFooter />
+        <AppFooter chrome={chrome} />
         <ClientOnly>
           <HelpChatWidget />
         </ClientOnly>

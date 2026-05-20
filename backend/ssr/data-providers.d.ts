@@ -43,7 +43,22 @@ export type HelpCategory = {
   subcategories: HelpSubCategory[];
 };
 
+export type SsrChromeData = {
+  header: {
+    signup_url?: string;
+    signup_label?: string;
+    signin_url?: string;
+    signin_label?: string;
+    demo_url?: string;
+    demo_label?: string;
+  } | null;
+  footer: { copyright?: string; description?: string } | null;
+  socialLinks: Array<{ id: string | number; platform: string; url: string }>;
+  footerLinks: Array<{ id: string | number; label: string; url: string }>;
+};
+
 export function loadAllSections(): SsrSectionRow[];
 export function loadHelpArticles(): SsrHelpArticle[];
 export function loadLegalPage(slug: string): SsrLegalPage | null;
 export function loadHelpForFrontend(): { categories: HelpCategory[] };
+export function loadChromeData(): SsrChromeData;

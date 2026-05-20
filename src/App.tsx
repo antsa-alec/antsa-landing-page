@@ -13,6 +13,7 @@ import ForClinicsBand from './components/ForClinicsBand';
 import TestimonialsSection from './components/TestimonialsSection';
 import ComplianceBadgesStrip from './components/ComplianceBadgesStrip';
 import Section from './components/Section';
+import ClientOnly from './ssr/ClientOnly';
 import type { SectionRow } from './pages/index/+data';
 import './styles/global.css';
 
@@ -79,7 +80,19 @@ function App({ sections = [] }: { sections?: SectionRow[] }) {
       <Section name="the-antsa"><TheAntsaSection section={byName['the-antsa']} /></Section>
       <Section name="features"><FeaturesSection section={byName.features} /></Section>
       <Section name="team"><TeamSection section={byName.team} /></Section>
-      <Section name="pricing"><PricingSection section={byName.pricing} /></Section>
+      {/*
+        PricingSection runs a useEffect fetch against /api/stripe/pricing and
+        reconciles the response against the CMS-seeded plans. That client-only
+        reconciliation produced a hydration mismatch on `/`. Wrap in ClientOnly:
+        the CMS plans still render after hydration, and we accept losing the
+        pricing block from the initial SSR HTML — SEO value here is low (the
+        pricing copy is short and the section is below the fold).
+      */}
+      <Section name="pricing">
+        <ClientOnly fallback={<div id="pricing" />}>
+          <PricingSection section={byName.pricing} />
+        </ClientOnly>
+      </Section>
       <Section name="faq"><FAQSection section={byName.faq} /></Section>
       <Section name="for_clinics"><ForClinicsBand section={byName.for_clinics} /></Section>
       <Section name="testimonials"><TestimonialsSection section={byName.testimonials} /></Section>

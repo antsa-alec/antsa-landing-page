@@ -1,4 +1,5 @@
-import { loadAllSections } from '../../../backend/ssr/data-providers.js';
+import { loadAllSections, loadChromeData } from '../../../backend/ssr/data-providers.js';
+import type { ChromeData } from '../chrome-data';
 
 export type SectionRow = {
   name: string;
@@ -10,8 +11,11 @@ export type SectionRow = {
   faqs?: Array<Record<string, unknown>>;
 };
 
-export type HomeData = { sections: SectionRow[] };
+export type HomeData = { sections: SectionRow[]; chrome: ChromeData };
 
 export function data(): HomeData {
-  return { sections: loadAllSections() as SectionRow[] };
+  return {
+    sections: loadAllSections() as SectionRow[],
+    chrome: loadChromeData() as ChromeData,
+  };
 }

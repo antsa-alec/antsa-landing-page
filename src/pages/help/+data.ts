@@ -1,7 +1,11 @@
-import { loadHelpForFrontend } from '../../../backend/ssr/data-providers.js';
+import { loadHelpForFrontend, loadChromeData } from '../../../backend/ssr/data-providers.js';
+import type { ChromeData } from '../chrome-data';
 
-export type HelpData = ReturnType<typeof loadHelpForFrontend>;
+export type HelpData = ReturnType<typeof loadHelpForFrontend> & { chrome: ChromeData };
 
 export function data(): HelpData {
-  return loadHelpForFrontend();
+  return {
+    ...loadHelpForFrontend(),
+    chrome: loadChromeData() as ChromeData,
+  };
 }
