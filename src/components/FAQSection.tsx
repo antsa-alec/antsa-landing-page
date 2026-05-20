@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Typography, Collapse } from 'antd';
 
 const { Title, Paragraph } = Typography;
@@ -12,21 +13,26 @@ interface FAQ {
 /**
  * FAQ SECTION - Accordion with small blue section label
  */
-type FAQProps = {
-  section?: {
-    faqs?: Array<Record<string, unknown>>;
-  };
-};
+const FAQSection = () => {
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const FAQSection = ({ section }: FAQProps) => {
-  const rawFaqs = section?.faqs;
-  const faqs: FAQ[] = Array.isArray(rawFaqs)
-    ? rawFaqs.map((item, i) => ({
-        id: String((item.id as string | number | undefined) ?? i),
-        question: String(item.question ?? ''),
-        answer: String(item.answer ?? ''),
-      }))
-    : [];
+  useEffect(() => {
+    fetch('/api/content/faq')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items) {
+          const transformedFaqs = data.items.map((item: any) => ({
+            id: String(item.id),
+            question: item.question,
+            answer: item.answer,
+          }));
+          setFaqs(transformedFaqs);
+        }
+      })
+      .catch((err) => console.error('Failed to load FAQs:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const defaultFaqs: FAQ[] = [
     { id: '1', question: 'Is ANTSA a therapy replacement?', answer: 'No. ANTSA supports care between sessions. Clinical judgement, formulation, and responsibility remain with the practitioner. AI support is assigned and overseen within defined clinical parameters. Practitioners control access. Clients are invited into the system by their practitioner and engage only with assigned supports.' },
@@ -44,6 +50,8 @@ const FAQSection = ({ section }: FAQProps) => {
   ];
 
   const displayFaqs = faqs.length > 0 ? faqs : defaultFaqs;
+
+  if (loading) return null;
 
   return (
     <section

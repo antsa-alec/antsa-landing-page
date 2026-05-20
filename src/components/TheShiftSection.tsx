@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Card } from 'antd';
 import * as AntIcons from '@ant-design/icons';
 
@@ -53,14 +54,27 @@ const HighlightedText = ({ text, highlights }: { text: string; highlights: strin
  * THE SHIFT SECTION - Problem statement cards
  * Shows 6 issues with current mental health care landscape
  */
-type TheShiftProps = {
-  section?: { content?: SectionContent & { items?: ShiftItem[] } };
-};
+const TheShiftSection = () => {
+  const [items, setItems] = useState<ShiftItem[]>([]);
+  const [sectionContent, setSectionContent] = useState<SectionContent>({});
+  const [loading, setLoading] = useState(true);
 
-const TheShiftSection = ({ section }: TheShiftProps) => {
-  const sectionContent: SectionContent = section?.content ?? {};
-  const rawItems = (section?.content as { items?: ShiftItem[] } | undefined)?.items;
-  const items: ShiftItem[] = Array.isArray(rawItems) ? rawItems : [];
+  useEffect(() => {
+    fetch('/api/content/section/the-shift')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.content) {
+          setSectionContent(data.content);
+        }
+        if (data.content?.items?.length) {
+          setItems(data.content.items);
+        } else if (data.items) {
+          setItems(data.items);
+        }
+      })
+      .catch((err) => console.error('Failed to load The Shift content:', err))
+      .finally(() => setLoading(false));
+  }, []);
 
   const badge = sectionContent.badge || 'THE SHIFT IN MENTAL HEALTH CARE';
   const title = sectionContent.title || 'Mental health care has already moved. Systems have not.';
@@ -84,6 +98,8 @@ const TheShiftSection = ({ section }: TheShiftProps) => {
     const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
     return <IconComponent style={{ fontSize: '28px', color: color || '#48abe2' }} />;
   };
+
+  if (loading) return null;
 
   return (
     <section

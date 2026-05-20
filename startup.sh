@@ -34,15 +34,12 @@ if [ -d /home/site/wwwroot/backend/uploads ]; then
 fi
 
 # ── Native module rebuild ─────────────────────────────────────────────────────
-# Only backend's better-sqlite3 is loaded at runtime. The root copy was
-# only needed during the Vite/Rollup build (so the SSR bundle could be
-# emitted with 'better-sqlite3' marked as external). At runtime the chain
-# dist/server/entries/* → backend/ssr/data-providers.js → backend/config/
-# database.js resolves better-sqlite3 from backend/node_modules, never from
-# the root. Trying to rebuild the root copy on Azure has historically failed
-# (no prebuilt matched the Azure Node 20 image), so we leave it alone.
+# node_modules are shipped in the deployment package (installed in CI), so we
+# don't need a full `npm install`. We only rebuild the better-sqlite3 native
+# addon because the CI runner (ubuntu-latest) may differ from the Azure runtime.
 cd /home/site/wwwroot/backend
-echo "🔨 Rebuilding better-sqlite3 in backend..."
+
+echo "🔨 Rebuilding better-sqlite3 for current Node/platform..."
 npm rebuild better-sqlite3
 echo "✅ Native module ready"
 

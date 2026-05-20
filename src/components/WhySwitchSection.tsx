@@ -1,4 +1,5 @@
 import type { ComponentType, CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, Card } from 'antd';
 import * as AntIcons from '@ant-design/icons';
 
@@ -48,16 +49,32 @@ const DEFAULT_WHY: Item[] = [
   },
 ];
 
-type WhySwitchProps = {
-  section?: { content?: { badge?: string; title?: string; subtitle?: string; items?: Item[] } };
-};
+const WhySwitchSection = () => {
+  const [badge, setBadge] = useState('WHY PRACTITIONERS SWITCH TO ANTSA');
+  const [title, setTitle] = useState('Why practitioners switch');
+  const [subtitle, setSubtitle] = useState('');
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const WhySwitchSection = ({ section }: WhySwitchProps) => {
-  const c = section?.content ?? {};
-  const badge = c.badge || 'WHY PRACTITIONERS SWITCH TO ANTSA';
-  const title = c.title || 'Why practitioners switch';
-  const subtitle = c.subtitle || '';
-  const items: Item[] = Array.isArray(c.items) && c.items.length ? c.items : DEFAULT_WHY;
+  useEffect(() => {
+    fetch('/api/content/section/why_switch')
+      .then((res) => res.json())
+      .then((data) => {
+        const c = data.content || {};
+        if (c.badge) setBadge(c.badge);
+        if (c.title) setTitle(c.title);
+        if (c.subtitle) setSubtitle(c.subtitle);
+        const list = data.content?.items || [];
+        if (Array.isArray(list) && list.length) setItems(list);
+        else setItems(DEFAULT_WHY);
+      })
+      .catch(() => {
+        setItems(DEFAULT_WHY);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
 
   return (
     <section
