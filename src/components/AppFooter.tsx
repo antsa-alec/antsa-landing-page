@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Typography, Space, Button, Input, message } from 'antd';
 import {
   InstagramOutlined,
@@ -10,35 +9,31 @@ import {
   ArrowRightOutlined,
 } from '@ant-design/icons';
 import antsaLogo from '../assets/logo-black.png';
+import type {
+  ChromeData,
+  SocialLink,
+  FooterLink,
+  FooterContent,
+} from '../pages/chrome-data';
 
 const { Paragraph, Link } = Typography;
 
-interface SocialLink {
-  id: string;
-  platform: string;
-  url: string;
-}
-
-interface FooterLink {
-  id: string;
-  label: string;
-  url: string;
-}
-
-interface FooterContent {
-  copyright?: string;
-  description?: string;
-}
-
 /**
- * FOOTER - Dark theme with ANTSA logo, social icons, legal links, subscribe
+ * FOOTER - Dark theme with ANTSA logo, social icons, legal links, subscribe.
+ *
+ * Footer content (copyright, social links, extra footer links) is piped through
+ * pageContext from each page's +data.ts. Both server-render and client first
+ * render use the same data, eliminating hydration mismatches that previously
+ * occurred when these values were fetched in useEffect on the client.
  */
-const AppFooter = () => {
-  const navigate = useNavigate();
-  const [footerContent, setFooterContent] = useState<FooterContent>({});
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
-  const [extraLinks, setExtraLinks] = useState<FooterLink[]>([]);
-  const [loading, setLoading] = useState(true);
+const AppFooter = ({ chrome }: { chrome?: ChromeData }) => {
+  const footerContent: FooterContent = chrome?.footer ?? {};
+  const socialLinks: SocialLink[] = chrome?.socialLinks ?? [];
+  // Filter out any legacy legal links that duplicate the hardcoded ones
+  const legalPaths = new Set(['/privacy-policy', '/terms-and-conditions']);
+  const extraLinks: FooterLink[] = (chrome?.footerLinks ?? []).filter(
+    (l) => !legalPaths.has(l.url),
+  );
 
   // Subscribe form state
   const [subscribeName, setSubscribeName] = useState('');
@@ -51,29 +46,6 @@ const AppFooter = () => {
     { label: 'Privacy Policy', path: '/privacy-policy' },
     { label: 'Terms & Conditions', path: '/terms-and-conditions' },
   ];
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/content/section/footer').then((res) => res.json()),
-      fetch('/api/content/social-links').then((res) => res.json()),
-      fetch('/api/content/footer-links').then((res) => res.json()),
-    ])
-      .then(([footerData, socialData, linksData]) => {
-        if (footerData.content) {
-          setFooterContent(footerData.content);
-        }
-        if (socialData.links) {
-          setSocialLinks(socialData.links);
-        }
-        if (linksData.links) {
-          // Filter out any legacy legal links that duplicate the hardcoded ones
-          const legalPaths = new Set(['/privacy-policy', '/terms-and-conditions']);
-          setExtraLinks(linksData.links.filter((l: FooterLink) => !legalPaths.has(l.url)));
-        }
-      })
-      .catch((err) => console.error('Failed to load footer data:', err))
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleSubscribe = async () => {
     // Validation
@@ -135,8 +107,6 @@ const AppFooter = () => {
       default: return <MailOutlined />;
     }
   };
-
-  if (loading) return null;
 
   return (
     <footer
@@ -368,17 +338,14 @@ const AppFooter = () => {
           {/* Legal + Extra Links */}
           <Space size={24} wrap>
             {legalPages.map((page) => (
-              <span
+              <a
                 key={page.path}
-                onClick={() => navigate(page.path)}
-                role="link"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') navigate(page.path); }}
+                href={page.path}
                 style={{
                   color: 'rgba(255, 255, 255, 0.5)',
                   fontSize: '13px',
+                  textDecoration: 'none',
                   transition: 'color 0.3s ease',
-                  cursor: 'pointer',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#ffffff';
@@ -388,7 +355,7 @@ const AppFooter = () => {
                 }}
               >
                 {page.label}
-              </span>
+              </a>
             ))}
             {extraLinks.map((link) => (
               <Link

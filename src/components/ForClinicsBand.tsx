@@ -1,50 +1,44 @@
-import { useEffect, useState } from 'react';
 import { Typography, Button, Row, Col } from 'antd';
 import { BankOutlined, CheckOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph } = Typography;
 
-const ForClinicsBand = () => {
-  const [title, setTitle] = useState('For Clinics & Enterprises');
-  const [subtitle, setSubtitle] = useState(
-    'Need multi-practitioner access, reporting, integrations or enterprise rollout? ANTSA scales with your organisation.',
-  );
-  const [checklist, setChecklist] = useState<string[]>([
+type ForClinicsProps = {
+  section?: {
+    content?: {
+      title?: string;
+      subtitle?: string;
+      cta_label?: string;
+      cta_href?: string;
+      checklist?: string[] | string;
+    };
+  };
+};
+
+const ForClinicsBand = ({ section }: ForClinicsProps) => {
+  const c = section?.content ?? {};
+  const title = c.title || 'For Clinics & Enterprises';
+  const subtitle =
+    c.subtitle ||
+    'Need multi-practitioner access, reporting, integrations or enterprise rollout? ANTSA scales with your organisation.';
+  const ctaLabel = c.cta_label || 'Talk to Us';
+  const ctaHref = c.cta_href || 'mailto:admin@antsa.com.au?subject=Enterprise%20ANTSA';
+  let checklist: string[] = [
     'Role-based access',
     'Advanced reporting',
     'Integrations & API access',
     'Dedicated onboarding',
-  ]);
-  const [ctaLabel, setCtaLabel] = useState('Talk to Us');
-  const [ctaHref, setCtaHref] = useState(
-    'mailto:admin@antsa.com.au?subject=Enterprise%20ANTSA',
-  );
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/content/section/for_clinics')
-      .then((res) => res.json())
-      .then((data) => {
-        const c = data.content || {};
-        if (c.title) setTitle(c.title);
-        if (c.subtitle) setSubtitle(c.subtitle);
-        if (c.cta_label) setCtaLabel(c.cta_label);
-        if (c.cta_href) setCtaHref(c.cta_href);
-        if (Array.isArray(c.checklist)) setChecklist(c.checklist);
-        else if (typeof c.checklist === 'string') {
-          try {
-            const p = JSON.parse(c.checklist);
-            if (Array.isArray(p)) setChecklist(p);
-          } catch {
-            /* ignore */
-          }
-        }
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return null;
+  ];
+  if (Array.isArray(c.checklist)) {
+    checklist = c.checklist;
+  } else if (typeof c.checklist === 'string') {
+    try {
+      const parsed = JSON.parse(c.checklist);
+      if (Array.isArray(parsed)) checklist = parsed;
+    } catch {
+      /* ignore */
+    }
+  }
 
   return (
     <section id="for-clinics" style={{ padding: '56px 20px', background: '#e8f4fc' }}>
