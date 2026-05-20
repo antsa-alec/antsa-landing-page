@@ -81,19 +81,28 @@ jobs:
         if-no-files-found: ignore
         retention-days: 30
 
+    - name: Prune root devDependencies for shipping
+      # `npm ci` above installed vite/typescript/etc. needed for the build.
+      # The Vike SSR bundle in dist/server/ imports vike/react/express/better-sqlite3
+      # at runtime, all of which are in root `dependencies`. Pruning leaves just
+      # those so we can ship root node_modules without the build toolchain.
+      run: npm prune --production
+
     - name: Create deployment package
       run: |
         mkdir -p deploy
         cp -r dist deploy/
         cp -r backend deploy/
-        # node_modules are already installed in CI — include them so startup is fast
-        # better-sqlite3 native binary will be rebuilt for Azure at startup via startup.sh
+        # Root node_modules holds runtime deps the SSR bundle resolves
+        # (vike/server, react-dom/server, @ant-design/cssinjs, better-sqlite3,
+        # express). Ship them alongside backend/node_modules.
+        cp -r node_modules deploy/
+        cp package.json deploy/package-root.json
         cp startup.sh deploy/startup.sh
         chmod +x deploy/startup.sh
-        
-        # Use startup.sh as the start script so it always runs on every deployment.
-        # startup.sh handles: persistent dir setup, better-sqlite3 rebuild, seeding,
-        # then exec node server.js from the backend directory.
+
+        # Top-level package.json invokes startup.sh. We keep our root deps in
+        # package-root.json so npm at the wwwroot level doesn't try to reinstall.
         cat > deploy/package.json << 'EOF'
         {
           "name": "antsa-landing-page",
@@ -114,3 +123,30 @@ jobs:
     - name: Restart app
       run: |
         az webapp restart --resource-group ${{ env.RESOURCE_GROUP }} --name ${{ env.APP_NAME }}
+
+    - name: Smoke test (auto-rollback gate)
+      # If the deployed site doesn't return real SSR content within 3 minutes,
+      # fail the job. The previous git ref is still on the App Service from the
+      # prior successful deploy, so a maintainer can `git revert` immediately.
+      run: |
+        echo "⏳ Waiting up to 3 minutes for SSR to come up..."
+        for i in $(seq 1 36); do
+          BODY=$(curl -fsS --max-time 8 https://antsa.ai/ 2>/dev/null || true)
+          if echo "$BODY" | grep -q 'Application Error'; then
+            echo "  [$i/36] still showing Azure error page..."
+          elif echo "$BODY" | grep -q '<h1'; then
+            echo "✅ Site is responding with content."
+            BOT_BODY=$(curl -fsS --max-time 8 -H 'User-Agent: GPTBot/1.2' https://antsa.ai/ 2>/dev/null || true)
+            if echo "$BOT_BODY" | grep -q '<h1'; then
+              echo "✅ Bot UA also gets content."
+              exit 0
+            fi
+            echo "❌ Bot UA didn't get content."
+            exit 1
+          else
+            echo "  [$i/36] no usable response yet..."
+          fi
+          sleep 5
+        done
+        echo "❌ Site never came up. Manually revert with: git revert HEAD && git push"
+        exit 1
