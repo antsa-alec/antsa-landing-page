@@ -13,6 +13,7 @@ import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
 import seoRoutes, { buildSeoBodyHtml, buildFaqJsonLd, loadAllSections, loadHelpArticles } from './routes/seo.js';
+import { isBotUA } from './lib/bot-ua.js';
 import { readFileSync } from 'fs';
 
 // ES Module __dirname equivalent
@@ -101,19 +102,32 @@ if (process.env.NODE_ENV === 'production') {
     return cachedShell;
   };
 
-  // Inject live CMS content into the body so non-JS clients (LLM fetchers,
-  // link previewers, archive bots) see meaningful content. React replaces
-  // #root on mount, so users see no difference. Content reflects the latest
-  // CMS edits because it's read from the DB on every request.
+  // Catch-all SPA handler.
+  //
+  // Humans get the clean shell — React mounts into an empty #root, so there is
+  // nothing for it to flash-replace. (That replace was the visible "FOUC" on
+  // antsa.ai.)
+  //
+  // Bots that read raw HTML (LLM scrapers like GPTBot/ClaudeBot, search
+  // engines, link previewers) get the injected SEO body. This preserves the
+  // original goal of giving non-JS scrapers full marketing content without
+  // requiring them to execute the SPA.
+  //
+  // FAQ JSON-LD is injected for everyone — it lives in <head>, is invisible,
+  // and helps any crawler that does parse it (Google rich results, etc.).
   app.get('*', (req, res) => {
     try {
       const sections = loadAllSections();
-      const helpArticles = loadHelpArticles();
-      const bodyHtml = buildSeoBodyHtml(sections, helpArticles);
       const faqLd = buildFaqJsonLd(sections);
+      const isBot = isBotUA(req.get('user-agent'));
 
-      let html = getShell()
-        .replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+      let html = getShell();
+
+      if (isBot) {
+        const helpArticles = loadHelpArticles();
+        const bodyHtml = buildSeoBodyHtml(sections, helpArticles);
+        html = html.replace('<div id="root"></div>', `<div id="root">${bodyHtml}</div>`);
+      }
 
       if (faqLd) {
         const faqScript = `<script type="application/ld+json">${JSON.stringify(faqLd)}</script>`;
@@ -121,6 +135,8 @@ if (process.env.NODE_ENV === 'production') {
       }
 
       res.set('Content-Type', 'text/html; charset=utf-8');
+      // Bot vs human variants must not share a cache entry.
+      res.set('Vary', 'User-Agent');
       res.set('Cache-Control', 'public, max-age=300');
       res.send(html);
     } catch (err) {
