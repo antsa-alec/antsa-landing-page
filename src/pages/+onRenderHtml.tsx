@@ -4,6 +4,7 @@ import { escapeInject, dangerouslySkipEscape } from 'vike/server';
 import type { OnRenderHtmlAsync } from 'vike/types';
 import { createCache, StyleProvider, extractStyle } from '@ant-design/cssinjs';
 import Layout from './+Layout';
+import DefaultHead from './+Head';
 
 const onRenderHtml: OnRenderHtmlAsync = async (pageContext) => {
   const { Page, data } = pageContext;
@@ -22,17 +23,27 @@ const onRenderHtml: OnRenderHtmlAsync = async (pageContext) => {
   );
   const styleTag = extractStyle(cache);
 
-  // config.Head is a user-defined meta field; cast config to access it
+  // Always render the default Head (Organization/OG/Twitter/gtag JSON-LD).
+  const defaultHeadHtml = renderToString(<DefaultHead />);
+
+  // config.Head is a page-level override set via +Head.tsx in each page directory.
+  // When present it is different from DefaultHead, so render it after the default
+  // so that page-specific <title> and <link rel="canonical"> override the defaults
+  // (last value wins in browsers for duplicate tags).
   const config = pageContext.config as Record<string, unknown>;
-  const HeadComp = config.Head as ComponentType<{ data: unknown }> | undefined;
-  const headHtml = HeadComp ? renderToString(<HeadComp data={data} />) : '';
+  const PageHead = config.Head as ComponentType<{ data: unknown }> | undefined;
+  const pageHeadHtml =
+    PageHead && PageHead !== (DefaultHead as unknown)
+      ? renderToString(<PageHead data={data} />)
+      : '';
 
   return escapeInject`<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    ${dangerouslySkipEscape(headHtml)}
+    ${dangerouslySkipEscape(defaultHeadHtml)}
+    ${dangerouslySkipEscape(pageHeadHtml)}
     ${dangerouslySkipEscape(styleTag)}
   </head>
   <body>
