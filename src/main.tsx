@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
 import Admin from './pages/Admin.tsx';
 import PrivacyPolicy from './pages-legacy/PrivacyPolicy.tsx';
-import TermsAndConditions from './pages/TermsAndConditions.tsx';
+import TermsAndConditions from './pages-legacy/TermsAndConditions.tsx';
 import HelpCentre from './pages/HelpCentre.tsx';
 import FreeTrial from './pages-legacy/FreeTrial.tsx';
 import HelpChatWidget from './components/HelpChatWidget.tsx';
