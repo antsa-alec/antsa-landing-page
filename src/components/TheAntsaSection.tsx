@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Card } from 'antd';
 import * as AntIcons from '@ant-design/icons';
 
@@ -96,27 +95,14 @@ const stepIcons = ['ScheduleOutlined', 'InteractionOutlined', 'FundViewOutlined'
 /**
  * THE ANTSA SECTION - Solution statement cards + Clinical Care Loop
  */
-const TheAntsaSection = () => {
-  const [items, setItems] = useState<SolutionItem[]>([]);
-  const [sectionContent, setSectionContent] = useState<SectionContent>({});
-  const [loading, setLoading] = useState(true);
+type TheAntsaProps = {
+  section?: { content?: SectionContent & { items?: SolutionItem[] } };
+};
 
-  useEffect(() => {
-    fetch('/api/content/section/the-antsa')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.content) {
-          setSectionContent(data.content);
-        }
-        if (data.content?.items?.length) {
-          setItems(data.content.items);
-        } else if (data.items) {
-          setItems(data.items);
-        }
-      })
-      .catch((err) => console.error('Failed to load The ANTSA content:', err))
-      .finally(() => setLoading(false));
-  }, []);
+const TheAntsaSection = ({ section }: TheAntsaProps) => {
+  const sectionContent: SectionContent = section?.content ?? {};
+  const rawItems = (section?.content as { items?: SolutionItem[] } | undefined)?.items;
+  const items: SolutionItem[] = Array.isArray(rawItems) ? rawItems : [];
 
   const badge = sectionContent.badge || 'PROBLEM? WE HAVE THE ANTSA';
   const title = sectionContent.title || 'The system that brings clinicians back into the loop.';
@@ -161,8 +147,6 @@ const TheAntsaSection = () => {
     const IconComponent = (AntIcons as any)[iconName] || AntIcons.StarOutlined;
     return <IconComponent style={{ fontSize: '28px', color: color || '#48abe2' }} />;
   };
-
-  if (loading) return null;
 
   return (
     <section

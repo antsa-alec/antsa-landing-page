@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Typography, Row, Col, Space, Button } from 'antd';
 import {
   LinkedinOutlined,
@@ -51,21 +50,11 @@ const getSocialConfig = (platform: string): { icon: React.ReactNode; label: stri
   }
 };
 
-const TeamSection = () => {
-  const [members, setMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
+type TeamProps = { section?: { content?: { members?: TeamMember[] } } };
 
-  useEffect(() => {
-    fetch('/api/content/section/team')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.content && data.content.members) {
-          setMembers(data.content.members);
-        }
-      })
-      .catch((err) => console.error('Failed to load team:', err))
-      .finally(() => setLoading(false));
-  }, []);
+const TeamSection = ({ section }: TeamProps) => {
+  const rawMembers = section?.content?.members;
+  const members: TeamMember[] = Array.isArray(rawMembers) ? rawMembers : [];
 
   const defaultMembers: TeamMember[] = [
     {
@@ -103,8 +92,6 @@ const TeamSection = () => {
   ];
 
   const displayMembers = members.length > 0 ? members : defaultMembers;
-
-  if (loading) return null;
 
   return (
     <section

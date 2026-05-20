@@ -1,5 +1,4 @@
 import type { ComponentType, CSSProperties } from 'react';
-import { useEffect, useState } from 'react';
 import * as AntIcons from '@ant-design/icons';
 
 type TrustItem = { label: string; icon: string };
@@ -12,18 +11,11 @@ const defaults: TrustItem[] = [
   { label: 'Unlimited Clients', icon: 'TeamOutlined' },
 ];
 
-const TrustStrip = () => {
-  const [items, setItems] = useState<TrustItem[]>(defaults);
+type TrustStripProps = { section?: { content?: { items?: TrustItem[] } } };
 
-  useEffect(() => {
-    fetch('/api/content/section/trust_strip')
-      .then((res) => res.json())
-      .then((data) => {
-        const raw = data.content?.items;
-        if (Array.isArray(raw) && raw.length) setItems(raw);
-      })
-      .catch(() => {});
-  }, []);
+const TrustStrip = ({ section }: TrustStripProps) => {
+  const raw = section?.content?.items;
+  const items: TrustItem[] = Array.isArray(raw) && raw.length ? raw : defaults;
 
   return (
     <div
