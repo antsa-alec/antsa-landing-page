@@ -4,11 +4,16 @@
  * for arbitrary keys (hero uses a dedicated one-shot patch).
  */
 import db from '../config/database.js';
+import { applyRedesignContent } from './redesign-content.mjs';
 
 const MARKER_SECTIONS = 'redesign_2026_sections_v1_done';
 const MARKER_JAIMEE = 'redesign_2026_jaimee_rename_done';
 const MARKER_REAL_SCREENSHOTS_V2 = 'redesign_2026_real_screenshots_v2_done';
 const MARKER_HEADER_CTAS_V3 = 'redesign_2026_header_ctas_v3_done';
+// Full clinician-governed design refactor (Aug 2026): applies the approved
+// design copy for hero/features/team/pricing/faq/header/footer/socials. Gated
+// one-time so it won't clobber later admin edits on subsequent boots.
+const MARKER_FULL_DESIGN_V1 = 'redesign_2026_full_design_v1_done';
 const CALENDLY_URL = 'https://calendly.com/sally-anne-mcc';
 
 function getSetting(key) {
@@ -469,12 +474,23 @@ function runHeaderCtasV3() {
   console.log('✅ redesign_2026: header CTAs (Book a Demo → Calendly) applied');
 }
 
+// Apply the full clinician-governed design content, one time. Supersedes the
+// earlier partial content migrations above; guarded by its own marker so a
+// deploy applies it once and never re-clobbers subsequent admin edits.
+function runFullDesignV1() {
+  if (getSetting(MARKER_FULL_DESIGN_V1)) return;
+  applyRedesignContent(db);
+  setSetting(MARKER_FULL_DESIGN_V1, '1');
+  console.log('✅ redesign_2026: full design content applied');
+}
+
 export function runRedesignMigrations() {
   try {
     runSectionsMigration();
     runJaimeeRename();
     runRealScreenshotsV2();
     runHeaderCtasV3();
+    runFullDesignV1();
   } catch (e) {
     console.error('⚠️ redesign_2026 migration error:', e.message);
   }

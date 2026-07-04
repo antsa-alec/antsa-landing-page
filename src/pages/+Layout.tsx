@@ -15,11 +15,11 @@ const theme = {
     colorWarning: '#f59e0b',
     colorError: '#ef4444',
     colorInfo: '#48abe2',
-    colorTextBase: '#0f172a',
+    colorTextBase: '#0f1622',
     colorBgBase: '#ffffff',
     borderRadius: 10,
     fontFamily:
-      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      "'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
     fontSize: 16,
     lineHeight: 1.6,
   },
@@ -49,7 +49,7 @@ export default function Layout({
     <ConfigProvider theme={theme}>
       <AntLayout style={{ minHeight: '100vh', background: '#ffffff' }}>
         <AppHeader chrome={chrome} urlPathname={urlPathname} />
-        <Content style={{ marginTop: '70px' }}>{children}</Content>
+        <Content style={{ marginTop: '65px' }}>{children}</Content>
         <AppFooter chrome={chrome} />
         <ClientOnly>
           <HelpChatWidget />

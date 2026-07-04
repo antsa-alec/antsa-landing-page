@@ -615,3 +615,174 @@ footer input {
   margin-bottom: 0;
 }
 
+/* ============================================================
+   2026 REDESIGN — "dc" DESIGN SYSTEM
+   Clinician-governed platform. Poppins + calm clinical blues.
+   Palette: ink #0F1622 · body #5B6472 · primary #48ABE2 (hover #2E96D4)
+            tints #DCE9FB/#EAF2FB/#EEF4FB · borders #E6E9EE/#D8DEE7
+            section bg alternates #fff / #F3F7FC · dark #0F1622
+   Helper classes are consumed by every redesigned section component.
+   ============================================================ */
+
+:root {
+  --dc-ink: #0f1622;
+  --dc-body: #5b6472;
+  --dc-muted: #8b95a3;
+  --dc-primary: #48abe2;
+  --dc-primary-dark: #2e96d4;
+  --dc-tint: #dce9fb;
+  --dc-bg-soft: #f3f7fc;
+  --dc-bg-hero: #eef4fb;
+  --dc-border: #e6e9ee;
+  --dc-border-strong: #d8dee7;
+  --dc-dark: #0f1622;
+  --dc-font: 'Poppins', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Apply Poppins globally on the marketing site (loaded via <link> in +Head). */
+body {
+  font-family: var(--dc-font);
+  color: var(--dc-ink);
+}
+
+/* Container — matches the design's 1180px max width */
+.dc-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Section kicker / eyebrow */
+.dc-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dc-primary-dark);
+}
+
+/* Section heading */
+.dc-h2 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--dc-ink);
+  margin: 0;
+}
+.dc-h2 .hl { color: var(--dc-primary); }
+.dc-lead {
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--dc-body);
+  margin: 0;
+}
+
+/* Buttons */
+.dc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 14px 26px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  white-space: nowrap;
+}
+.dc-btn-sm { padding: 9px 16px; font-size: 15px; }
+.dc-btn-primary {
+  background: var(--dc-primary);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(72, 171, 226, 0.22);
+}
+.dc-btn-primary:hover { background: var(--dc-primary-dark); color: #fff; }
+.dc-btn-secondary {
+  background: #fff;
+  color: var(--dc-ink);
+  border-color: var(--dc-border-strong);
+}
+.dc-btn-secondary:hover { border-color: var(--dc-primary); }
+.dc-btn-outline {
+  background: #fff;
+  color: var(--dc-primary);
+  border-color: var(--dc-primary);
+}
+.dc-btn-outline:hover { background: var(--dc-primary); color: #fff; }
+
+/* Nav link */
+.dc-nav-link {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--dc-body);
+  transition: color 0.2s ease;
+}
+.dc-nav-link:hover { color: var(--dc-ink); }
+
+/* Card + hover lift */
+.dc-card {
+  background: #fff;
+  border: 1px solid var(--dc-border);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(15, 22, 34, 0.04);
+}
+.dc-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.dc-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(15, 22, 34, 0.1);
+}
+
+/* Small blue-outline link chip (team socials, etc.) */
+.dc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--dc-border-strong);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dc-primary);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.dc-chip:hover { border-color: var(--dc-primary); }
+
+/* Responsive grids — collapse gracefully on narrow viewports */
+.dc-grid-2,
+.dc-grid-3,
+.dc-grid-4 { display: grid; }
+.dc-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.dc-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.dc-grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 960px) {
+  .dc-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .dc-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .dc-grid-2,
+  .dc-grid-3,
+  .dc-grid-4 { grid-template-columns: 1fr; }
+  .dc-container { padding: 0 18px; }
+  .dc-h2 { font-size: 26px; line-height: 34px; }
+}
+
+/* Dark-band social pill (governance/footer) */
+.dc-social {
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.dc-social:hover { background: var(--dc-primary) !important; color: #fff !important; transform: translateY(-2px); }
+
+/* Design scrollbar */
+html { scrollbar-width: thin; scrollbar-color: #48abe2 #eef4fb; }
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: #eef4fb; }
+::-webkit-scrollbar-thumb { background: #48abe2; border-radius: 999px; border: 3px solid #eef4fb; }
+::-webkit-scrollbar-thumb:hover { background: #2e96d4; }
+::selection { background: #dce9fb; }
+

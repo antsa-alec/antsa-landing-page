@@ -1,40 +1,109 @@
 import { useEffect, useState } from 'react';
-import { Typography, Row, Col, Card, Button, List } from 'antd';
-import { CheckOutlined, MailOutlined } from '@ant-design/icons';
-
-const { Title, Paragraph } = Typography;
-
-interface PricingPlan {
-  id: string;
-  name: string;
-  price: string;
-  period: string;
-  features: string[];
-  featured?: boolean;
-  cta_text: string;
-  cta_url?: string;
-}
 
 /**
- * PRICING SECTION - Three-tier pricing cards
+ * PRICING — "One platform, simple pricing". Three tiers.
+ * CMS + live Stripe: SSR seeds from section.content.plans; the client refreshes
+ * the Solo price from /api/stripe/pricing. Priced (featured) plan renders the
+ * Solo layout with two CTAs; unpriced plans render a "Contact us" card.
  */
+
+type PricingPlan = {
+  id?: string | number;
+  name: string;
+  price: string;
+  period?: string;
+  features: string[];
+  featured?: boolean;
+  cta_text?: string;
+  cta_url?: string;
+};
+
 type PricingProps = { section?: { content?: { plans?: PricingPlan[] } } };
 
-const PricingSection = ({ section }: PricingProps) => {
-  // Seed with server-rendered CMS plans for SSR; refresh from live Stripe on the client.
-  const rawSeed = Array.isArray(section?.content?.plans)
+const hasPrice = (p: PricingPlan) => !!p.price && /^\$\d/.test(p.price);
+
+const DEFAULT_PLANS: PricingPlan[] = [
+  {
+    id: 'solo',
+    name: 'Solo practitioner',
+    price: '$99',
+    period: '/ month',
+    featured: true,
+    features: [
+      'Full platform access',
+      'Clinician-overseen AI chatbot',
+      'Practitioner AI assistant',
+      'AI Scribe & templates',
+      'Telehealth & session summaries',
+      'Mood & distress tracking',
+      'Secure messaging',
+      'Homework task assignment',
+      'Psychoeducation library',
+      'Automated reminders',
+      'Psychometric measures',
+    ],
+    cta_url: 'https://au.antsa.ai/sign-in',
+  },
+  {
+    id: 'clinic',
+    name: 'Clinic / practice',
+    price: '',
+    period: 'Volume pricing for teams',
+    features: [
+      'Everything in solo practitioner',
+      'Reduced per-licence pricing',
+      'Multi-practitioner management',
+      'Practice-level reporting',
+      'Encrypted practitioner communication',
+      'Real-time reporting of practitioner usage',
+    ],
+    cta_url: 'mailto:admin@antsa.com.au',
+  },
+  {
+    id: 'enterprise',
+    name: 'Enterprise',
+    price: '',
+    period: 'For organisations at scale',
+    features: [
+      'Everything in clinic / practice',
+      'Custom integrations',
+      'Dedicated support',
+      'Service-level agreements',
+      'Custom deployment options',
+    ],
+    cta_url: 'mailto:admin@antsa.com.au',
+  },
+];
+
+/** Subtitle shown under an unpriced plan name. */
+const subtitleFor = (p: PricingPlan) => {
+  if (p.period && !p.period.startsWith('/')) return p.period;
+  const n = p.name.toLowerCase();
+  if (n.includes('clinic') || n.includes('practice')) return 'Volume pricing for teams';
+  if (n.includes('enterprise')) return 'For organisations at scale';
+  return 'Talk to us about pricing';
+};
+
+const Check = ({ color }: { color: string }) => (
+  <span style={{ color, flexShrink: 0, display: 'inline-flex' }}>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  </span>
+);
+
+const MailIcon = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+    <polyline points="22,6 12,13 2,6" />
+  </svg>
+);
+
+export default function PricingSection({ section }: PricingProps) {
+  const seed = Array.isArray(section?.content?.plans) && section!.content!.plans!.length
     ? (section!.content!.plans as PricingPlan[])
-    : [];
-  const seedPlans: PricingPlan[] = rawSeed.map((p) => ({
-    ...p,
-    cta_text: p.cta_text || (p.price && /^\$\d/.test(p.price) ? 'Start Free Trial' : 'Contact Us'),
-    cta_url:
-      p.cta_url ||
-      (p.price && /^\$\d/.test(p.price)
-        ? '/free-trial'
-        : 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry'),
-  }));
-  const [plans, setPlans] = useState<PricingPlan[]>(seedPlans);
+    : DEFAULT_PLANS;
+  const [plans, setPlans] = useState<PricingPlan[]>(seed);
 
   useEffect(() => {
     fetch('/api/stripe/pricing')
@@ -43,307 +112,118 @@ const PricingSection = ({ section }: PricingProps) => {
         return res.json();
       })
       .then((data) => {
-        if (data.plans && data.plans.length > 0) {
-          setPlans(data.plans);
-        }
+        if (data.plans && data.plans.length > 0) setPlans(data.plans);
       })
       .catch((err) => console.error('Failed to load pricing:', err));
   }, []);
 
-  const defaultPlans: PricingPlan[] = [
-    {
-      id: '0',
-      name: 'Free Trial',
-      price: '$0',
-      period: '/14 days',
-      features: [
-        'Full platform access for 14 days',
-        'Up to 3 active clients',
-        'AI Scribe & Templates',
-        'Clinician-Overseen AI Chatbot',
-        'Telehealth & Session Summaries',
-        'Mood & Distress Tracking',
-        'Secure Messaging',
-        'Psychometric Measures',
-        'No credit card required',
-      ],
-      featured: false,
-      cta_text: 'Start Free Trial',
-      cta_url: '/free-trial',
-    },
-    {
-      id: '1',
-      name: 'Solo Practitioner',
-      price: '$79',
-      period: '/month',
-      features: [
-        'Full platform access',
-        'Clinician-Overseen AI Chatbot',
-        'Practitioner AI Assistant',
-        'AI Scribe & Templates',
-        'Telehealth & Session Summaries',
-        'Mood & Distress Tracking',
-        'Secure Messaging',
-        'Homework Task Assignment',
-        'Psychoeducation Library',
-        'Automated Reminders',
-        'Psychometric Measures',
-      ],
-      featured: true,
-      cta_text: 'Start Free Trial',
-      cta_url: '/free-trial',
-    },
-    {
-      id: '2',
-      name: 'Clinic / Practice',
-      price: '',
-      period: '',
-      features: [
-        'Everything in Solo Practitioner',
-        'Reduced per-licence pricing',
-        'Multi-practitioner management',
-        'Practice-level reporting',
-        'Encrypted practitioner communication',
-        'Real-time reporting of practitioner usage',
-      ],
-      featured: false,
-      cta_text: 'Contact Us',
-      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Clinic%20Pricing%20Enquiry',
-    },
-    {
-      id: '3',
-      name: 'Enterprise',
-      price: '',
-      period: '',
-      features: [
-        'Everything in Clinic / Practice',
-        'Custom integrations',
-        'Dedicated support',
-        'Service-level agreements',
-        'Custom deployment options',
-      ],
-      featured: false,
-      cta_text: 'Contact Us',
-      cta_url: 'mailto:admin@antsa.com.au?subject=ANTSA%20Enterprise%20Enquiry',
-    },
-  ];
-
-  const displayPlans = plans.length > 0 ? plans : defaultPlans;
+  const displayPlans = plans.length ? plans : DEFAULT_PLANS;
 
   return (
-    <section
-      id="pricing"
-      style={{
-        background: '#ffffff',
-        padding: '120px 20px',
-      }}
-    >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-          <Title
-            level={5}
-            className="reveal"
-            style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#48abe2',
-              marginBottom: '16px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}
-          >
-            PRICING
-          </Title>
-          <Title
-            level={2}
-            className="reveal"
-            style={{
-              fontSize: 'clamp(32px, 5vw, 48px)',
-              fontWeight: 800,
-              color: '#0f172a',
-              marginBottom: '24px',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Pricing should be <span style={{ color: '#48abe2' }}>simple</span>.
-          </Title>
-          <Paragraph
-            className="reveal"
-            style={{
-              fontSize: '18px',
-              color: '#64748b',
-              maxWidth: '700px',
-              margin: '0 auto',
-              lineHeight: 1.7,
-            }}
-          >
-            One system. Full access. No hidden add-ons.
-          </Paragraph>
+    <section id="pricing" style={{ background: '#F3F7FC', padding: '88px 0' }}>
+      <div className="dc-container">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 48 }}>
+          <div className="dc-eyebrow" style={{ marginBottom: 12 }}>Pricing</div>
+          <h2 className="dc-h2" style={{ marginBottom: 14 }}>
+            <span className="hl">One</span> platform, <span className="hl">simple</span> pricing
+          </h2>
+          <p className="dc-lead" style={{ maxWidth: 580 }}>
+            No confusing add-ons. No multiple subscriptions. Clinical workflow and between-session support in one place.
+          </p>
         </div>
 
-        {/* Pricing Cards */}
-        <Row gutter={[32, 32]} justify="center">
-          {displayPlans.map((plan, index) => {
-            const hasPrice = plan.price && /^\$\d/.test(plan.price);
-            const isContact = !hasPrice;
-
+        <div className="dc-grid-3" style={{ gap: 20, alignItems: 'start' }}>
+          {displayPlans.map((p) => {
+            const priced = hasPrice(p);
             return (
-              <Col xs={24} sm={12} md={6} key={plan.id}>
-                <Card
-                  className="reveal"
-                  style={{
-                    height: '100%',
-                    border: plan.featured ? '2px solid #48abe2' : '1px solid #e2e8f0',
-                    borderRadius: '16px',
-                    background: '#ffffff',
-                    padding: '32px 24px',
-                    transition: 'all 0.3s ease',
-                    transitionDelay: `${index * 100}ms`,
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                  bodyStyle={{ padding: 0, display: 'flex', flexDirection: 'column', flex: 1 }}
-                  bordered={false}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-8px)';
-                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.1)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                >
-                  {plan.featured && (
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: '-12px',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        background: '#48abe2',
-                        color: '#ffffff',
-                        padding: '4px 16px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      Most Popular
-                    </div>
-                  )}
-
-                  {/* Header zone - fixed height so buttons & features align across cards */}
-                  <div style={{ minHeight: '190px', display: 'flex', flexDirection: 'column' }}>
-                    {/* Plan Name */}
-                    <Title
-                      level={3}
-                      style={{
-                        fontSize: '24px',
-                        fontWeight: 700,
-                        color: '#0f172a',
-                        marginBottom: '8px',
-                      }}
-                    >
-                      {plan.name}
-                    </Title>
-
-                    {/* Price - only shown for plans with a dollar amount */}
-                    {hasPrice && (
-                      <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap' }}>
-                        <span
-                          style={{
-                            fontSize: '40px',
-                            fontWeight: 800,
-                            color: '#0f172a',
-                          }}
-                        >
-                          {plan.price}
-                        </span>
-                        {plan.period && (
-                          <span
-                            style={{
-                              fontSize: '18px',
-                              color: '#64748b',
-                              marginLeft: '4px',
-                            }}
-                          >
-                            {plan.period}
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Spacer pushes button to bottom of header zone */}
-                    <div style={{ flex: 1, minHeight: '16px' }} />
-
-                    {/* CTA Button */}
-                    <Button
-                      type={plan.featured ? 'primary' : 'default'}
-                      block
-                      size="large"
-                      icon={isContact ? <MailOutlined /> : undefined}
-                      style={{
-                        height: '56px',
-                        fontSize: '16px',
-                        fontWeight: 600,
-                        borderRadius: '12px',
-                        background: plan.featured ? '#48abe2' : '#ffffff',
-                        border: plan.featured ? 'none' : '2px solid #e2e8f0',
-                        color: plan.featured ? '#ffffff' : '#0f172a',
-                      }}
-                      href={plan.cta_url || (isContact ? 'mailto:admin@antsa.com.au?subject=ANTSA%20Pricing%20Enquiry' : '/free-trial')}
-                    >
-                      {plan.cta_text}
-                    </Button>
+              <div
+                key={p.id ?? p.name}
+                style={{
+                  background: '#fff',
+                  border: priced ? '2px solid #48ABE2' : '1px solid #E6E9EE',
+                  borderRadius: 22,
+                  padding: '34px 30px',
+                  position: 'relative',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  boxShadow: priced ? '0 8px 28px rgba(72,171,226,.12)' : '0 4px 16px rgba(15,22,34,.04)',
+                }}
+              >
+                {!!p.featured && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: -13,
+                      left: 30,
+                      background: '#48ABE2',
+                      color: '#fff',
+                      padding: '5px 14px',
+                      borderRadius: 999,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      letterSpacing: '.06em',
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    Most popular
                   </div>
+                )}
+                <h3 style={{ fontSize: 20, fontWeight: 700, margin: '0 0 12px' }}>{p.name}</h3>
 
-                  {/* Features List - grows to fill remaining card space */}
-                  <div style={{ flex: 1, paddingTop: '24px' }}>
-                    <List
-                      dataSource={plan.features}
-                      renderItem={(feature) => (
-                        <List.Item
-                          style={{
-                            border: 'none',
-                            padding: '10px 0',
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                            <CheckOutlined
-                              style={{
-                                color: '#10b981',
-                                fontSize: '16px',
-                                marginTop: '2px',
-                              }}
-                            />
-                            <span
-                              style={{
-                                fontSize: '14px',
-                                color: '#475569',
-                                flex: 1,
-                                lineHeight: 1.5,
-                              }}
-                            >
-                              {feature}
-                            </span>
-                          </div>
-                        </List.Item>
-                      )}
-                    />
+                {priced ? (
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginBottom: 22, minHeight: 66 }}>
+                    <span style={{ fontSize: 44, fontWeight: 700, letterSpacing: '-0.02em' }}>{p.price}</span>
+                    <span style={{ fontSize: 17, color: '#8B95A3' }}>{p.period || '/ month'}</span>
                   </div>
-                </Card>
-              </Col>
+                ) : (
+                  <div style={{ fontSize: 15, color: '#8B95A3', marginBottom: 22, minHeight: 66, display: 'flex', alignItems: 'center' }}>
+                    {subtitleFor(p)}
+                  </div>
+                )}
+
+                {priced ? (
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 24, minHeight: 50 }}>
+                    <a
+                      className="dc-btn dc-btn-primary dc-btn-sm"
+                      style={{ flex: 1, padding: '13px 8px' }}
+                      href={p.cta_url || 'https://au.antsa.ai/sign-in'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Start now
+                    </a>
+                    <a
+                      className="dc-btn dc-btn-outline dc-btn-sm"
+                      style={{ flex: 1, padding: '13px 8px' }}
+                      href="https://antsa.ai/free-trial"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Start free trial
+                    </a>
+                  </div>
+                ) : (
+                  <a
+                    className="dc-btn dc-btn-secondary"
+                    style={{ marginBottom: 24, minHeight: 50 }}
+                    href={p.cta_url || 'mailto:admin@antsa.com.au'}
+                  >
+                    <MailIcon /> Contact us
+                  </a>
+                )}
+
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 11 }}>
+                  {(p.features ?? []).map((f, i) => (
+                    <li key={i} style={{ display: 'flex', gap: 10, fontSize: 15, color: '#22272F' }}>
+                      <Check color={priced ? '#2EAD6F' : '#48ABE2'} /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             );
           })}
-        </Row>
+        </div>
       </div>
     </section>
   );
-};
-
-export default PricingSection;
+}

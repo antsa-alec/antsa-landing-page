@@ -1,17 +1,21 @@
 import { useEffect } from 'react';
 import HeroSplit from './components/HeroSplit';
-import TrustStrip from './components/TrustStrip';
-import WhySwitchSection from './components/WhySwitchSection';
-import EverythingOneLoginSection from './components/EverythingOneLoginSection';
-import TheShiftSection from './components/TheShiftSection';
-import TheAntsaSection from './components/TheAntsaSection';
+import AudienceStrip from './components/AudienceStrip';
+import GapBetweenSessions from './components/GapBetweenSessions';
+import WhyItMatters from './components/WhyItMatters';
+import WhatAntsaDoes from './components/WhatAntsaDoes';
+import Comparison from './components/Comparison';
+import AntsaBot from './components/AntsaBot';
 import FeaturesSection from './components/FeaturesSection';
+import Governance from './components/Governance';
+import Audiences from './components/Audiences';
+import Security from './components/Security';
 import TeamSection from './components/TeamSection';
 import PricingSection from './components/PricingSection';
 import FAQSection from './components/FAQSection';
-import ForClinicsBand from './components/ForClinicsBand';
-import TestimonialsSection from './components/TestimonialsSection';
+import ClinicsCTA from './components/ClinicsCTA';
 import ComplianceBadgesStrip from './components/ComplianceBadgesStrip';
+import ClinicalDisclaimer from './components/ClinicalDisclaimer';
 import Section from './components/Section';
 import ClientOnly from './ssr/ClientOnly';
 import type { SectionRow } from './pages/index/+data';
@@ -71,22 +75,21 @@ function App({ sections = [] }: { sections?: SectionRow[] }) {
   return (
     <>
       <Section name="hero"><HeroSplit section={byName.hero} /></Section>
-      <Section name="trust_strip"><TrustStrip section={byName.trust_strip} /></Section>
-      <Section name="why_switch"><WhySwitchSection section={byName.why_switch} /></Section>
-      <Section name="everything_one_login">
-        <EverythingOneLoginSection section={byName.everything_one_login} />
-      </Section>
-      <Section name="the-shift"><TheShiftSection section={byName['the-shift']} /></Section>
-      <Section name="the-antsa"><TheAntsaSection section={byName['the-antsa']} /></Section>
+      <Section name="audience_strip"><AudienceStrip /></Section>
+      <Section name="gap"><GapBetweenSessions /></Section>
+      <Section name="why_it_matters"><WhyItMatters /></Section>
+      <Section name="what_antsa_does"><WhatAntsaDoes /></Section>
+      <Section name="comparison"><Comparison /></Section>
+      <Section name="antsabot"><AntsaBot /></Section>
       <Section name="features"><FeaturesSection section={byName.features} /></Section>
+      <Section name="governance"><Governance /></Section>
+      <Section name="audiences"><Audiences /></Section>
+      <Section name="security"><Security /></Section>
       <Section name="team"><TeamSection section={byName.team} /></Section>
       {/*
-        PricingSection runs a useEffect fetch against /api/stripe/pricing and
-        reconciles the response against the CMS-seeded plans. That client-only
-        reconciliation produced a hydration mismatch on `/`. Wrap in ClientOnly:
-        the CMS plans still render after hydration, and we accept losing the
-        pricing block from the initial SSR HTML — SEO value here is low (the
-        pricing copy is short and the section is below the fold).
+        PricingSection fetches /api/stripe/pricing on the client and reconciles it
+        against the CMS-seeded plans. Wrapping in ClientOnly keeps SSR/hydration
+        clean; the CMS plans render after hydration.
       */}
       <Section name="pricing">
         <ClientOnly fallback={<div id="pricing" />}>
@@ -94,9 +97,9 @@ function App({ sections = [] }: { sections?: SectionRow[] }) {
         </ClientOnly>
       </Section>
       <Section name="faq"><FAQSection section={byName.faq} /></Section>
-      <Section name="for_clinics"><ForClinicsBand section={byName.for_clinics} /></Section>
-      <Section name="testimonials"><TestimonialsSection section={byName.testimonials} /></Section>
+      <Section name="for_clinics"><ClinicsCTA /></Section>
       <Section name="compliance"><ComplianceBadgesStrip section={byName.compliance} /></Section>
+      <Section name="disclaimer"><ClinicalDisclaimer /></Section>
     </>
   );
 }

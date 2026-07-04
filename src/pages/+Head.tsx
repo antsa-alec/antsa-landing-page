@@ -10,9 +10,13 @@ const orgLd = {
       logo: 'https://antsa.ai/LOGO-BLACK.png',
       email: 'admin@antsa.com.au',
       description:
-        'Australian-built digital mental health platform connecting practitioners and clients with clinically governed AI, mood tracking, homework, messaging, and video sessions.',
+        'Clinician-governed digital mental health platform supporting the whole therapy journey — AI Scribe, telehealth, homework, mood tracking, secure messaging and optional clinician-governed AI support.',
       areaServed: ['AU', 'US', 'GB'],
-      sameAs: ['https://antsa.com.au'],
+      sameAs: [
+        'https://www.linkedin.com/company/antsa-mentalhealth/',
+        'https://www.instagram.com/antsa.app/',
+        'https://www.facebook.com/ANTSAforProfessionals',
+      ],
     },
     {
       '@type': 'SoftwareApplication',
@@ -31,31 +35,39 @@ const orgLd = {
 export default function Head() {
   return (
     <>
-      <title>ANTSA — Support clients between sessions. Reduce admin.</title>
+      <title>ANTSA — Clinician-governed mental health platform for between-session care</title>
       <meta
         name="description"
-        content="Support clients between sessions. Reduce admin. One system built for practitioners — client engagement, AI documentation, telehealth, reminders, questionnaires and practitioner-visible AI support in one secure Australian system."
+        content="ANTSA is a secure Australian mental health platform that keeps clinicians at the centre of care — AI Scribe, telehealth, homework, mood tracking, secure messaging and clinician-governed AI support, in one place."
       />
       <link rel="canonical" href="https://antsa.ai/" />
-      <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <link rel="apple-touch-icon" href="/favicon.svg" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+      />
       <meta name="theme-color" content="#48abe2" />
       <meta name="author" content="ANTSA Pty Ltd" />
       <meta name="robots" content="index, follow, max-image-preview:large" />
+      <meta name="keywords" content="mental health platform, AI scribe, telehealth, clinician-governed AI, between-session care, psychology software, Australia" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="ANTSA" />
-      <meta property="og:title" content="ANTSA — Support clients between sessions. Reduce admin." />
+      <meta property="og:title" content="ANTSA — Mental health care belongs in clinician hands" />
       <meta
         property="og:description"
-        content="One system for practitioners: engagement tools, AI documentation, telehealth, reminders and AI support — Australian hosted."
+        content="A secure Australian platform that helps clinicians reduce admin, support clients between sessions, and keep clinical oversight — with optional clinician-governed AI."
       />
       <meta property="og:url" content="https://antsa.ai/" />
       <meta property="og:image" content="https://antsa.ai/LOGO-BLACK.png" />
       <meta property="og:locale" content="en_AU" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="ANTSA — Support clients between sessions. Reduce admin." />
+      <meta name="twitter:title" content="ANTSA — Mental health care belongs in clinician hands" />
       <meta
         name="twitter:description"
-        content="One system for practitioners: engagement, AI notes, telehealth, reminders — Australian hosted."
+        content="A secure Australian platform for clinician-governed, between-session mental health care."
       />
       <meta name="twitter:image" content="https://antsa.ai/LOGO-BLACK.png" />
       <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />

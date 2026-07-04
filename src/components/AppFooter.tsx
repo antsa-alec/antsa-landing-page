@@ -1,404 +1,227 @@
 import { useState } from 'react';
-import { Typography, Space, Button, Input, message } from 'antd';
-import {
-  InstagramOutlined,
-  FacebookOutlined,
-  LinkedinOutlined,
-  MailOutlined,
-  CheckCircleFilled,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
-import antsaLogo from '../assets/logo-black.png';
-import type {
-  ChromeData,
-  SocialLink,
-  FooterLink,
-  FooterContent,
-} from '../pages/chrome-data';
-
-const { Paragraph, Link } = Typography;
+import { message } from 'antd';
+import type { ReactNode } from 'react';
+import antsaLogo from '../assets/antsa-logo.png';
+import type { ChromeData, SocialLink, FooterLink, FooterContent } from '../pages/chrome-data';
 
 /**
- * FOOTER - Dark theme with ANTSA logo, social icons, legal links, subscribe.
- *
- * Footer content (copyright, social links, extra footer links) is piped through
- * pageContext from each page's +data.ts. Both server-render and client first
- * render use the same data, eliminating hydration mismatches that previously
- * occurred when these values were fetched in useEffect on the client.
+ * FOOTER — dark, clinician-governed design. Three columns: brand, Follow us,
+ * Stay in the loop (functional newsletter subscribe → /api/content/subscribe).
+ * Social + footer links + copyright are CMS-driven via `chrome`.
  */
-const AppFooter = ({ chrome }: { chrome?: ChromeData }) => {
+
+const DEFAULT_SOCIAL: SocialLink[] = [
+  { id: 'ig', platform: 'instagram', url: 'https://www.instagram.com/antsa.app/' },
+  { id: 'fb', platform: 'facebook', url: 'https://www.facebook.com/ANTSAforProfessionals' },
+  { id: 'li', platform: 'linkedin', url: 'https://www.linkedin.com/company/antsa-mentalhealth' },
+  { id: 'em', platform: 'email', url: 'mailto:admin@antsa.com.au' },
+];
+
+const DEFAULT_COPYRIGHT =
+  'Copyright © ANTSA® Pty Ltd 2026 (ABN: 77 664 161 237) (ACN: 664 161 237) · All rights reserved';
+
+const socialIcon = (platform: string): ReactNode => {
+  switch (platform.toLowerCase()) {
+    case 'instagram':
+      return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" />
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+        </svg>
+      );
+    case 'facebook':
+      return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+        </svg>
+      );
+    case 'linkedin':
+      return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+        </svg>
+      );
+    default:
+      return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      );
+  }
+};
+
+export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
   const footerContent: FooterContent = chrome?.footer ?? {};
-  const socialLinks: SocialLink[] = chrome?.socialLinks ?? [];
-  // Filter out any legacy legal links that duplicate the hardcoded ones
+  const social = chrome?.socialLinks?.length ? chrome.socialLinks : DEFAULT_SOCIAL;
   const legalPaths = new Set(['/privacy-policy', '/terms-and-conditions']);
-  const extraLinks: FooterLink[] = (chrome?.footerLinks ?? []).filter(
-    (l) => !legalPaths.has(l.url),
-  );
+  const extraLinks: FooterLink[] = (chrome?.footerLinks ?? []).filter((l) => !legalPaths.has(l.url));
+  const copyright = footerContent.copyright || DEFAULT_COPYRIGHT;
 
-  // Subscribe form state
-  const [subscribeName, setSubscribeName] = useState('');
-  const [subscribeEmail, setSubscribeEmail] = useState('');
-  const [subscribeLoading, setSubscribeLoading] = useState(false);
-  const [subscribeSuccess, setSubscribeSuccess] = useState(false);
-  const [subscribeError, setSubscribeError] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
 
-  const legalPages = [
-    { label: 'Privacy Policy', path: '/privacy-policy' },
-    { label: 'Terms & Conditions', path: '/terms-and-conditions' },
-  ];
-
-  const handleSubscribe = async () => {
-    // Validation
-    if (!subscribeName.trim()) {
-      setSubscribeError('Please enter your name.');
-      return;
-    }
-    if (!subscribeEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(subscribeEmail)) {
-      setSubscribeError('Please enter a valid email address.');
-      return;
-    }
-
-    setSubscribeError('');
-    setSubscribeLoading(true);
-
+  const subscribe = async () => {
+    if (!name.trim()) return setError('Please enter your name.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError('Please enter a valid email address.');
+    setError('');
+    setLoading(true);
     try {
-      const response = await fetch('/api/content/subscribe', {
+      const res = await fetch('/api/content/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: subscribeName.trim(), email: subscribeEmail.trim() }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubscribeSuccess(true);
-        setSubscribeName('');
-        setSubscribeEmail('');
+      const data = await res.json();
+      if (res.ok) {
+        setDone(true);
+        setName('');
+        setEmail('');
         message.success(data.message || 'Thank you for subscribing!');
-      } else if (response.status === 409) {
-        setSubscribeError('This email is already subscribed.');
+      } else if (res.status === 409) {
+        setError('This email is already subscribed.');
       } else {
-        setSubscribeError(data.errors?.[0]?.msg || data.error || 'Something went wrong. Please try again.');
+        setError(data.error || 'Something went wrong. Please try again.');
       }
     } catch {
-      setSubscribeError('Network error. Please try again.');
+      setError('Network error. Please try again.');
     } finally {
-      setSubscribeLoading(false);
+      setLoading(false);
     }
   };
 
-  const copyright = footerContent.copyright || 'Copyright \u00A9 ANTSA Pty Ltd 2026 (ABN: 77 664 161 237) (ACN: 664 161 237) - All Rights Reserved.';
-
-  const defaultSocialLinks: SocialLink[] = [
-    { id: '1', platform: 'instagram', url: 'https://www.instagram.com/antsa.ai/' },
-    { id: '2', platform: 'facebook', url: 'https://www.facebook.com/antsa.ai/' },
-    { id: '3', platform: 'linkedin', url: 'https://www.linkedin.com/company/antsa-ai/' },
-    { id: '4', platform: 'email', url: 'mailto:admin@antsa.com.au' },
-  ];
-
-  const displaySocial = socialLinks.length > 0 ? socialLinks : defaultSocialLinks;
-
-  const getSocialIcon = (platform: string) => {
-    switch (platform) {
-      case 'instagram': return <InstagramOutlined />;
-      case 'facebook': return <FacebookOutlined />;
-      case 'linkedin': return <LinkedinOutlined />;
-      case 'email': return <MailOutlined />;
-      default: return <MailOutlined />;
-    }
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    height: 42,
+    borderRadius: 10,
+    background: '#1A2433',
+    border: '1px solid #2A3647',
+    color: '#fff',
+    fontSize: 14,
+    padding: '0 14px',
+    outline: 'none',
   };
+
+  const legalLinkStyle: React.CSSProperties = { color: '#B7C0CD', transition: 'color .2s ease' };
 
   return (
-    <footer
-      style={{
-        background: '#000000',
-        color: '#ffffff',
-        padding: '60px 20px 32px',
-      }}
-    >
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* Main Footer Content */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: '40px',
-            marginBottom: '48px',
-          }}
-        >
-          {/* Left: Logo and description */}
-          <div style={{ maxWidth: '300px', flex: '1 1 250px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <img
-                src={antsaLogo}
-                alt="ANTSA"
-                style={{
-                  height: '107px',
-                  width: 'auto',
-                  objectFit: 'contain',
-                  borderRadius: '4px',
-                }}
-              />
-            </div>
+    <footer style={{ background: '#0F1622', padding: '56px 0 0', color: '#fff' }}>
+      <div className="dc-container">
+        <div className="dc-footer-grid" style={{ display: 'grid', gap: 48, paddingBottom: 44, alignItems: 'start' }}>
+          {/* Brand */}
+          <div>
+            <img
+              src={antsaLogo}
+              alt="ANTSA for professionals"
+              style={{ height: 40, marginBottom: 18, filter: 'brightness(0) invert(1)' }}
+            />
+            <p style={{ fontSize: 14, color: '#8B95A3', maxWidth: 280, margin: 0 }}>
+              Clinician-governed digital mental health support for the whole therapy journey.
+            </p>
           </div>
 
-          {/* Center: Social Icons */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: '0 0 auto' }}>
-            <div
-              style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                color: 'rgba(255, 255, 255, 0.5)',
-                marginBottom: '16px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}
-            >
-              Follow Us
-            </div>
-            <Space size={12}>
-              {displaySocial.map((link) => (
+          {/* Follow us */}
+          <div style={{ textAlign: 'center' }}>
+            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', margin: '0 0 16px', color: '#8B95A3' }}>
+              Follow us
+            </h4>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              {social.map((s) => (
                 <a
-                  key={link.id}
-                  href={link.url}
-                  target={link.platform === 'email' ? undefined : '_blank'}
-                  rel="noopener noreferrer"
-                  style={{
-                    width: '40px',
-                    height: '40px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.1)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#ffffff',
-                    fontSize: '18px',
-                    transition: 'all 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#48abe2';
-                    e.currentTarget.style.transform = 'translateY(-3px)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
+                  key={s.id ?? s.platform}
+                  href={s.url}
+                  {...(s.platform.toLowerCase() === 'email' ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+                  aria-label={s.platform}
+                  className="dc-social"
+                  style={{ width: 42, height: 42, borderRadius: 999, background: '#1A2433', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C3CBD6' }}
                 >
-                  {getSocialIcon(link.platform)}
+                  {socialIcon(s.platform)}
                 </a>
               ))}
-            </Space>
+            </div>
           </div>
 
-          {/* Right: Subscribe Form */}
-          <div style={{ minWidth: '300px', maxWidth: '400px', flex: '1 1 300px' }}>
-            {subscribeSuccess ? (
-              <div
-                style={{
-                  textAlign: 'center',
-                  padding: '24px',
-                  background: 'rgba(72, 171, 226, 0.1)',
-                  borderRadius: '12px',
-                  border: '1px solid rgba(72, 171, 226, 0.2)',
-                }}
-              >
-                <CheckCircleFilled style={{ fontSize: '32px', color: '#48abe2', marginBottom: '12px' }} />
-                <div style={{ fontSize: '18px', fontWeight: 600, color: '#ffffff', marginBottom: '8px' }}>
-                  You're subscribed!
-                </div>
-                <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.6)' }}>
-                  Thank you for joining. We'll keep you updated.
-                </div>
-                <Button
-                  type="link"
-                  style={{ color: '#48abe2', marginTop: '12px', padding: 0 }}
-                  onClick={() => setSubscribeSuccess(false)}
-                >
-                  Subscribe another email
-                </Button>
-              </div>
+          {/* Stay in the loop */}
+          <div>
+            <h4 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 8px' }}>Stay in the loop</h4>
+            <p style={{ fontSize: 14, color: '#8B95A3', margin: '0 0 16px' }}>
+              The mental health AI space is moving fast. Stay up-to-date with our newsletter.
+            </p>
+            {done ? (
+              <div style={{ fontSize: 14, color: '#7FB6F0' }}>You&apos;re subscribed — thank you!</div>
             ) : (
-              <>
-                <div
-                  style={{
-                    fontSize: '18px',
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    marginBottom: '8px',
-                  }}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <input
+                  style={inputStyle}
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => { setName(e.target.value); setError(''); }}
+                />
+                <input
+                  style={inputStyle}
+                  type="email"
+                  placeholder="Your email address"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                  onKeyDown={(e) => { if (e.key === 'Enter') subscribe(); }}
+                />
+                {error && <div style={{ color: '#ef6b6b', fontSize: 13 }}>{error}</div>}
+                <button
+                  type="button"
+                  onClick={subscribe}
+                  disabled={loading}
+                  className="dc-btn dc-btn-primary"
+                  style={{ width: '100%', border: 'none', opacity: loading ? 0.7 : 1 }}
                 >
-                  Stay in the loop
-                </div>
-                <div
-                  style={{
-                    fontSize: '14px',
-                    color: 'rgba(255, 255, 255, 0.5)',
-                    marginBottom: '20px',
-                    lineHeight: 1.5,
-                  }}
-                >
-                  Get updates on new features, clinical insights, and product news.
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <Input
-                    placeholder="Your name"
-                    value={subscribeName}
-                    onChange={(e) => {
-                      setSubscribeName(e.target.value);
-                      setSubscribeError('');
-                    }}
-                    onPressEnter={() => {
-                      const emailInput = document.getElementById('subscribe-email');
-                      emailInput?.focus();
-                    }}
-                    className="footer-subscribe-input"
-                    style={{
-                      height: '44px',
-                      borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                    }}
-                    styles={{ input: { color: '#ffffff', background: 'transparent' } }}
-                  />
-                  <Input
-                    id="subscribe-email"
-                    placeholder="Your email address"
-                    type="email"
-                    value={subscribeEmail}
-                    onChange={(e) => {
-                      setSubscribeEmail(e.target.value);
-                      setSubscribeError('');
-                    }}
-                    onPressEnter={handleSubscribe}
-                    className="footer-subscribe-input"
-                    style={{
-                      height: '44px',
-                      borderRadius: '10px',
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      color: '#ffffff',
-                      fontSize: '14px',
-                    }}
-                    styles={{ input: { color: '#ffffff', background: 'transparent' } }}
-                  />
-                  {subscribeError && (
-                    <div style={{ color: '#ef4444', fontSize: '13px', marginTop: '-4px' }}>
-                      {subscribeError}
-                    </div>
-                  )}
-                  <Button
-                    type="primary"
-                    icon={<ArrowRightOutlined />}
-                    loading={subscribeLoading}
-                    onClick={handleSubscribe}
-                    style={{
-                      height: '44px',
-                      borderRadius: '10px',
-                      background: '#48abe2',
-                      border: 'none',
-                      fontWeight: 600,
-                      fontSize: '15px',
-                    }}
-                  >
-                    Subscribe
-                  </Button>
-                </div>
-              </>
+                  {loading ? 'Subscribing…' : 'Subscribe'}
+                </button>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* Bottom bar */}
         <div
           style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            paddingTop: '24px',
+            borderTop: '1px solid #2A3647',
+            padding: '20px 0',
             display: 'flex',
-            flexWrap: 'wrap',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '16px',
+            flexWrap: 'wrap',
+            gap: 12,
+            fontSize: 13,
+            color: '#8B95A3',
           }}
         >
-          {/* Copyright */}
-          <Paragraph
-            style={{
-              color: 'rgba(255, 255, 255, 0.5)',
-              fontSize: '13px',
-              margin: 0,
-            }}
-          >
-            {copyright}
-          </Paragraph>
-
-          {/* Legal + Extra Links */}
-          <Space size={24} wrap>
-            {legalPages.map((page) => (
+          <div>{copyright}</div>
+          <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
+            <a href="/privacy-policy" style={legalLinkStyle}>Privacy policy</a>
+            <a href="/terms-and-conditions" style={legalLinkStyle}>Terms &amp; conditions</a>
+            {extraLinks.map((l) => (
               <a
-                key={page.path}
-                href={page.path}
-                style={{
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontSize: '13px',
-                  textDecoration: 'none',
-                  transition: 'color 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
-                }}
+                key={l.id ?? l.url}
+                href={l.url}
+                {...(l.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                style={legalLinkStyle}
               >
-                {page.label}
+                {l.label}
               </a>
             ))}
-            {extraLinks.map((link) => (
-              <Link
-                key={link.id}
-                href={link.url}
-                target={link.url.startsWith('http') ? '_blank' : undefined}
-                style={{
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  fontSize: '13px',
-                  transition: 'color 0.3s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ffffff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.5)';
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </Space>
+          </div>
         </div>
       </div>
-      {/* Placeholder color override for dark inputs */}
+
       <style>{`
-        .footer-subscribe-input input::placeholder {
-          color: rgba(255, 255, 255, 0.45) !important;
-        }
-        .footer-subscribe-input input {
-          color: #ffffff !important;
-          background: transparent !important;
-        }
-        .footer-subscribe-input input:-webkit-autofill,
-        .footer-subscribe-input input:-webkit-autofill:hover,
-        .footer-subscribe-input input:-webkit-autofill:focus {
-          -webkit-text-fill-color: #ffffff !important;
-          -webkit-box-shadow: 0 0 0px 1000px rgba(255,255,255,0.08) inset !important;
-          caret-color: #ffffff;
+        .dc-footer-grid { grid-template-columns: 1.4fr 1fr 1.4fr; }
+        @media (max-width: 780px) {
+          .dc-footer-grid { grid-template-columns: 1fr; text-align: left; }
         }
       `}</style>
     </footer>
   );
-};
-
-export default AppFooter;
+}

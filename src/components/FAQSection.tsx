@@ -1,150 +1,85 @@
-import { Typography, Collapse } from 'antd';
-
-const { Title, Paragraph } = Typography;
-const { Panel } = Collapse;
-
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-}
+import { useState } from 'react';
 
 /**
- * FAQ SECTION - Accordion with small blue section label
+ * FAQ — "Common questions". Single-open accordion.
+ * CMS-driven: reads section.faqs (top-level faq_items array) and falls back to
+ * the approved design set.
  */
-type FAQProps = {
-  section?: {
-    faqs?: Array<Record<string, unknown>>;
-  };
-};
 
-const FAQSection = ({ section }: FAQProps) => {
+type FAQ = { id: string; question: string; answer: string };
+
+type FAQProps = { section?: { faqs?: Array<Record<string, unknown>> } };
+
+const DEFAULT_FAQS: FAQ[] = [
+  { id: '1', question: 'Is ANTSA a replacement for therapy?', answer: 'No. ANTSA® is a clinical support platform that helps extend structured care between sessions. It does not replace therapy, diagnose conditions, make clinical decisions or operate independently of practitioner oversight.' },
+  { id: '2', question: 'Is ANTSAbot optional?', answer: 'Yes. ANTSAbot is completely optional. Clinicians decide whether it is appropriate for each client, and clients are asked to consent before using it. ANTSA® can still be used for AI Scribe, telehealth, homework, mood tracking, resources, secure messaging and other clinical workflow tools without ANTSAbot.' },
+  { id: '3', question: 'Will ANTSA replace clinicians?', answer: 'No. ANTSA® is built to bring clinicians into digital care, not remove them. It supports your clinical workflow and helps clients stay engaged between sessions, while clinical decisions and responsibility remain with you.' },
+  { id: '4', question: 'Does ANTSAbot give independent advice?', answer: 'No. ANTSAbot supports reflection, psychoeducation and engagement within a clinician-governed platform. It does not diagnose, provide independent therapy, create treatment plans or give medical advice.' },
+  { id: '5', question: 'How is ANTSA different from a consumer AI tool?', answer: 'ANTSA® is clinician-governed. Tools such as ANTSAbot are assigned by the practitioner, reviewable by the clinician and used within a governance framework, unlike consumer tools that operate without clinical oversight.' },
+  { id: '6', question: 'Is client data used to train AI models?', answer: 'No. Client data is not used to train AI models. Privacy and security are core to how ANTSA® is designed.' },
+  { id: '7', question: 'Is client data secure?', answer: 'Yes. ANTSA® is hosted on Australian servers and designed with privacy, encryption, two-factor authentication and consent-based sharing. It is aligned with the Australian Privacy Principles, HIPAA and GDPR, with ISO 27001 certification in progress.' },
+];
+
+export default function FAQSection({ section }: FAQProps) {
   const rawFaqs = section?.faqs;
-  const faqs: FAQ[] = Array.isArray(rawFaqs)
+  const faqs: FAQ[] = Array.isArray(rawFaqs) && rawFaqs.length
     ? rawFaqs.map((item, i) => ({
         id: String((item.id as string | number | undefined) ?? i),
         question: String(item.question ?? ''),
         answer: String(item.answer ?? ''),
       }))
-    : [];
+    : DEFAULT_FAQS;
 
-  const defaultFaqs: FAQ[] = [
-    { id: '1', question: 'Is ANTSA a therapy replacement?', answer: 'No. ANTSA supports care between sessions. Clinical judgement, formulation, and responsibility remain with the practitioner. AI support is assigned and overseen within defined clinical parameters. Practitioners control access. Clients are invited into the system by their practitioner and engage only with assigned supports.' },
-    { id: '2', question: 'Does ANTSA diagnose mental health conditions?', answer: 'No. ANTSA is a practitioner-governed digital support system. It does not diagnose, independently treat, or make autonomous clinical decisions. Practitioners remain responsible for clinical decision-making.' },
-    { id: '3', question: 'How is ANTSA different from consumer AI tools?', answer: 'Consumer tools operate outside clinical systems. ANTSA sits inside your practice workflow. You assign supports, monitor engagement, review interactions, and retain accountability within a single integrated record.' },
-    { id: '4', question: 'How does ANTSA help with risk management?', answer: 'ANTSA provides structured visibility into mood data, engagement patterns, and client interactions between sessions. This supports earlier identification of deterioration rather than reactive crisis response.' },
-    { id: '5', question: 'Is the AI supervised in real time?', answer: 'No. Practitioners can review interactions after they occur. Oversight, feedback, and adjustment remain in your control.' },
-    { id: '6', question: 'Is client data secure?', answer: 'Yes. ANTSA is hosted on secure Australian servers and aligned with Australian Privacy Principles and professional standards. Data is contained within your governed clinical system.' },
-    { id: '7', question: 'Does ANTSA replace practitioner responsibility?', answer: 'No. Clinical judgement, regulatory compliance, and duty of care remain with the practitioner at all times. ANTSA is practitioner-controlled infrastructure. Compliance alignment reflects system design and data handling practices, not a transfer of professional responsibility.' },
-    { id: '8', question: 'What happens if a client discloses risk in the platform?', answer: 'ANTSA supports visibility and structured monitoring. It does not replace crisis services. Practitioners retain responsibility for clinical response and escalation according to their professional standards.' },
-    { id: '9', question: 'Does ANTSA include telehealth and note-taking?', answer: 'Yes. Telehealth, AI scribe, client engagement tools, mood tracking, and AI-assisted support are included within one system. There are no add-on feature tiers.' },
-    { id: '10', question: 'Can ANTSA be used without assigning ANTSAbot?', answer: 'Yes. All AI-assisted components are practitioner-assigned. The system can be used for engagement, mood tracking, telehealth, and documentation without AI support if preferred.' },
-    { id: '11', question: 'Can ANTSA be used in group practices or organisations?', answer: 'Yes. ANTSA supports solo practitioners, group practices and larger services. It is designed as governed infrastructure, making it suitable for structured service environments.' },
-    { id: '12', question: 'Is client data used to train external AI models?', answer: 'No. Client data remains within the governed system and is not used to train public or external AI models.' },
-  ];
-
-  const displayFaqs = faqs.length > 0 ? faqs : defaultFaqs;
+  const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section
-      id="faq"
-      style={{
-        background: '#f8fafc',
-        padding: '120px 20px',
-      }}
-    >
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <Title
-            level={5}
-            className="reveal"
-            style={{
-              fontSize: '14px',
-              fontWeight: 600,
-              color: '#48abe2',
-              marginBottom: '16px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-            }}
-          >
-            FAQ
-          </Title>
-          <Title
-            level={2}
-            className="reveal"
-            style={{
-              fontSize: 'clamp(32px, 5vw, 48px)',
-              fontWeight: 800,
-              color: '#0f172a',
-              marginBottom: '24px',
-              letterSpacing: '-0.02em',
-            }}
-          >
-            Frequently Asked Questions
-          </Title>
-          <Paragraph
-            className="reveal"
-            style={{
-              fontSize: '18px',
-              color: '#64748b',
-              maxWidth: '600px',
-              margin: '0 auto',
-              lineHeight: 1.7,
-            }}
-          >
-            Find answers to common questions about ANTSA.
-          </Paragraph>
+    <section id="faq" style={{ background: '#fff', padding: '88px 0' }}>
+      <div className="dc-container">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 48 }}>
+          <div className="dc-eyebrow" style={{ marginBottom: 12 }}>FAQ</div>
+          <h2 className="dc-h2">Common questions</h2>
         </div>
-
-        {/* FAQ Accordion */}
-        <Collapse
-          className="reveal faq-collapse"
-          bordered={false}
-          expandIconPosition="end"
-          style={{
-            background: 'transparent',
-          }}
-        >
-          {displayFaqs.map((faq) => (
-            <Panel
-              header={
-                <Title
-                  level={5}
+        <div style={{ maxWidth: 800, margin: '0 auto' }}>
+          {faqs.map((f, i) => {
+            const isOpen = i === open;
+            return (
+              <div key={f.id} style={{ background: '#fff', border: '1px solid #E6E9EE', borderRadius: 14, marginBottom: 12, overflow: 'hidden' }}>
+                <div
+                  onClick={() => setOpen(isOpen ? null : i)}
                   style={{
-                    fontSize: '17px',
+                    padding: '18px 22px',
                     fontWeight: 600,
-                    color: '#0f172a',
-                    margin: 0,
+                    fontSize: 17,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: 16,
                   }}
                 >
-                  {faq.question}
-                </Title>
-              }
-              key={faq.id}
-              style={{
-                marginBottom: '12px',
-                borderRadius: '12px',
-                background: '#ffffff',
-                border: '1px solid #e2e8f0',
-              }}
-            >
-              <Paragraph
-                style={{
-                  fontSize: '15px',
-                  color: '#64748b',
-                  margin: 0,
-                  lineHeight: 1.7,
-                }}
-              >
-                {faq.answer}
-              </Paragraph>
-            </Panel>
-          ))}
-        </Collapse>
+                  <span>{f.question}</span>
+                  <span
+                    style={{
+                      color: '#8B95A3',
+                      flexShrink: 0,
+                      display: 'inline-flex',
+                      transition: 'transform .25s cubic-bezier(.4,0,.2,1)',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </span>
+                </div>
+                {isOpen && (
+                  <div style={{ padding: '0 22px 20px', fontSize: 16, color: '#5B6472', lineHeight: 1.6 }}>{f.answer}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
-};
-
-export default FAQSection;
+}

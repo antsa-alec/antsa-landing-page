@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import db from '../config/database.js';
+import { applyRedesignContent } from './redesign-content.mjs';
 
 async function seed() {
   console.log('🌱 Starting database seeding...');
@@ -870,6 +871,14 @@ async function seed() {
     settingsStmt.run('site_tagline', 'Digital Mental Health Infrastructure');
 
     console.log('✅ Seeded settings');
+
+    // =========================================================================
+    // 2026 REDESIGN — override base content with the approved clinician-governed
+    // design copy (hero, features, team, pricing, faq, header, footer, socials).
+    // =========================================================================
+    applyRedesignContent(db);
+    settingsStmt.run('redesign_2026_full_design_v1_done', '1');
+    console.log('✅ Applied 2026 redesign content');
 
     // =========================================================================
     console.log('\n🎉 Database seeding completed successfully!');
