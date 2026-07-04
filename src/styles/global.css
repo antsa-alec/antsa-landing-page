@@ -786,6 +786,10 @@ a {
   section { padding-left: 0; padding-right: 0; }
 }
 
+/* Footer text link (light on dark, brightens on hover) */
+.dc-footer-link { color: #b7c0cd; transition: color 0.2s ease; }
+.dc-footer-link:hover { color: #fff; }
+
 /* Dark-band social pill (governance/footer) */
 .dc-social {
   transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;

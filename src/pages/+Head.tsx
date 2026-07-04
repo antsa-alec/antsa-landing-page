@@ -7,7 +7,7 @@ const orgLd = {
       name: 'ANTSA',
       legalName: 'ANTSA Pty Ltd',
       url: 'https://antsa.ai/',
-      logo: 'https://antsa.ai/LOGO-BLACK.png',
+      logo: 'https://antsa.ai/antsa-symbol.svg',
       email: 'admin@antsa.com.au',
       description:
         'Clinician-governed digital mental health platform supporting the whole therapy journey — AI Scribe, telehealth, homework, mood tracking, secure messaging and optional clinician-governed AI support.',
@@ -29,6 +29,18 @@ const orgLd = {
       publisher: { '@id': 'https://antsa.ai/#organization' },
     },
     { '@type': 'WebSite', url: 'https://antsa.ai/', name: 'ANTSA', publisher: { '@id': 'https://antsa.ai/#organization' } },
+    {
+      '@type': 'ItemList',
+      name: 'ANTSA site navigation',
+      itemListElement: [
+        { '@type': 'SiteNavigationElement', position: 1, name: 'Home', url: 'https://antsa.ai/' },
+        { '@type': 'SiteNavigationElement', position: 2, name: 'Clinical governance', url: 'https://antsa.ai/governance' },
+        { '@type': 'SiteNavigationElement', position: 3, name: 'Free trial', url: 'https://antsa.ai/free-trial' },
+        { '@type': 'SiteNavigationElement', position: 4, name: 'Help centre', url: 'https://antsa.ai/help' },
+        { '@type': 'SiteNavigationElement', position: 5, name: 'Privacy policy', url: 'https://antsa.ai/privacy-policy' },
+        { '@type': 'SiteNavigationElement', position: 6, name: 'Terms & conditions', url: 'https://antsa.ai/terms-and-conditions' },
+      ],
+    },
   ],
 };
 
@@ -39,8 +51,8 @@ export default function Head() {
   // duplicate/conflicting tags on sub-pages. Only truly-global brand/analytics tags live here.
   return (
     <>
-      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-      <link rel="apple-touch-icon" href="/favicon.svg" />
+      <link rel="icon" type="image/svg+xml" href="/antsa-symbol.svg" />
+      <link rel="apple-touch-icon" href="/antsa-symbol.svg" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link

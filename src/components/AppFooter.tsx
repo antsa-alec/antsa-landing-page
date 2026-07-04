@@ -122,6 +122,27 @@ export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
             </p>
           </div>
 
+          {/* Explore — crawlable sub-page nav (internal linking + Google sitelinks) */}
+          <nav aria-label="Site pages">
+            <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', margin: '0 0 16px', color: '#8B95A3' }}>
+              Explore
+            </h4>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {[
+                ['Home', '/'],
+                ['Clinical governance', '/governance'],
+                ['Free trial', '/free-trial'],
+                ['Help centre', '/help'],
+                ['Privacy policy', '/privacy-policy'],
+                ['Terms & conditions', '/terms-and-conditions'],
+              ].map(([label, href]) => (
+                <li key={href}>
+                  <a href={href} className="dc-footer-link" style={{ fontSize: 14 }}>{label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
           {/* Follow us */}
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', margin: '0 0 16px', color: '#8B95A3' }}>
@@ -216,7 +237,8 @@ export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
       </div>
 
       <style>{`
-        .dc-footer-grid { grid-template-columns: 1.4fr 1fr 1.4fr; }
+        .dc-footer-grid { grid-template-columns: 1.6fr 1fr 1fr 1.6fr; }
+        @media (max-width: 980px) { .dc-footer-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 780px) {
           .dc-footer-grid { grid-template-columns: 1fr; text-align: left; }
         }
