@@ -73,7 +73,7 @@ export default function WhatAntsaDoes() {
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: '#2E96D4', marginBottom: 12 }}>
             What ANTSA does
           </div>
-          <h2 style={{ fontSize: 32, lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: 0, maxWidth: 760 }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5.2vw, 32px)', lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: 0, maxWidth: 760 }}>
             A secure platform for the <span style={{ color: '#48ABE2' }}>whole therapy journey</span>
           </h2>
         </div>

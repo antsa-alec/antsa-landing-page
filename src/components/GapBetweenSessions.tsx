@@ -68,8 +68,8 @@ export default function GapBetweenSessions() {
 
   const iconBox: React.CSSProperties = {
     flexShrink: 0,
-    width: 64,
-    height: 64,
+    width: 'clamp(46px, 13vw, 64px)',
+    height: 'clamp(46px, 13vw, 64px)',
     borderRadius: 16,
     background: '#fff',
     border: '1px solid #E6E9EE',
@@ -88,11 +88,11 @@ export default function GapBetweenSessions() {
         style={{ maxWidth: 900, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
       >
         <div className="dc-eyebrow" style={{ marginBottom: 30 }}>The gap between sessions</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20, width: '100%', maxWidth: 760, marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(10px, 3.5vw, 20px)', width: '100%', maxWidth: 760, marginBottom: 24 }}>
           <div style={iconBox}><CalendarIcon /></div>
           <div style={dash} />
           <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ fontSize: 84, lineHeight: 1, fontWeight: 700, color: '#48ABE2', letterSpacing: '-0.02em' }}>
+            <div style={{ fontSize: 'clamp(42px, 13vw, 84px)', lineHeight: 1, fontWeight: 700, color: '#48ABE2', letterSpacing: '-0.02em' }}>
               <span ref={counterRef}>10,000</span>
             </div>
             <div style={{ fontSize: 18, fontWeight: 500, color: '#5B6472', letterSpacing: '.06em', marginTop: 6 }}>minutes</div>
@@ -100,7 +100,7 @@ export default function GapBetweenSessions() {
           <div style={dash} />
           <div style={iconBox}><CalendarIcon /></div>
         </div>
-        <h2 style={{ fontSize: 34, lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
+        <h2 style={{ fontSize: 'clamp(24px, 6vw, 34px)', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
           between appointments
         </h2>
         <p style={{ fontSize: 18, lineHeight: 1.65, color: '#5B6472', maxWidth: 600, margin: 0 }}>

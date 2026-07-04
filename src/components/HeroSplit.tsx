@@ -127,7 +127,7 @@ export default function HeroSplit({ section }: HeroProps) {
         <div className="dc-eyebrow" style={{ marginBottom: 18 }}>{badge}</div>
         <h1
           style={{
-            fontSize: 46,
+            fontSize: 'clamp(30px, 7.5vw, 46px)',
             lineHeight: 1.12,
             fontWeight: 700,
             letterSpacing: '-0.02em',

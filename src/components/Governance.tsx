@@ -34,7 +34,7 @@ export default function Governance() {
           </div>
           <h2
             style={{
-              fontSize: 30,
+              fontSize: 'clamp(23px, 5.2vw, 30px)',
               lineHeight: 1.2,
               fontWeight: 700,
               letterSpacing: '-0.01em',
@@ -61,6 +61,12 @@ export default function Governance() {
             replace therapy, provide treatment plans, give independent clinical advice or operate as a crisis
             service.
           </p>
+          <a
+            href="/governance"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#7FB6F0', fontWeight: 600, fontSize: 15, marginTop: 20 }}
+          >
+            Read our clinical governance →
+          </a>
         </div>
         <div style={{ flex: 1, minWidth: 320, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {CHECKLIST.map((item) => (

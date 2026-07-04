@@ -38,7 +38,7 @@ export default function ClinicsCTA() {
               <polygon points="12 2 20 7 4 7" />
             </svg>
           </div>
-          <h2 style={{ fontSize: 30, lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 18px' }}>
+          <h2 style={{ fontSize: 'clamp(23px, 5.2vw, 30px)', lineHeight: 1.2, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 18px' }}>
             For clinics &amp; enterprises
           </h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 48, flexWrap: 'wrap' }}>

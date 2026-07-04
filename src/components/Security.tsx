@@ -117,7 +117,7 @@ export default function Security() {
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: '#2E96D4', marginBottom: 12 }}>
             Security &amp; governance
           </div>
-          <h2 style={{ fontSize: 32, lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5.2vw, 32px)', lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
             Trusted with sensitive clinical information
           </h2>
           <p style={{ fontSize: 18, lineHeight: '28px', color: '#5B6472', maxWidth: 640, margin: 0 }}>

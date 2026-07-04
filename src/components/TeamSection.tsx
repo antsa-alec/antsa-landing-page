@@ -115,7 +115,7 @@ export default function TeamSection({ section }: TeamProps) {
     <section id="team" style={{ background: '#F3F7FC', padding: '88px 0' }}>
       <div className="dc-container">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 38, lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 18px' }}>
+          <h2 style={{ fontSize: 'clamp(26px, 6.2vw, 38px)', lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 18px' }}>
             Meet the <span style={{ color: '#48ABE2' }}>people</span> behind ANTSA
           </h2>
           <p style={{ fontSize: 17, lineHeight: 1.7, color: '#5B6472', maxWidth: 760, margin: 0 }}>

@@ -4,6 +4,10 @@ import AppFooter from '../components/AppFooter';
 import HelpChatWidget from '../components/HelpChatWidget';
 import ClientOnly from '../ssr/ClientOnly';
 import type { ChromeData } from './chrome-data';
+// Imported here (renders on every route) so the chrome's dc-* classes, the
+// anchor reset and Poppins are present on ALL pages in the production CSS split,
+// not just the homepage (App.tsx also imports it).
+import '../styles/global.css';
 
 /**
  * Global chrome. Deliberately AntD-free so the marketing homepage doesn't ship

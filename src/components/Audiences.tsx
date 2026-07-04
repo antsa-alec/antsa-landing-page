@@ -105,7 +105,7 @@ export default function Audiences() {
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: '#2E96D4', marginBottom: 12 }}>
             Who ANTSA is for
           </div>
-          <h2 style={{ fontSize: 32, lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: 0 }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5.2vw, 32px)', lineHeight: '40px', fontWeight: 700, letterSpacing: '-0.01em', margin: 0 }}>
             <span style={{ color: '#48ABE2' }}>Support</span> that fits how <span style={{ color: '#48ABE2' }}>you</span> work
           </h2>
         </div>

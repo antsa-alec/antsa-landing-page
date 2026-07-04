@@ -8,6 +8,7 @@ const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://antsa.ai';
 const STATIC_ROUTES = [
   { path: '/', title: 'ANTSA — Clinician-governed mental health platform for between-session care' },
   { path: '/free-trial', title: 'Free Trial' },
+  { path: '/governance', title: 'Clinical Governance' },
   { path: '/help', title: 'Help Centre' },
   { path: '/privacy-policy', title: 'Privacy Policy' },
   { path: '/terms-and-conditions', title: 'Terms and Conditions' },

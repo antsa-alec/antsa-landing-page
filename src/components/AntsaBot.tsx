@@ -62,7 +62,7 @@ export default function AntsaBot() {
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', color: '#2E96D4', marginBottom: 12 }}>
             ANTSAbot
           </div>
-          <h2 style={{ fontSize: 32, lineHeight: 1.25, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
+          <h2 style={{ fontSize: 'clamp(24px, 5.2vw, 32px)', lineHeight: 1.25, fontWeight: 700, letterSpacing: '-0.01em', margin: '0 0 14px' }}>
             ANTSAbot <span style={{ color: '#5B6472', fontWeight: 500, fontSize: 22 }}>(optional AI - clinical oversight built in)</span>
           </h2>
           <p style={{ fontSize: 18, lineHeight: 1.6, color: '#5B6472', maxWidth: 640, margin: 0 }}>

@@ -198,6 +198,7 @@ export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
         >
           <div>{copyright}</div>
           <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
+            <a href="/governance" style={legalLinkStyle}>Clinical governance</a>
             <a href="/privacy-policy" style={legalLinkStyle}>Privacy policy</a>
             <a href="/terms-and-conditions" style={legalLinkStyle}>Terms &amp; conditions</a>
             {extraLinks.map((l) => (
