@@ -6,12 +6,43 @@ const router = express.Router();
 const SITE_ORIGIN = process.env.SITE_ORIGIN || 'https://antsa.ai';
 
 const STATIC_ROUTES = [
-  { path: '/', title: 'ANTSA — Support clients between sessions. Reduce admin.' },
+  { path: '/', title: 'ANTSA — Clinician-governed mental health platform for between-session care' },
   { path: '/free-trial', title: 'Free Trial' },
   { path: '/help', title: 'Help Centre' },
   { path: '/privacy-policy', title: 'Privacy Policy' },
   { path: '/terms-and-conditions', title: 'Terms and Conditions' },
 ];
+
+// IndexNow key — public by design (also served at /<key>.txt). Lets Bing (and,
+// via Bing, ChatGPT/Copilot) recrawl changed pages within minutes.
+export const INDEXNOW_KEY = 'a3f1c9e84b7d4e2fa1b6c8d05e9f7a2c';
+
+/** Most-recent CMS edit, used for real sitemap <lastmod>. */
+function getSiteLastmod() {
+  try {
+    const rows = [
+      db.prepare('SELECT MAX(updated_at) AS v FROM content').get(),
+      db.prepare('SELECT MAX(updated_at) AS v FROM sections').get(),
+    ];
+    const times = rows.map((r) => r?.v).filter(Boolean).map((d) => new Date(d).getTime());
+    return times.length ? new Date(Math.max(...times)) : new Date();
+  } catch {
+    return new Date();
+  }
+}
+
+/** Per-route lastmod: /help tracks the newest help edit; others use site lastmod. */
+function getRouteLastmod(path) {
+  if (path === '/help') {
+    try {
+      const r = db.prepare('SELECT MAX(updated_at) AS v FROM help_articles').get();
+      if (r?.v) return new Date(r.v);
+    } catch {
+      /* fall through */
+    }
+  }
+  return getSiteLastmod();
+}
 
 function stripHtml(value) {
   if (value == null) return '';
@@ -136,9 +167,10 @@ function buildLlmsTxt(sections) {
   lines.push(tagline);
   lines.push('');
   lines.push('## Highlights');
-  lines.push('- Why practitioners switch — streamlined admin and engagement (`why_switch`)');
-  lines.push('- Everything in one login — dashboard, clients, telehealth, client app, mood (`everything_one_login`)');
-  lines.push('- For clinics — governance, onboarding, and collaboration (`for_clinics`)');
+  lines.push('- One login for your whole practice — AI Scribe, secure messaging, homework, psychometrics, mood tracking, telehealth (`features`)');
+  lines.push('- ANTSAbot — optional, clinician-governed AI support assigned and reviewed by the practitioner; never independent therapy (`antsabot`)');
+  lines.push('- Security & governance — Australian-hosted, encrypted, two-factor auth; aligned with the Australian Privacy Principles, HIPAA and GDPR (`security`)');
+  lines.push('- Simple pricing — one platform, no confusing add-ons or multiple subscriptions (`pricing`)');
   lines.push('');
   lines.push('## Pages');
   for (const r of STATIC_ROUTES) {
@@ -268,10 +300,10 @@ function buildLlmsFullTxt(sections, helpArticles) {
 }
 
 function buildSitemapXml() {
-  const today = new Date().toISOString().slice(0, 10);
-  const urls = STATIC_ROUTES.map(
-    (r) => `  <url>\n    <loc>${SITE_ORIGIN}${r.path}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`
-  ).join('\n');
+  const urls = STATIC_ROUTES.map((r) => {
+    const lastmod = getRouteLastmod(r.path).toISOString().slice(0, 10);
+    return `  <url>\n    <loc>${SITE_ORIGIN}${r.path}</loc>\n    <lastmod>${lastmod}</lastmod>\n  </url>`;
+  }).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
@@ -464,17 +496,36 @@ export function buildFaqJsonLd(sections) {
 export { loadAllSections, loadHelpArticles };
 
 function buildRobotsTxt() {
-  return [
+  // AI answer-engine crawlers we explicitly welcome for retrieval + citation.
+  // (The wildcard below already allows them; listing them signals intent and
+  // makes the policy auditable. Training crawlers are left allowed too — for a
+  // small brand, being in the corpus aids unprompted recall.)
+  const AI_BOTS = [
+    'OAI-SearchBot', 'ChatGPT-User', 'GPTBot',
+    'PerplexityBot', 'Perplexity-User',
+    'Claude-SearchBot', 'Claude-User', 'ClaudeBot',
+    'Google-Extended', 'Applebot-Extended',
+  ];
+  const lines = [
     'User-agent: *',
     'Allow: /',
     'Disallow: /admin',
     'Disallow: /api/',
     '',
-    `Sitemap: ${SITE_ORIGIN}/sitemap.xml`,
-    '',
-    `# Machine-readable site summary: ${SITE_ORIGIN}/llms.txt`,
-    '',
-  ].join('\n');
+    '# AI answer engines — allowed for retrieval, citation and training',
+  ];
+  for (const bot of AI_BOTS) {
+    lines.push(`User-agent: ${bot}`);
+    lines.push('Allow: /');
+    lines.push('Disallow: /admin');
+    lines.push('Disallow: /api/');
+    lines.push('');
+  }
+  lines.push(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`);
+  lines.push('');
+  lines.push(`# Machine-readable site summary: ${SITE_ORIGIN}/llms.txt`);
+  lines.push('');
+  return lines.join('\n');
 }
 
 router.get('/llms.txt', (_req, res) => {
@@ -517,5 +568,34 @@ router.get('/robots.txt', (_req, res) => {
   res.set('Cache-Control', 'public, max-age=3600');
   res.send(buildRobotsTxt());
 });
+
+// IndexNow ownership key file — https://antsa.ai/<key>.txt returns the key.
+router.get(`/${INDEXNOW_KEY}.txt`, (_req, res) => {
+  res.set('Content-Type', 'text/plain; charset=utf-8');
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.send(INDEXNOW_KEY);
+});
+
+/**
+ * Ping IndexNow so Bing (and, via Bing, ChatGPT/Copilot) recrawl changed pages
+ * within minutes. Fire-and-forget; no-op outside production / non-https origins.
+ * @param {string[]} [urls] absolute URLs; defaults to all static routes.
+ */
+export async function pingIndexNow(urls) {
+  try {
+    if (process.env.NODE_ENV !== 'production') return;
+    if (!/^https:\/\//i.test(SITE_ORIGIN)) return;
+    const urlList = urls?.length ? urls : STATIC_ROUTES.map((r) => `${SITE_ORIGIN}${r.path}`);
+    const host = new URL(SITE_ORIGIN).host;
+    const res = await fetch('https://api.indexnow.org/IndexNow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({ host, key: INDEXNOW_KEY, keyLocation: `${SITE_ORIGIN}/${INDEXNOW_KEY}.txt`, urlList }),
+    });
+    console.log(`IndexNow ping: ${res.status} (${urlList.length} urls)`);
+  } catch (err) {
+    console.warn('IndexNow ping failed:', err.message);
+  }
+}
 
 export default router;

@@ -33,14 +33,12 @@ const orgLd = {
 };
 
 export default function Head() {
+  // NOTE: page-specific tags (title, description, canonical, og:title/description/url,
+  // twitter:title/description) are intentionally NOT emitted here — Vike's Head is
+  // cumulative, so each page's own +Head (via PageHead) provides them to avoid
+  // duplicate/conflicting tags on sub-pages. Only truly-global brand/analytics tags live here.
   return (
     <>
-      <title>ANTSA — Clinician-governed mental health platform for between-session care</title>
-      <meta
-        name="description"
-        content="ANTSA is a secure Australian mental health platform that keeps clinicians at the centre of care — AI Scribe, telehealth, homework, mood tracking, secure messaging and clinician-governed AI support, in one place."
-      />
-      <link rel="canonical" href="https://antsa.ai/" />
       <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       <link rel="apple-touch-icon" href="/favicon.svg" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -52,23 +50,11 @@ export default function Head() {
       <meta name="theme-color" content="#48abe2" />
       <meta name="author" content="ANTSA Pty Ltd" />
       <meta name="robots" content="index, follow, max-image-preview:large" />
-      <meta name="keywords" content="mental health platform, AI scribe, telehealth, clinician-governed AI, between-session care, psychology software, Australia" />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content="ANTSA" />
-      <meta property="og:title" content="ANTSA — Mental health care belongs in clinician hands" />
-      <meta
-        property="og:description"
-        content="A secure Australian platform that helps clinicians reduce admin, support clients between sessions, and keep clinical oversight — with optional clinician-governed AI."
-      />
-      <meta property="og:url" content="https://antsa.ai/" />
       <meta property="og:image" content="https://antsa.ai/LOGO-BLACK.png" />
       <meta property="og:locale" content="en_AU" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="ANTSA — Mental health care belongs in clinician hands" />
-      <meta
-        name="twitter:description"
-        content="A secure Australian platform for clinician-governed, between-session mental health care."
-      />
       <meta name="twitter:image" content="https://antsa.ai/LOGO-BLACK.png" />
       <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
       <link rel="alternate" type="text/plain" title="Machine-readable site summary" href="/llms.txt" />

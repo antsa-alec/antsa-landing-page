@@ -12,7 +12,7 @@ import documentRoutes from './routes/documents.js';
 import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
-import seoRoutes from './routes/seo.js';
+import seoRoutes, { pingIndexNow } from './routes/seo.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -29,6 +29,13 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// HSTS — TLS is terminated at Azure; harmless over http, honoured over https.
+// includeSubDomains protects the whole antsa.ai / {country}.antsa.ai tree.
+app.use((_req, res, next) => {
+  res.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  next();
+});
 
 // CORS configuration
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -68,6 +75,16 @@ app.use('/api', (req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+// Ping IndexNow when admin content changes so Bing/Copilot (and via Bing,
+// ChatGPT) recrawl within minutes. Fire-and-forget after a successful write.
+app.use('/api/content', (req, res, next) => {
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    res.on('finish', () => {
+      if (res.statusCode >= 200 && res.statusCode < 300) pingIndexNow();
+    });
+  }
+  next();
+});
 app.use('/api/content', contentRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/documents', documentRoutes);

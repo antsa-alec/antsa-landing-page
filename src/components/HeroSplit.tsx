@@ -167,7 +167,12 @@ export default function HeroSplit({ section }: HeroProps) {
               <img
                 src={heroImage}
                 alt="A clinician and client connected through ANTSA between sessions"
-                style={{ width: '100%', display: 'block' }}
+                width={1440}
+                height={900}
+                loading="eager"
+                decoding="async"
+                {...({ fetchpriority: 'high' } as Record<string, string>)}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
               />
             </div>
           </div>

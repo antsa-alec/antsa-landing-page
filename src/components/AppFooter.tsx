@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { message } from 'antd';
 import type { ReactNode } from 'react';
 import antsaLogo from '../assets/antsa-logo.png';
 import type { ChromeData, SocialLink, FooterLink, FooterContent } from '../pages/chrome-data';
@@ -81,7 +80,6 @@ export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
         setDone(true);
         setName('');
         setEmail('');
-        message.success(data.message || 'Thank you for subscribing!');
       } else if (res.status === 409) {
         setError('This email is already subscribed.');
       } else {

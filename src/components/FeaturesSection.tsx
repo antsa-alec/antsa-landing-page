@@ -40,6 +40,20 @@ const DEFAULT_ITEMS: FeatureItem[] = [
   { title: 'Mobile app', description: 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', image_url: '/landing/mobile-sign-in.png' },
 ];
 
+/** Intrinsic pixel dimensions per screenshot, so each <img> carries a correct
+ * aspect ratio (CLS-safe). Desktop captures are 1440×900; the mobile screen is
+ * portrait. Falls back to the desktop ratio for CMS-supplied URLs. */
+const IMG_DIMENSIONS: Record<string, { w: number; h: number }> = {
+  '/landing/dashboard.png': { w: 1440, h: 900 },
+  '/landing/client-detail-sessions-notes.png': { w: 1440, h: 900 },
+  '/landing/client-detail-overview.png': { w: 1440, h: 900 },
+  '/landing/templates.png': { w: 1440, h: 900 },
+  '/landing/clients-list.png': { w: 1440, h: 900 },
+  '/landing/calendar.png': { w: 1440, h: 900 },
+  '/landing/mobile-sign-in.png': { w: 1170, h: 1992 },
+};
+const dimsFor = (url?: string) => IMG_DIMENSIONS[url || ''] ?? { w: 1440, h: 900 };
+
 export default function FeaturesSection({ section }: Props) {
   const items = section?.content?.items?.length ? section.content.items : DEFAULT_ITEMS;
   const [active, setActive] = useState(0);
@@ -78,23 +92,31 @@ export default function FeaturesSection({ section }: Props) {
             }}
           >
             <div style={{ position: 'relative', width: '100%', height: 520 }}>
-              {items.map((it, i) => (
-                <img
-                  key={it.id ?? i}
-                  src={it.image_url || DEFAULT_ITEMS[i % DEFAULT_ITEMS.length].image_url}
-                  alt={it.title || ''}
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    opacity: i === active ? 1 : 0,
-                    zIndex: i === active ? 2 : 1,
-                    transition: 'opacity .6s ease',
-                  }}
-                />
-              ))}
+              {items.map((it, i) => {
+                const src = it.image_url || DEFAULT_ITEMS[i % DEFAULT_ITEMS.length].image_url;
+                const dims = dimsFor(src);
+                return (
+                  <img
+                    key={it.id ?? i}
+                    src={src}
+                    alt={it.title || ''}
+                    width={dims.w}
+                    height={dims.h}
+                    loading="lazy"
+                    decoding="async"
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'contain',
+                      opacity: i === active ? 1 : 0,
+                      zIndex: i === active ? 2 : 1,
+                      transition: 'opacity .6s ease',
+                    }}
+                  />
+                );
+              })}
             </div>
           </div>
 

@@ -31,6 +31,16 @@ const teamPhotos: Record<string, string> = {
   'Ben Smith': photoBen,
 };
 
+/** Intrinsic pixel dimensions of the bundled team photos (all 1:1 square), so
+ * each <img> carries a correct aspect ratio (CLS-safe). Falls back to 480×480
+ * for CMS-supplied members. */
+const photoDimensions: Record<string, { w: number; h: number }> = {
+  'Sally-Anne McCormack': { w: 480, h: 480 },
+  'Kiera Macdonald': { w: 480, h: 480 },
+  'Amber Macdonald': { w: 428, h: 428 },
+  'Ben Smith': { w: 480, h: 480 },
+};
+
 const DEFAULT_MEMBERS: TeamMember[] = [
   {
     id: '1',
@@ -118,11 +128,12 @@ export default function TeamSection({ section }: TeamProps) {
         <div className="dc-grid-4" style={{ gap: 24, alignItems: 'stretch' }}>
           {members.map((m) => {
             const photo = m.image_url || teamPhotos[m.name];
+            const dims = photoDimensions[m.name] ?? { w: 480, h: 480 };
             const linkedin = m.socials?.find((s) => s.platform.toLowerCase() === 'linkedin')?.url;
             const photoInner = (
               <div style={{ width: 120, height: 120, borderRadius: 999, overflow: 'hidden', border: '3px solid #C9DEF6', margin: '0 auto', background: '#48ABE2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {photo ? (
-                  <img src={photo} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <img src={photo} alt={m.name} width={dims.w} height={dims.h} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 ) : (
                   <span style={{ color: '#fff', fontWeight: 700, fontSize: 34 }}>{initials(m.name)}</span>
                 )}

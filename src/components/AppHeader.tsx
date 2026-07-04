@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Drawer, Button } from 'antd';
-import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import antsaLogo from '../assets/antsa-logo.png';
 import type { ChromeData, HeaderConfig } from '../pages/chrome-data';
 
 /**
- * HEADER — sticky, translucent, clinician-governed design.
+ * HEADER — sticky, translucent, clinician-governed design. AntD-free (plain
+ * HTML + CSS + inline SVG) so it stays off the marketing critical path.
  * Nav CTAs (Log in / Start free trial / Book a demo) are CMS-driven via
  * chrome.header with the approved defaults as fallback.
  */
@@ -46,7 +45,6 @@ type AppHeaderProps = { chrome?: ChromeData; urlPathname?: string };
 export default function AppHeader({ chrome, urlPathname = '/' }: AppHeaderProps) {
   const [open, setOpen] = useState(false);
   const cfg = resolveCfg(chrome?.header);
-  // Anchor links only work in-page on the home route; prefix with "/" elsewhere.
   const navHref = (href: string) =>
     isExternal(href) || urlPathname === '/' ? href : `/${href}`;
 
@@ -87,7 +85,7 @@ export default function AppHeader({ chrome, urlPathname = '/' }: AppHeaderProps)
               }
             }}
           >
-            <img src={antsaLogo} alt="ANTSA for professionals" style={{ height: 38, width: 'auto', display: 'block' }} />
+            <img src={antsaLogo} alt="ANTSA for professionals" width={140} height={38} style={{ height: 38, width: 'auto', display: 'block' }} />
           </a>
 
           <nav className="dc-desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: 26 }}>
@@ -110,55 +108,80 @@ export default function AppHeader({ chrome, urlPathname = '/' }: AppHeaderProps)
             </a>
           </div>
 
-          <Button
+          <button
+            type="button"
             className="dc-mobile-toggle"
-            type="text"
-            icon={<MenuOutlined style={{ fontSize: 20 }} />}
             onClick={() => setOpen(true)}
-            style={{ display: 'none' }}
             aria-label="Open menu"
-          />
+            style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: '#0F1622', padding: 6 }}
+          >
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
         </div>
       </header>
 
-      <Drawer
-        title={<img src={antsaLogo} alt="ANTSA" style={{ height: 30, display: 'block' }} />}
-        placement="right"
-        onClose={() => setOpen(false)}
-        open={open}
-        closeIcon={<CloseOutlined />}
-      >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {NAV.map((n) => (
-            <a
-              key={n.label}
-              className="dc-nav-link"
-              href={navHref(n.href)}
-              {...extraProps(n.href)}
-              onClick={() => setOpen(false)}
-              style={{ fontSize: 17 }}
-            >
-              {n.label}
+      {open && (
+        <div className="dc-mobile-menu" role="dialog" aria-modal="true">
+          <div className="dc-mobile-menu__scrim" onClick={() => setOpen(false)} />
+          <div className="dc-mobile-menu__panel">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <img src={antsaLogo} alt="ANTSA" width={110} height={30} style={{ height: 30, width: 'auto' }} />
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close menu"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0F1622', padding: 6 }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            {NAV.map((n) => (
+              <a
+                key={n.label}
+                className="dc-nav-link"
+                href={navHref(n.href)}
+                {...extraProps(n.href)}
+                onClick={() => setOpen(false)}
+                style={{ fontSize: 17, padding: '10px 0' }}
+              >
+                {n.label}
+              </a>
+            ))}
+            <div style={{ height: 1, background: '#E6E9EE', margin: '10px 0' }} />
+            <a className="dc-nav-link" href={cfg.signin_url} {...extraProps(cfg.signin_url)} style={{ fontSize: 17, padding: '10px 0' }}>
+              {cfg.signin_label}
             </a>
-          ))}
-          <div style={{ height: 1, background: '#E6E9EE', margin: '4px 0' }} />
-          <a className="dc-nav-link" href={cfg.signin_url} {...extraProps(cfg.signin_url)} style={{ fontSize: 17 }}>
-            {cfg.signin_label}
-          </a>
-          <a className="dc-btn dc-btn-secondary" href={cfg.signup_url} {...extraProps(cfg.signup_url)}>
-            {cfg.signup_label}
-          </a>
-          <a className="dc-btn dc-btn-primary" href={cfg.demo_url} {...extraProps(cfg.demo_url)}>
-            {cfg.demo_label}
-          </a>
+            <a className="dc-btn dc-btn-secondary" href={cfg.signup_url} {...extraProps(cfg.signup_url)} style={{ marginTop: 6 }}>
+              {cfg.signup_label}
+            </a>
+            <a className="dc-btn dc-btn-primary" href={cfg.demo_url} {...extraProps(cfg.demo_url)} style={{ marginTop: 8 }}>
+              {cfg.demo_label}
+            </a>
+          </div>
         </div>
-      </Drawer>
+      )}
 
       <style>{`
         @media (max-width: 1040px) {
           .dc-desktop-nav { display: none !important; }
-          .dc-mobile-toggle { display: inline-flex !important; }
+          .dc-mobile-toggle { display: inline-flex !important; align-items: center; }
         }
+        .dc-mobile-menu { position: fixed; inset: 0; z-index: 1100; }
+        .dc-mobile-menu__scrim { position: absolute; inset: 0; background: rgba(15,22,34,.4); }
+        .dc-mobile-menu__panel {
+          position: absolute; top: 0; right: 0; height: 100%; width: min(320px, 86vw);
+          background: #fff; box-shadow: -8px 0 32px rgba(15,22,34,.16);
+          padding: 18px 22px; display: flex; flex-direction: column; overflow-y: auto;
+          animation: dcSlideIn .25s ease-out;
+        }
+        @keyframes dcSlideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
       `}</style>
     </>
   );
