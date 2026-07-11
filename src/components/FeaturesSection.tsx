@@ -29,30 +29,32 @@ const PALETTE = [
 ];
 
 const DEFAULT_ITEMS: FeatureItem[] = [
-  { title: 'AI Scribe', description: 'Transcribes and summarises sessions so you finish notes faster, and review every word.', image_url: '/landing/client-detail-sessions-notes.png' },
-  { title: 'Client messaging', description: 'Secure, in-platform messaging that keeps client communication in one place.', image_url: '/landing/client-detail-overview.png' },
-  { title: 'AI assistant', description: 'A practitioner-side assistant that helps you draft, summarise and stay organised.', image_url: '/landing/dashboard.png' },
-  { title: 'Homework & tasks', description: 'Assign tasks, journals and activities clients can complete between sessions.', image_url: '/landing/templates.png' },
-  { title: 'Psychometrics', description: 'Send validated measures with automatic scoring for intake, review and monitoring.', image_url: '/landing/client-detail-overview.png' },
-  { title: 'Mood & engagement', description: 'See mood trends and engagement at a glance, without chasing reports.', image_url: '/landing/client-detail-overview.png' },
-  { title: 'Telehealth', description: 'Built-in secure video, working alongside the AI Scribe. No separate platform.', image_url: '/landing/calendar.png' },
-  { title: 'ANTSAbot', description: 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', image_url: '/landing/dashboard.png' },
-  { title: 'Mobile app', description: 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', image_url: '/landing/mobile-sign-in.png' },
+  { title: 'AI Scribe', description: 'Transcribes and summarises sessions so you finish notes faster, and review every word.', image_url: '/landing/screen-scribe.webp' },
+  { title: 'Client messaging', description: 'Secure, in-platform messaging that keeps client communication in one place.', image_url: '/landing/screen-messages.webp' },
+  { title: 'AI assistant', description: 'A practitioner-side assistant that helps you draft, summarise and stay organised.', image_url: '/landing/screen-assistant.webp' },
+  { title: 'Homework & tasks', description: 'Assign tasks, journals and activities clients can complete between sessions.', image_url: '/landing/screen-homework.webp' },
+  { title: 'Psychometrics', description: 'Send validated measures with automatic scoring for intake, review and monitoring.', image_url: '/landing/screen-psychometrics.webp' },
+  { title: 'Mood & engagement', description: 'See mood trends and engagement at a glance, without chasing reports.', image_url: '/landing/screen-mood.webp' },
+  { title: 'Telehealth', description: 'Built-in secure video, working alongside the AI Scribe. No separate platform.', image_url: '/landing/screen-calendar.webp' },
+  { title: 'ANTSAbot', description: 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', image_url: '/landing/screen-chatbot.webp' },
+  { title: 'Mobile app', description: 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', image_url: '/landing/screen-mobile.webp' },
 ];
 
-/** Intrinsic pixel dimensions per screenshot, so each <img> carries a correct
- * aspect ratio (CLS-safe). Desktop captures are 1440×900; the mobile screen is
- * portrait. Falls back to the desktop ratio for CMS-supplied URLs. */
+/** Intrinsic pixel dimensions per product image, so each <img> carries a correct
+ * aspect ratio (CLS-safe). These are the real design screenshots (webp). Falls
+ * back to a 4:3 desktop ratio for CMS-supplied URLs we don't know the size of. */
 const IMG_DIMENSIONS: Record<string, { w: number; h: number }> = {
-  '/landing/dashboard.png': { w: 1440, h: 900 },
-  '/landing/client-detail-sessions-notes.png': { w: 1440, h: 900 },
-  '/landing/client-detail-overview.png': { w: 1440, h: 900 },
-  '/landing/templates.png': { w: 1440, h: 900 },
-  '/landing/clients-list.png': { w: 1440, h: 900 },
-  '/landing/calendar.png': { w: 1440, h: 900 },
-  '/landing/mobile-sign-in.png': { w: 1170, h: 1992 },
+  '/landing/screen-scribe.webp': { w: 1181, h: 1331 },
+  '/landing/screen-messages.webp': { w: 1173, h: 1341 },
+  '/landing/screen-assistant.webp': { w: 1213, h: 1297 },
+  '/landing/screen-homework.webp': { w: 1212, h: 1298 },
+  '/landing/screen-psychometrics.webp': { w: 1448, h: 1086 },
+  '/landing/screen-mood.webp': { w: 1536, h: 1024 },
+  '/landing/screen-calendar.webp': { w: 1448, h: 1086 },
+  '/landing/screen-chatbot.webp': { w: 1303, h: 1207 },
+  '/landing/screen-mobile.webp': { w: 1208, h: 1302 },
 };
-const dimsFor = (url?: string) => IMG_DIMENSIONS[url || ''] ?? { w: 1440, h: 900 };
+const dimsFor = (url?: string) => IMG_DIMENSIONS[url || ''] ?? { w: 1440, h: 1080 };
 
 export default function FeaturesSection({ section }: Props) {
   const items = section?.content?.items?.length ? section.content.items : DEFAULT_ITEMS;

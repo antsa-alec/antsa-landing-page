@@ -34,7 +34,7 @@ const DEFAULTS = {
   cta_primary_url: 'https://calendly.com/sally-anne-mcc',
   cta_secondary: 'Start free trial',
   cta_secondary_url: 'https://antsa.ai/free-trial',
-  hero_desktop_image: '/landing/dashboard.png',
+  hero_desktop_image: '/landing/hero-clinician-client.webp',
 };
 
 const isExternal = (url: string) => /^https?:\/\//i.test(url);
@@ -167,8 +167,8 @@ export default function HeroSplit({ section }: HeroProps) {
               <img
                 src={heroImage}
                 alt="A clinician and client connected through ANTSA between sessions"
-                width={1440}
-                height={900}
+                width={1916}
+                height={821}
                 loading="eager"
                 decoding="async"
                 {...({ fetchpriority: 'high' } as Record<string, string>)}

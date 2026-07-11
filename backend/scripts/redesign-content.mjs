@@ -46,7 +46,7 @@ export function applyRedesignContent(db) {
     setText(hero, 'cta_primary_url', 'https://calendly.com/sally-anne-mcc');
     setText(hero, 'cta_secondary', 'Start free trial');
     setText(hero, 'cta_secondary_url', 'https://antsa.ai/free-trial');
-    setText(hero, 'hero_desktop_image', '/landing/dashboard.png');
+    setText(hero, 'hero_desktop_image', '/landing/hero-clinician-client.webp');
 
     // ---- FEATURES ("See ANTSA in action") ----
     const features = ensureSection('features', 7);
@@ -54,15 +54,15 @@ export function applyRedesignContent(db) {
     setText(features, 'subtitle', 'The core tools you use to support and monitor clients, during sessions and between them.');
     const palette = ['#48ABE2', '#1F9D8B', '#E0922C', '#7C6CE0', '#E0567F', '#2BB0C4', '#48ABE2', '#1F9D8B', '#E0922C'];
     const featureItems = [
-      ['AI Scribe', 'Transcribes and summarises sessions so you finish notes faster, and review every word.', '/landing/client-detail-sessions-notes.png'],
-      ['Client messaging', 'Secure, in-platform messaging that keeps client communication in one place.', '/landing/client-detail-overview.png'],
-      ['AI assistant', 'A practitioner-side assistant that helps you draft, summarise and stay organised.', '/landing/dashboard.png'],
-      ['Homework & tasks', 'Assign tasks, journals and activities clients can complete between sessions.', '/landing/templates.png'],
-      ['Psychometrics', 'Send validated measures with automatic scoring for intake, review and monitoring.', '/landing/client-detail-overview.png'],
-      ['Mood & engagement', 'See mood trends and engagement at a glance, without chasing reports.', '/landing/client-detail-overview.png'],
-      ['Telehealth', 'Built-in secure video, working alongside the AI Scribe. No separate platform.', '/landing/calendar.png'],
-      ['ANTSAbot', 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', '/landing/dashboard.png'],
-      ['Mobile app', 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', '/landing/mobile-sign-in.png'],
+      ['AI Scribe', 'Transcribes and summarises sessions so you finish notes faster, and review every word.', '/landing/screen-scribe.webp'],
+      ['Client messaging', 'Secure, in-platform messaging that keeps client communication in one place.', '/landing/screen-messages.webp'],
+      ['AI assistant', 'A practitioner-side assistant that helps you draft, summarise and stay organised.', '/landing/screen-assistant.webp'],
+      ['Homework & tasks', 'Assign tasks, journals and activities clients can complete between sessions.', '/landing/screen-homework.webp'],
+      ['Psychometrics', 'Send validated measures with automatic scoring for intake, review and monitoring.', '/landing/screen-psychometrics.webp'],
+      ['Mood & engagement', 'See mood trends and engagement at a glance, without chasing reports.', '/landing/screen-mood.webp'],
+      ['Telehealth', 'Built-in secure video, working alongside the AI Scribe. No separate platform.', '/landing/screen-calendar.webp'],
+      ['ANTSAbot', 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', '/landing/screen-chatbot.webp'],
+      ['Mobile app', 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', '/landing/screen-mobile.webp'],
     ];
     db.prepare('DELETE FROM feature_items WHERE section_id = ?').run(features);
     const featStmt = db.prepare(

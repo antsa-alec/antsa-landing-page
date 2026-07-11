@@ -14,7 +14,37 @@ const MARKER_HEADER_CTAS_V3 = 'redesign_2026_header_ctas_v3_done';
 // design copy for hero/features/team/pricing/faq/header/footer/socials. Gated
 // one-time so it won't clobber later admin edits on subsequent boots.
 const MARKER_FULL_DESIGN_V1 = 'redesign_2026_full_design_v1_done';
+// v6 — replace the earlier Playwright-test-env screenshots with the real
+// approved design images (webp). The v2/full-design content pointed feature
+// tiles + hero at PNGs captured from a Playwright run (showed "Good afternoon,
+// Playwright" / test-account data). This applies the designer's screenshots.
+const MARKER_REAL_DESIGN_IMAGES_V6 = 'redesign_2026_real_design_images_v6_done';
 const CALENDLY_URL = 'https://calendly.com/sally-anne-mcc';
+
+// Main features carousel (section 'features'), by 0-based order_index → the
+// real design screenshot for each feature (see redesign-content.mjs seed order).
+const FEATURE_IMAGES_BY_ORDER = [
+  '/landing/screen-scribe.webp', // 0 AI Scribe
+  '/landing/screen-messages.webp', // 1 Client messaging
+  '/landing/screen-assistant.webp', // 2 AI assistant
+  '/landing/screen-homework.webp', // 3 Homework & tasks
+  '/landing/screen-psychometrics.webp', // 4 Psychometrics
+  '/landing/screen-mood.webp', // 5 Mood & engagement
+  '/landing/screen-calendar.webp', // 6 Telehealth
+  '/landing/screen-chatbot.webp', // 7 ANTSAbot
+  '/landing/screen-mobile.webp', // 8 Mobile app
+];
+// "Everything, one login" tiles (section 'everything_one_login'), by title.
+const EOL_IMAGES = [
+  ['Practitioner Dashboard%', '/landing/screen-assistant.webp'],
+  ['Client App%', '/landing/screen-mobile.webp'],
+  ['Client Records%', '/landing/screen-psychometrics.webp'],
+  ['Telehealth%', '/landing/screen-calendar.webp'],
+  ['AI Scribe%', '/landing/screen-scribe.webp'],
+  ['AI scribe%', '/landing/screen-scribe.webp'],
+  ['Mood%', '/landing/screen-mood.webp'],
+  ['Client Overview%', '/landing/screen-mood.webp'],
+];
 
 function getSetting(key) {
   try {
@@ -484,6 +514,54 @@ function runFullDesignV1() {
   console.log('✅ redesign_2026: full design content applied');
 }
 
+/**
+ * v6 — swap the Playwright-test screenshots for the real approved design
+ * images (webp), committed under /landing/ by the build. Force-set (the prior
+ * values were test-env captures, not meaningful admin edits); marker-gated so
+ * it applies once and never re-clobbers later admin edits.
+ */
+function runRealDesignImagesV6() {
+  if (getSetting(MARKER_REAL_DESIGN_IMAGES_V6) === '1') return;
+
+  const contentUpsert = db.prepare(`
+    INSERT INTO content (section_id, key, value, type)
+    VALUES (?, ?, ?, 'text')
+    ON CONFLICT(section_id, key) DO UPDATE SET
+      value = excluded.value,
+      type = excluded.type,
+      updated_at = CURRENT_TIMESTAMP
+  `);
+
+  const heroId = getSectionId('hero');
+  if (heroId) {
+    contentUpsert.run(heroId, 'hero_desktop_image', '/landing/hero-clinician-client.webp');
+    contentUpsert.run(heroId, 'hero_mobile_image', '/landing/screen-mobile.webp');
+  }
+
+  // Main features carousel — update by 0-based order_index (robust to renames).
+  const featuresId = getSectionId('features');
+  if (featuresId) {
+    const upd = db.prepare(
+      `UPDATE feature_items SET image_url = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE section_id = ? AND order_index = ?`,
+    );
+    FEATURE_IMAGES_BY_ORDER.forEach((img, i) => upd.run(img, featuresId, i));
+  }
+
+  // "Everything, one login" tiles — update by title.
+  const eolId = getSectionId('everything_one_login');
+  if (eolId) {
+    const updLike = db.prepare(
+      `UPDATE feature_items SET image_url = ?, updated_at = CURRENT_TIMESTAMP
+       WHERE section_id = ? AND title LIKE ?`,
+    );
+    for (const [titleLike, img] of EOL_IMAGES) updLike.run(img, eolId, titleLike);
+  }
+
+  setSetting(MARKER_REAL_DESIGN_IMAGES_V6, '1');
+  console.log('✅ redesign_2026: real design images (webp) applied');
+}
+
 export function runRedesignMigrations() {
   try {
     runSectionsMigration();
@@ -491,6 +569,7 @@ export function runRedesignMigrations() {
     runRealScreenshotsV2();
     runHeaderCtasV3();
     runFullDesignV1();
+    runRealDesignImagesV6();
   } catch (e) {
     console.error('⚠️ redesign_2026 migration error:', e.message);
   }

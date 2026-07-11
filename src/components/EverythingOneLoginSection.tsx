@@ -17,27 +17,27 @@ const DEFAULT_TILES: Tile[] = [
   {
     title: 'Practitioner dashboard',
     description: 'See clients, sessions, messages, and tasks at a glance.',
-    image_url: '/landing/dashboard.png',
+    image_url: '/landing/screen-assistant.webp',
   },
   {
     title: 'Client records',
     description: 'Structured engagement and clinical context in one place.',
-    image_url: '/landing/clients-list.png',
+    image_url: '/landing/screen-psychometrics.webp',
   },
   {
     title: 'Telehealth',
     description: 'Schedule and run secure video sessions from your calendar.',
-    image_url: '/landing/calendar.png',
+    image_url: '/landing/screen-calendar.webp',
   },
   {
     title: 'AI scribe & notes',
     description: 'Reusable templates and AI summaries for faster documentation.',
-    image_url: '/landing/templates.png',
+    image_url: '/landing/screen-scribe.webp',
   },
   {
     title: 'Client overview',
     description: 'Mood, tasks, sessions, and snapshot at a glance.',
-    image_url: '/landing/client-detail-overview.png',
+    image_url: '/landing/screen-mood.webp',
   },
 ];
 
