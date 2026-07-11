@@ -73,10 +73,10 @@ export default function AntsaBot() {
         <div style={{ display: 'flex', gap: 48, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ flex: 1.3, minWidth: 300 }}>
             <img
-              src="/landing/client-detail-overview.png"
+              src="/landing/antsabot-oversight.webp"
               alt="How clinical oversight works with ANTSAbot"
-              width={1440}
-              height={900}
+              width={1672}
+              height={941}
               loading="lazy"
               decoding="async"
               style={{ width: '100%', height: 'auto', borderRadius: 16, border: '1px solid #E6E9EE', boxShadow: '0 8px 28px rgba(15,22,34,.06)', display: 'block' }}
