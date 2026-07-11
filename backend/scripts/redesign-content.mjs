@@ -58,10 +58,10 @@ export function applyRedesignContent(db) {
       ['Client messaging', 'Secure, in-platform messaging that keeps client communication in one place.', '/landing/client-detail-overview.png'],
       ['AI assistant', 'A practitioner-side assistant that helps you draft, summarise and stay organised.', '/landing/dashboard.png'],
       ['Homework & tasks', 'Assign tasks, journals and activities clients can complete between sessions.', '/landing/templates.png'],
-      ['Psychometrics', 'Send validated measures with automatic scoring for intake, review and monitoring.', '/landing/clients-list.png'],
+      ['Psychometrics', 'Send validated measures with automatic scoring for intake, review and monitoring.', '/landing/client-detail-overview.png'],
       ['Mood & engagement', 'See mood trends and engagement at a glance, without chasing reports.', '/landing/client-detail-overview.png'],
       ['Telehealth', 'Built-in secure video, working alongside the AI Scribe. No separate platform.', '/landing/calendar.png'],
-      ['ANTSAbot', 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', '/landing/mobile-sign-in.png'],
+      ['ANTSAbot', 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', '/landing/dashboard.png'],
       ['Mobile app', 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', '/landing/mobile-sign-in.png'],
     ];
     db.prepare('DELETE FROM feature_items WHERE section_id = ?').run(features);

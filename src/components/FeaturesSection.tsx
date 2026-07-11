@@ -33,10 +33,10 @@ const DEFAULT_ITEMS: FeatureItem[] = [
   { title: 'Client messaging', description: 'Secure, in-platform messaging that keeps client communication in one place.', image_url: '/landing/client-detail-overview.png' },
   { title: 'AI assistant', description: 'A practitioner-side assistant that helps you draft, summarise and stay organised.', image_url: '/landing/dashboard.png' },
   { title: 'Homework & tasks', description: 'Assign tasks, journals and activities clients can complete between sessions.', image_url: '/landing/templates.png' },
-  { title: 'Psychometrics', description: 'Send validated measures with automatic scoring for intake, review and monitoring.', image_url: '/landing/clients-list.png' },
+  { title: 'Psychometrics', description: 'Send validated measures with automatic scoring for intake, review and monitoring.', image_url: '/landing/client-detail-overview.png' },
   { title: 'Mood & engagement', description: 'See mood trends and engagement at a glance, without chasing reports.', image_url: '/landing/client-detail-overview.png' },
   { title: 'Telehealth', description: 'Built-in secure video, working alongside the AI Scribe. No separate platform.', image_url: '/landing/calendar.png' },
-  { title: 'ANTSAbot', description: 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', image_url: '/landing/mobile-sign-in.png' },
+  { title: 'ANTSAbot', description: 'Optional, clinician-governed AI support for reflection and psychoeducation between sessions.', image_url: '/landing/dashboard.png' },
   { title: 'Mobile app', description: 'Clients access their tasks, mood check-ins and resources from a simple mobile app.', image_url: '/landing/mobile-sign-in.png' },
 ];
 
