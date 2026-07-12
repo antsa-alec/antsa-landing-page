@@ -112,9 +112,13 @@ if (process.env.NODE_ENV === 'production') {
 
   // Admin SPA carve-out. Vike never sees /admin/*; we serve the admin
   // shell directly and React mounts client-side as today.
-  // The admin SPA shell lives at dist/index.html (top-level Vite output),
-  // not inside dist/client/ which is the Vike SSR client bundle.
-  const adminShell = path.join(distPath, 'index.html');
+  // The admin SPA is built by `vite build --config vite.admin.config.ts` into
+  // dist/client (alongside the Vike client assets), so its shell is
+  // dist/client/index.html and its hashed bundle (/assets/index-*.js) is served
+  // by the express.static(dist/client) mount above. (Previously this pointed at
+  // dist/index.html, which the vike build no longer produces — the shell's
+  // bundle 404'd and the admin rendered blank.)
+  const adminShell = path.join(distClientPath, 'index.html');
   app.get('/admin', (_req, res) => {
     res.sendFile(adminShell);
   });
