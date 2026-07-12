@@ -59,7 +59,6 @@ const trialIncludes = [
   'Mood tracking and psychometrics',
   'Secure messaging and homework tasks',
   'Psychoeducation library',
-  'No credit card required upfront',
 ];
 
 const FreeTrial = () => {
@@ -165,9 +164,6 @@ const FreeTrial = () => {
             </span>
             <span style={{ fontSize: '14px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <TeamOutlined /> Up to 3 clients
-            </span>
-            <span style={{ fontSize: '14px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <SafetyCertificateOutlined /> No credit card required
             </span>
           </div>
         </div>
