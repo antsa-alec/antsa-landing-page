@@ -16,8 +16,8 @@ export type TrackerRegisterEntry = {
 /**
  * Current marketing-site register produced from live traffic and source review
  * on 13 August 2026. CookiePolicy renders it directly; update it whenever a tag
- * or SDK is added, removed, or reconfigured. The clinical products remain under
- * a separately tracked authenticated/device audit and are not represented here.
+ * or SDK is added, removed, or reconfigured. The cross-platform audit status is
+ * reported separately below because native/app technologies are not cookies.
  */
 export const TRACKER_REGISTER: TrackerRegisterEntry[] = [
   {
@@ -65,15 +65,15 @@ export const AUDIT_SCOPE = [
   },
   {
     platform: 'Client mobile app',
-    result: 'Incomplete. Source review found Firebase messaging/dynamic links and an iOS Firebase Analytics/AdIdSupport dependency; removal and physical-device traffic verification remain required.',
+    result: 'Source and production dependency audit found no analytics, advertising or session-replay SDK. Firebase notifications and embedded media require Functional consent. A clean-install physical-device traffic audit remains required.',
   },
   {
     platform: 'Clinician platform',
-    result: 'Incomplete. Source review found no advertising tag, but production Sentry session replay and passive CDN calls require removal, deployment and authenticated traffic verification.',
+    result: 'AU production login audit found no advertising tag, session replay or passive third-party request. Authenticated clinical journeys remain in the live audit scope.',
   },
   {
     platform: 'Internal administration platform',
-    result: 'Incomplete. Source review found Sentry replay configuration; deployment and authenticated traffic verification remain required.',
+    result: 'AU production login audit found no advertising tag, session replay or passive third-party request. Authenticated administration journeys remain in the live audit scope.',
   },
 ];
 
