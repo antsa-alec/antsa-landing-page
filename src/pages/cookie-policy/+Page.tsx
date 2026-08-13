@@ -15,8 +15,9 @@ export default function Page() {
         Optional tracking is off by default. We load the Google Analytics tracking tag only after you actively accept
         Analytics. Doing nothing or continuing to browse is not consent. You can reject all categories or withdraw
         consent from the persistent privacy control on every page. Refusal is remembered and the banner is not shown
-        again for 12 months. Advertising and optional functional categories are available as separate choices, but no
-        technologies in those categories are currently installed.
+        again for 12 months. Advertising and optional functional categories are available as separate choices. The
+        marketing site does not currently install technologies in either category; app features that use optional
+        notifications or embedded media are described separately in the cross-platform review below.
       </p>
 
       <h2 style={{ marginTop: 34 }}>Cross-platform review status</h2>
