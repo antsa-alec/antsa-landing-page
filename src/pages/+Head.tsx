@@ -48,17 +48,11 @@ export default function Head() {
   // NOTE: page-specific tags (title, description, canonical, og:title/description/url,
   // twitter:title/description) are intentionally NOT emitted here — Vike's Head is
   // cumulative, so each page's own +Head (via PageHead) provides them to avoid
-  // duplicate/conflicting tags on sub-pages. Only truly-global brand/analytics tags live here.
+  // duplicate/conflicting tags on sub-pages. Only truly-global brand tags live here.
   return (
     <>
       <link rel="icon" type="image/svg+xml" href="/antsa-symbol.svg" />
       <link rel="apple-touch-icon" href="/antsa-symbol.svg" />
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
       <meta name="theme-color" content="#48abe2" />
       <meta name="author" content="ANTSA Pty Ltd" />
       <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -71,12 +65,6 @@ export default function Head() {
       <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml" />
       <link rel="alternate" type="text/plain" title="Machine-readable site summary" href="/llms.txt" />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-207E2PQKJN" />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-207E2PQKJN');`,
-        }}
-      />
     </>
   );
 }

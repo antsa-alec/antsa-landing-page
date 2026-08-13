@@ -260,6 +260,21 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS consent_events (
+    event_id TEXT PRIMARY KEY,
+    visitor_id TEXT NOT NULL,
+    event_timestamp TEXT NOT NULL,
+    choice TEXT NOT NULL,
+    analytics INTEGER NOT NULL DEFAULT 0,
+    advertising INTEGER NOT NULL DEFAULT 0,
+    functional INTEGER NOT NULL DEFAULT 0,
+    banner_version TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_consent_events_visitor_time
+    ON consent_events(visitor_id, event_timestamp DESC);
+
   CREATE TABLE IF NOT EXISTS help_categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -426,4 +441,3 @@ try {
 
 export default db;
 export { PERSISTENT_DIR };
-

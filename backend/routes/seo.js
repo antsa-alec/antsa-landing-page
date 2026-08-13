@@ -11,6 +11,7 @@ const STATIC_ROUTES = [
   { path: '/governance', title: 'Clinical Governance' },
   { path: '/help', title: 'Help Centre' },
   { path: '/privacy-policy', title: 'Privacy Policy' },
+  { path: '/cookie-policy', title: 'Cookie and Tracking Policy' },
   { path: '/terms-and-conditions', title: 'Terms and Conditions' },
 ];
 

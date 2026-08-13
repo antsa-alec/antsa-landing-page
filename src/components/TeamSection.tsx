@@ -3,6 +3,7 @@ import photoSallyAnne from '../assets/team-sally-anne.png';
 import photoKiera from '../assets/team-kiera.png';
 import photoAmber from '../assets/team-amber.png';
 import photoBen from '../assets/team-ben.png';
+import { DEFAULT_TEAM_INTRO } from '../content/team';
 
 /**
  * TEAM — "Meet the people behind ANTSA". 4-up cards with round photo, optional
@@ -22,7 +23,14 @@ type TeamMember = {
   socials?: Social[];
 };
 
-type TeamProps = { section?: { content?: { members?: TeamMember[] } } };
+type TeamProps = {
+  section?: {
+    content?: {
+      intro_text?: string;
+      members?: TeamMember[];
+    };
+  };
+};
 
 const teamPhotos: Record<string, string> = {
   'Sally-Anne McCormack': photoSallyAnne,
@@ -110,6 +118,7 @@ const initials = (name: string) =>
 
 export default function TeamSection({ section }: TeamProps) {
   const members = section?.content?.members?.length ? section.content.members : DEFAULT_MEMBERS;
+  const introText = section?.content?.intro_text?.trim() || DEFAULT_TEAM_INTRO;
 
   return (
     <section id="team" style={{ background: '#F3F7FC', padding: '88px 0' }}>
@@ -118,10 +127,8 @@ export default function TeamSection({ section }: TeamProps) {
           <h2 style={{ fontSize: 'clamp(26px, 6.2vw, 38px)', lineHeight: 1.15, fontWeight: 700, letterSpacing: '-0.02em', margin: '0 0 18px' }}>
             Meet the <span style={{ color: '#48ABE2' }}>people</span> behind ANTSA
           </h2>
-          <p style={{ fontSize: 17, lineHeight: 1.7, color: '#5B6472', maxWidth: 760, margin: 0 }}>
-            ANTSA® is a female-owned Australian company founded by a clinical psychologist and built with her two daughters.
-            The team brings clinical, governance, legal, scientific and technical expertise to one shared goal. Keeping
-            clinicians at the centre of digital mental health care.
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: '#5B6472', maxWidth: 760, margin: 0, whiteSpace: 'pre-line' }}>
+            {introText}
           </p>
         </div>
 

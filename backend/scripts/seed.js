@@ -523,6 +523,7 @@ async function seed() {
       { key: 'title', value: 'Meet the experts behind ANTSA.', type: 'text' },
       { key: 'title_highlights', value: JSON.stringify(['experts']), type: 'json' },
       { key: 'subtitle', value: 'ANTSA is a female-owned Australian company founded by a clinical psychologist and built with her two daughters. Together, the team brings deep clinical insight, strong governance, and practical experience in digital health, designing infrastructure that scales without losing clinical accountability.', type: 'text' },
+      { key: 'intro_text', value: 'ANTSA® is a female-owned Australian company founded by a clinical psychologist and built with her two daughters. The team brings clinical, governance, scientific and technical expertise to one shared goal. Keeping clinicians at the centre of digital mental health care.', type: 'text' },
     ];
 
     teamContent.forEach(item => {

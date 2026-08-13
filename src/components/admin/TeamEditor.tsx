@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Card, List, Button, Modal, Form, Input, message, Spin, Space, Popconfirm, Avatar, Upload, Select, Tag, Typography } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, UploadOutlined, LinkOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined, UploadOutlined, LinkOutlined, SaveOutlined } from '@ant-design/icons';
 import { AuthContextType, API_BASE_URL } from '../../pages/Admin';
+import { DEFAULT_TEAM_INTRO } from '../../content/team';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -52,6 +53,8 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
   const [badgeUrl, setBadgeUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [badgeUploading, setBadgeUploading] = useState(false);
+  const [introText, setIntroText] = useState(DEFAULT_TEAM_INTRO);
+  const [savingIntro, setSavingIntro] = useState(false);
   
   // Social links state
   const [socialsModalVisible, setSocialsModalVisible] = useState(false);
@@ -73,6 +76,7 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
 
       if (response.ok) {
         setMembers(data.content.members || []);
+        setIntroText(data.content.intro_text || DEFAULT_TEAM_INTRO);
       } else {
         message.error('Failed to load team members');
       }
@@ -81,6 +85,38 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
       message.error('Connection error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveIntro = async () => {
+    const trimmedIntro = introText.trim();
+    if (!trimmedIntro) {
+      message.error('Team introduction cannot be empty');
+      return;
+    }
+
+    setSavingIntro(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/section/team`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify({ content: { intro_text: trimmedIntro } }),
+      });
+
+      if (response.ok) {
+        setIntroText(trimmedIntro);
+        message.success('Team introduction saved successfully!');
+      } else {
+        message.error('Failed to save team introduction');
+      }
+    } catch (error) {
+      console.error('Save team introduction error:', error);
+      message.error('Connection error');
+    } finally {
+      setSavingIntro(false);
     }
   };
 
@@ -318,6 +354,26 @@ const TeamEditor = ({ auth }: TeamEditorProps) => {
 
   return (
     <div>
+      <Card title="Team Section Introduction" style={{ marginBottom: 24 }}>
+        <TextArea
+          value={introText}
+          onChange={(event) => setIntroText(event.target.value)}
+          rows={5}
+          maxLength={1000}
+          showCount
+          aria-label="Team section introduction"
+        />
+        <Button
+          type="primary"
+          icon={<SaveOutlined />}
+          loading={savingIntro}
+          onClick={handleSaveIntro}
+          style={{ marginTop: 16 }}
+        >
+          Save Introduction
+        </Button>
+      </Card>
+
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
         <h3>Team Members</h3>
         <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>

@@ -8,18 +8,11 @@ import TermsAndConditions from './pages-legacy/TermsAndConditions.tsx';
 import HelpCentre from './pages-legacy/HelpCentre.tsx';
 import FreeTrial from './pages-legacy/FreeTrial.tsx';
 import HelpChatWidget from './components/HelpChatWidget.tsx';
-import { usePageTracking } from './hooks/usePageTracking.ts';
 import './styles/global.css';
-
-function Analytics() {
-  usePageTracking();
-  return null;
-}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Analytics />
       <HelpChatWidget />
       <Routes>
         <Route path="/" element={<App />} />

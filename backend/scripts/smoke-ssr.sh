@@ -39,12 +39,23 @@ check_route "/"                       '<h1'
 check_route "/free-trial"             '<h1'
 check_route "/help"                   '<h1'
 check_route "/privacy-policy"         '<h1'
+check_route "/cookie-policy"          'Cookie and tracking policy'
 check_route "/terms-and-conditions"   '<h1'
 
 echo
 echo "── JSON-LD on home ──"
 HOME_BODY=$(curl -sS "${BASE}/")
 grep -q '"@type":"Organization"' <<< "$HOME_BODY" && echo "✅ Organization JSON-LD" || (echo "❌ Organization JSON-LD missing"; exit 1)
+
+echo
+echo "── Team copy ──"
+EXPECTED_TEAM_COPY='The team brings clinical, governance, scientific and technical expertise to one shared goal.'
+OLD_TEAM_COPY='The team brings clinical, governance, legal, scientific and technical expertise to one shared goal.'
+grep -Fq "$EXPECTED_TEAM_COPY" <<< "$HOME_BODY" && echo "✅ Team copy omits legal" || (echo "❌ Updated team copy missing"; exit 1)
+if grep -Fq "$OLD_TEAM_COPY" <<< "$HOME_BODY"; then
+  echo "❌ Old team copy is still present"
+  exit 1
+fi
 
 echo
 echo "── Admin SPA (shell only is correct) ──"

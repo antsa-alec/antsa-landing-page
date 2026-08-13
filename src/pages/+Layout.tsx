@@ -3,6 +3,7 @@ import AppHeader from '../components/AppHeader';
 import AppFooter from '../components/AppFooter';
 import HelpChatWidget from '../components/HelpChatWidget';
 import ClientOnly from '../ssr/ClientOnly';
+import ConsentManager from '../privacy/ConsentManager';
 import type { ChromeData } from './chrome-data';
 // Imported here (renders on every route) so the chrome's dc-* classes, the
 // anchor reset and Poppins are present on ALL pages in the production CSS split,
@@ -36,6 +37,7 @@ export default function Layout({
       <AppFooter chrome={chrome} />
       <ClientOnly>
         <HelpChatWidget />
+        <ConsentManager />
       </ClientOnly>
     </div>
   );

@@ -13,6 +13,7 @@ import stripePricingRoutes from './routes/stripe-pricing.js';
 import helpRoutes from './routes/help.js';
 import contactRoutes from './routes/contact.js';
 import seoRoutes, { pingIndexNow } from './routes/seo.js';
+import consentEventRoutes from './routes/consent-events.js';
 
 // ES Module __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
@@ -91,6 +92,7 @@ app.use('/api/documents', documentRoutes);
 app.use('/api/stripe', stripePricingRoutes);
 app.use('/api/content/help', helpRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/consent-events', consentEventRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -177,4 +179,3 @@ app.listen(PORT, () => {
 });
 
 export default app;
-
