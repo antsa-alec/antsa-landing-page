@@ -1,14 +1,19 @@
 import { useState } from 'react';
 
 /**
- * FAQ — "Common questions". Single-open accordion.
- * CMS-driven: reads section.faqs (top-level faq_items array) and falls back to
- * the approved design set.
+ * The homepage preview and full FAQ page share the same live CMS content.
  */
 
 type FAQ = { id: string; question: string; answer: string };
 
-type FAQProps = { section?: { faqs?: Array<Record<string, unknown>> } };
+export type FAQContent = {
+  content?: Record<string, unknown>;
+  faqs?: Array<Record<string, unknown>>;
+};
+
+type FAQProps = { section?: FAQContent; preview?: boolean; standalone?: boolean };
+
+export const FAQ_PREVIEW_COUNT = 3;
 
 const DEFAULT_FAQS: FAQ[] = [
   { id: '1', question: 'Is ANTSA a replacement for therapy?', answer: 'No. ANTSA® is a clinical support platform that helps extend structured care between sessions. It does not replace therapy, diagnose conditions, make clinical decisions or operate independently of practitioner oversight.' },
@@ -20,9 +25,9 @@ const DEFAULT_FAQS: FAQ[] = [
   { id: '7', question: 'Is client data secure?', answer: 'Yes. ANTSA® is hosted on Australian servers and designed with privacy, encryption, two-factor authentication and consent-based sharing. It is aligned with the Australian Privacy Principles, HIPAA and GDPR, with ISO 27001 certification in progress.' },
 ];
 
-export default function FAQSection({ section }: FAQProps) {
+export function getFAQContent(section?: FAQContent, preview = false) {
   const rawFaqs = section?.faqs;
-  const faqs: FAQ[] = Array.isArray(rawFaqs) && rawFaqs.length
+  const faqs: FAQ[] = Array.isArray(rawFaqs)
     ? rawFaqs.map((item, i) => ({
         id: String((item.id as string | number | undefined) ?? i),
         question: String(item.question ?? ''),
@@ -30,23 +35,45 @@ export default function FAQSection({ section }: FAQProps) {
       }))
     : DEFAULT_FAQS;
 
+  return {
+    title: String(section?.content?.title ?? 'Common questions'),
+    subtitle: String(section?.content?.subtitle ?? ''),
+    badge: String(section?.content?.badge ?? 'FAQ'),
+    faqs: preview ? faqs.slice(0, FAQ_PREVIEW_COUNT) : faqs,
+  };
+}
+
+export default function FAQSection({ section, preview = false, standalone = false }: FAQProps) {
+  const { title, subtitle, badge, faqs } = getFAQContent(section, preview);
+  const Heading = standalone ? 'h1' : 'h2';
+
   const [open, setOpen] = useState<number | null>(0);
 
   return (
     <section id="faq" style={{ background: '#fff', padding: '88px 0' }}>
       <div className="dc-container">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: 48 }}>
-          <div className="dc-eyebrow" style={{ marginBottom: 12 }}>FAQ</div>
-          <h2 className="dc-h2">Common questions</h2>
+          <div className="dc-eyebrow" style={{ marginBottom: 12 }}>{badge}</div>
+          <Heading className="dc-h2">{title}</Heading>
+          {subtitle && <p style={{ color: '#5B6472', marginTop: 16 }}>{subtitle}</p>}
         </div>
         <div style={{ maxWidth: 800, margin: '0 auto' }}>
           {faqs.map((f, i) => {
             const isOpen = i === open;
             return (
               <div key={f.id} style={{ background: '#fff', border: '1px solid #E6E9EE', borderRadius: 14, marginBottom: 12, overflow: 'hidden' }}>
-                <div
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${f.id}`}
                   onClick={() => setOpen(isOpen ? null : i)}
                   style={{
+                    width: '100%',
+                    border: 0,
+                    background: 'none',
+                    color: 'inherit',
+                    fontFamily: 'inherit',
+                    textAlign: 'left',
                     padding: '18px 22px',
                     fontWeight: 600,
                     fontSize: 17,
@@ -71,13 +98,16 @@ export default function FAQSection({ section }: FAQProps) {
                       <polyline points="6 9 12 15 18 9" />
                     </svg>
                   </span>
-                </div>
-                {isOpen && (
-                  <div style={{ padding: '0 22px 20px', fontSize: 16, color: '#5B6472', lineHeight: 1.6 }}>{f.answer}</div>
-                )}
+                </button>
+                <div id={`faq-answer-${f.id}`} hidden={!isOpen} style={{ padding: '0 22px 20px', fontSize: 16, color: '#5B6472', lineHeight: 1.6 }}>{f.answer}</div>
               </div>
             );
           })}
+          {preview && (
+            <div style={{ marginTop: 28, textAlign: 'center' }}>
+              <a href="/faq" className="dc-btn dc-btn-secondary">View all frequently asked questions</a>
+            </div>
+          )}
         </div>
       </div>
     </section>

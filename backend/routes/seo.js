@@ -10,6 +10,7 @@ const STATIC_ROUTES = [
   { path: '/free-trial', title: 'Free Trial' },
   { path: '/governance', title: 'Clinical Governance' },
   { path: '/help', title: 'Help Centre' },
+  { path: '/faq', title: 'Frequently Asked Questions' },
   { path: '/privacy-policy', title: 'Privacy Policy' },
   { path: '/cookie-policy', title: 'Cookie and Tracking Policy' },
   { path: '/terms-and-conditions', title: 'Terms and Conditions' },
@@ -25,6 +26,7 @@ function getSiteLastmod() {
     const rows = [
       db.prepare('SELECT MAX(updated_at) AS v FROM content').get(),
       db.prepare('SELECT MAX(updated_at) AS v FROM sections').get(),
+      db.prepare('SELECT MAX(updated_at) AS v FROM faq_items').get(),
     ];
     const times = rows.map((r) => r?.v).filter(Boolean).map((d) => new Date(d).getTime());
     return times.length ? new Date(Math.max(...times)) : new Date();

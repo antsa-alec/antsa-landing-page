@@ -96,7 +96,7 @@ function App({ sections = [] }: { sections?: SectionRow[] }) {
           <PricingSection section={byName.pricing} />
         </ClientOnly>
       </Section>
-      <Section name="faq"><FAQSection section={byName.faq} /></Section>
+      <Section name="faq"><FAQSection section={byName.faq} preview /></Section>
       <Section name="for_clinics"><ClinicsCTA /></Section>
       <Section name="compliance"><ComplianceBadgesStrip section={byName.compliance} /></Section>
       <Section name="disclaimer"><ClinicalDisclaimer /></Section>
