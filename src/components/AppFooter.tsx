@@ -133,6 +133,7 @@ export default function AppFooter({ chrome }: { chrome?: ChromeData }) {
                 ['Clinical governance', '/governance'],
                 ['Free trial', '/free-trial'],
                 ['Help centre', '/help'],
+                ['FAQ', '/faq'],
                 ['Privacy policy', '/privacy-policy'],
                 ['Cookie & tracking policy', '/cookie-policy'],
                 ['Terms & conditions', '/terms-and-conditions'],
